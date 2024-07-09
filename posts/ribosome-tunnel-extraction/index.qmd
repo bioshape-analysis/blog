@@ -1,0 +1,307 @@
+---
+title: "Ribosome Exit Tunnel Geometry"
+subtitle: "Extraction Protocol via Space Partioning and DBSCAN"
+
+engine: "jupyter"
+author:
+  - name: "Artem Kushner" 
+    email: "rtkushner@gmail.com"
+    affiliations:
+      - name: KDD Group
+        url: "https://rtviii.xyz/"
+
+  - name: "Khanh Dao Duc" 
+    email: "kdd@math.ubc.ca"
+    affiliations:
+      - name: Department of Mathematics, UBC
+        url: "https://www.math.ubc.ca/"
+      - name: Department of Computer Science, UBC
+        url: "https://www.cs.ubc.ca/"
+      - name: Department of Zoology, UBC
+        url: "https://zoology.ubc.ca/"
+
+date: "29 June 2024"
+categories: [biology, bioinformatics, surface-reconstruction, computer graphics]    
+
+callout-icon: false
+# format:
+#   pdf:
+#     include-in-header:
+#       text: |
+#         \usepackage{amsmath}
+
+execute:
+  echo: false
+  freeze: auto
+  pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
+
+---
+
+
+
+
+
+
+## The ribosome and its exit tunnel
+
+The ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.
+
+It is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the __Peptidyl Transferse Center__, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time. 
+
+The built protein exits the ribosome through a channel known as the __Ribosome Exit Tunnel__.  The interior geometry of the tunnel influences the escape speed of proteins and can be blocked by ligands and antibiotics making it a crucial site for all processes of life.
+
+_Here, we are interested in obtaining a representation of the Exit Tunel's geometry and describe a protocol for doing so._
+
+::: {layout="[[57,70] ]"}
+![PDB 8OJ0. The structure of human ribosome.](./data/8OJ0.gif){fig-alt=""}
+
+![The locations of the ribosome exit tunnel and the PTC.](./data/ptc_and_tunnel_illustration.png){fig-alt=""}
+:::
+
+
+
+
+## Tunnel Geometry Extraction: Visual Protocol#
+
+
+![Schematic representation of the tunnel geometry surface reconstruction ](./data/visual_protocol.png){fig-alt=""}
+
+
+
+## 0. Mole-based centerline extraction
+
+
+One representation of the ribosome exit tunnel can be obtained via the [ MOLE ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3765717/) software, which is an implementation of the "probe"-based family of algorithms popular for extracting general biomolecular cavities and pores. This step is non-essential if other means of extracting the intial pointcloud are available, but for convenience this will be our starting point.
+
+A probe is a sphere of varying radius which is "rolled" by the algorithm against the walls of a given molecule tracing out a path and a radius.
+
+_The algorithm yields an array of varying x,y,z coordinates (henceforth, the $C$~$x,y,z$~) and radius R at each coordinate (henceforth, the $R$~$x,y,z$~)_
+
+:::{layout="[[1,1]]"}
+
+![](./data/mole3.png){width=50%}
+
+![](./data/mole1.png){width=50%}
+:::
+
+## 1. Bounding Box 
+
+This step captures the subset of atoms enclosing the cavity of interest (the tunnel) from the original structure.
+
+:::{.callout-note appearance="simple" collapse="true"}
+
+## Parameters
+
+$R_{\mathbf{expansion}}$: define the radius of expansion to be the value added to $R_{x,y,z}$ of the centerline at every $C_{x,y,z}$
+
+$B$: The smallest bounding box containing all of the coordinates formed by the expanded centerline 
+
+$R_{\mathbf{vdw}}$: Van der Waals radius of an atom in Ångstroms. Default to the value of 2.
+
+$pc_{B}$: The pointcloud formed by applying $B$ to the original structure and widening each atom coordinate to include points withing a sphere with radius $R_{\mathbf{vdw}}$
+
+:::
+
+1. For each $C_{x,y,z}$, capture atoms whose center belongs to the sphere formed by $R_{x,y,z} + R_{\mathbf{expansion}}$, filter out duplicates. Call this coordinate set the ${\textit{Centerline Expansion Atoms}}$.
+
+2. Calculate the coordinates of the bounding box $B$ around the $\text{\textit{Centerline Expansion Atoms}}$.
+
+3. Apply $B$ to the initial structure to extract all atoms that belong to $B$. Call this $\mathbf{pc^{B}}$.
+
+4. Widen each coordinate (atom center) $C_{x,y,z}^{pc_{B}}$ inside $pc_{B}$ by $R_{vdw}$ to include a more realistic representation of atoms. This is done by creating a voxel subgrid whose bounding cube is between $(C_{x}^{pc_{B}}-R_{vdw},C_{y}^{pc_{B}}-R_{vdw},C_{z}^{pc_{B}}-R_{vdw})$ and $(C_{x}^{pc_{B}}+R_{vdw},C_{y}^{pc_{B}}+R_{vdw},C_{z}^{pc_{B}}+R_{vdw})$, a cube of indices centered at $C_{x,y,z}^{pc_{B}}$. The resultant coordinate set is $\mathbf{pc_{B}}$.
+
+5. Anchor the coordinates of the $pc_{B}$ to the origin by subtracting the $\mu(pc_{B})$ of the coordinate set from each $C_{x,y,z}^{pc_{B}}$ and then shifting each $C_{x,y,z}^{pc_{B}}$ upwards by $|\min(x,y,z)|$. This is done to reduce the amount of empty voxel cells in the following steps, reduce compute. 
+
+## 2. Voxelization
+
+
+1. Assume voxel size of $1$ in correspondence to the units of the dataset, Angstroms in our case. (Alternatively, atom-to-sphere expansion in step **1. Bounding Box** should be accordingly scaled). 
+
+2. Create a boolean voxel grid with the dimensions of the ($pc_{B}$ + $1$), call this the $Grid_{index}$ (as opposed to $Grid_{coordinate}$)
+
+3. Set voxels at _index_ [$C_{x},C_{y},C_{z}$] for every $C$ in  $pc_{B}$ in the $Grid_{index}$ to $1$. All other voxel are $0$.
+
+
+## 3. Inversion
+
+Invert the $Grid_{index}$ to create a representation of the _"empty space"_ inside the exit tunnel. 
+
+## 4. DBSCAN
+
+The aim in this step is to extract only the voxels belonging to the "empty space" inside the tunnel and no other. Given that we have a good idea of the Van der Waals radii of the atoms that constitute the walls and have control over the size of the voxel in the $Grid_{index}$, one method that we can apply is DBSCAN. 
+
+DBSCAN is a density-based clustering non-parametric algorithm that is akin to UMAP/t-SNE. 
+
+:::{.callout-note appearance="simple" collapse="true"}
+
+## DBSCAN Parameters
+
+$eps$: The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
+
+$min\_nbrs$ ($min\_samples$): If $min\_samples$ is set to a higher value, DBSCAN will find denser clusters, whereas if it is set to a lower value, the found clusters will be more sparse. The metric to use when calculating distance between instances in a feature array.
+
+$metric$: The metric to use when calculating distance between instances in a feature array. We use the Euclidian distance.
+:::
+
+
+
+```{python}
+#| echo: false
+import pickle
+import pyvista as pv
+from matplotlib import pyplot as plt
+import numpy as np
+import warnings
+
+warnings.filterwarnings("ignore")
+FONT="courier"
+# eps      = 5.5
+# min_nbrs = 600
+eps      = 3
+min_nbrs = 123
+
+dbscan_cluster_dict = pickle.load(open("./data/dbscan_cluster_dict.pkl", "rb"))
+plotter               = pv.Plotter()
+plotter.subplot(0,0)
+
+clusters_palette = dict(zip(range(-1, 60), plt.cm.terrain(np.linspace(0, 1, 60))))
+for k, v in clusters_palette.items():
+    clusters_palette[k] = [*v[:3], 0.5]
+
+combined_cluster_colors = []
+combined_cluster_points = []
+
+for dbscan_label, coordinates in dbscan_cluster_dict.items():
+    combined_cluster_points.extend(coordinates)
+    combined_cluster_colors.extend( [clusters_palette[( dbscan_label * 5 )%len(clusters_palette)]   if dbscan_label != -1 else [0, 0, 0, 0.1]] * len(coordinates) )
+
+ptcloud_all_clusters         = pv.PolyData(combined_cluster_points)
+ptcloud_all_clusters["rgba"] = combined_cluster_colors
+
+plotter.add_mesh(ptcloud_all_clusters, scalars="rgba", rgb=True, show_scalar_bar=False)
+
+plotter.add_text('DBSCAN Params\neps: {}\nmin_nbrs: {}'.format(eps, min_nbrs), position='upper_right', font_size=12, shadow=True, font=FONT, color='black')
+plotter.add_text('DBSCAN Clusters', position='upper_left', font_size=14, shadow=True, font=FONT, color='black')
+plotter.show()
+```
+
+## 5. Interior Surface via Delaunay Triangulation
+
+The aim of this step is to extract a point cloud containing only the voxels on the surface of convex hull enclosing the interior space of the tunnel.
+
+:::{.callout-note appearance="simple" collapse="true"}
+
+## Delaunay 3D parameters
+
+
+$alpha$: Controls the smoothness of the constructed alpha-shape. For a non-zero $alpha$ value, only vertices, edges, faces, or tetrahedra contained within the circumsphere (of radius $alpha$) will be output. Otherwise, only tetrahedra will be output.
+
+$tol$: Tolerance to control discarding of closely spaced points. This tolerance is specified as a fraction of the diagonal length of the bounding box of the points.
+
+$offset$: Multiplier to control the size of the initial, bounding Delaunay triangulation.
+
+:::
+
+## 6. Normal Estimation & Orientation 
+
+The aim of this step is to prepare the convex hull point cloud for the surface reconstruction algorithm. For the final mesh to be smooth and free of artifacts, this step has to assign a normal vector point outwards at each point of the convex hull thus defining a clear boundary between "inner" and "outer" space vis-a-vis the surface.
+
+One popular method for normal estimation is a KDTree search and for smoothing their orientations a collection of tangent planes is used.
+
+:::{.callout-note appearance="simple" collapse="true"}
+
+## KD Tree Search and Tangent Plane Orientation
+
+$kdtree\_radius$: 
+
+$kdtree\_max\_nn$:
+
+$tangent\_planes\_n$:
+
+:::
+
+
+## 7. Surface Reconstruction
+
+```{python}
+#| echo: false
+"""
+@translation_vectors is a np.ndarray of shape (2,3) where
+    - the first row is the means of the coordinate set
+    - the second row is the deviations of the normalized coordinate set
+    (to be used to reverse the normalization process or to travel to this coordinate frame)
+"""
+import pyvista as pv
+import json
+import numpy as np
+
+FONT                  = 'courier'
+CHAIN_PT_SIZE         = 8
+PTC_PT_SIZE           = 20
+CHAIN_LANDMARK_COLORS = ["purple","orange", "cornflowerblue", "cornsilk", "crimson", "darkblue", "darkcyan", "darkgoldenrod", "darkgray", "darkgreen", "darkkhaki", "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred", "rebeccapurple", "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen"]
+
+def retrieve_ptc_and_chain_atoms(rcsb_id):
+        with open( "./data/4UG0_tunnel_atoms_bbox.json", "r", ) as infile:
+            bbox_atoms: list[dict] = json.load(infile)
+            _atom_centers       = np.array(list(map(lambda x: x["coord"], bbox_atoms)))
+            _vdw_radii          = np.array(list(map(lambda x: x["vdw_radius"], bbox_atoms)))
+
+
+        with open( "./data/4UG0_PTC.json", "r", ) as infile:
+            ptc_data = json.load(infile)
+
+        atom_coordinates_by_chain: dict[str, list] = {}
+        for atom in bbox_atoms:
+            if len(atom["chain_nomenclature"]) < 1:
+                # print( "atom ", atom, "has no chain nomenclature", atom["chain_nomenclature"] )
+                continue
+            if atom["chain_nomenclature"][0] not in atom_coordinates_by_chain:
+                atom_coordinates_by_chain[atom["chain_nomenclature"][0]] = []
+            atom_coordinates_by_chain[atom["chain_nomenclature"][0]].extend([atom["coord"]])
+
+        ptc_midpoint = np.array(ptc_data["midpoint_coordinates"])
+
+        return ptc_midpoint, atom_coordinates_by_chain
+
+# src_taxid = RibosomeOps(rcsb_id).get_taxids()[0][0]
+rcsb_id = "4UG0"
+src_taxid = 9606
+taxname   = "Homo sapiens"
+
+ptc_midpoint,atom_coordinates_by_chain = retrieve_ptc_and_chain_atoms(rcsb_id)
+poisson_recon = "./data/4UG0_poisson_recon_ascii.ply"
+mesh_   = pv.read(poisson_recon)
+plotter = pv.Plotter()
+plotter.add_mesh(mesh_, opacity=1)
+
+
+for i, ( chain_name, coords ) in enumerate(atom_coordinates_by_chain.items()):
+    plotter.add_points(
+            np.array(coords),
+          point_size               = 8 if chain_name in ["eL39","uL4","uL22", "uL23"] else 2 if "rRNA" in chain_name else 4 ,
+          color                    =  'gray' if "rRNA" in chain_name else "cyan" if chain_name == "eL39" else 'pink' if chain_name=='uL23' else "lightgreen" if chain_name == "uL4" else "gold" if chain_name =="uL22" else CHAIN_LANDMARK_COLORS[i],
+          opacity                  = 0.1 if chain_name not in ["eL39","uL4","uL22", 'uL23'] else 1 ,
+          render_points_as_spheres = True ,
+    )
+
+for i, (label, color) in enumerate([( 'eL39','cyan' ),( 'uL4','lightgreen' ),( 'uL22','gold' )]):
+    offset   = i * 50  # Adjust the offset as needed
+    position = (20, 200 - offset, 0)
+    plotter.add_text( label, position=position, font_size=20, font=FONT,color=color, shadow=True )
+
+plotter.add_points( 
+    # move_cords_to_normalized_cord_frame( grid_dimensions, mean_abs_vectors, np.array([ptc_midpoint]) ),
+    np.array([ptc_midpoint]),
+                    point_size=PTC_PT_SIZE, color="red", render_points_as_spheres=True )
+
+#!--- Labels ----
+plotter.add_text('RCSB_ID:{}'.format(rcsb_id), position='upper_right', font_size=14, shadow=True, font=FONT, color='black')
+# plotter.add_text('eps: {} \nmin_nbrs: {}'.format(eps, min_nbrs), position='upper_left', font_size=8, shadow=True, font=FONT, color='black')
+plotter.add_text('Tunnel Mesh Volume: {}'.format(round(mesh_.volume, 3)), position='lower_left', font_size=8, shadow=True, font=FONT, color='black')
+plotter.add_text('{}'.format(taxname), position='lower_right', font_size=8, shadow=True, font=FONT, color='black') 
+
+
+plotter.show(auto_close=False)
+
+
+```

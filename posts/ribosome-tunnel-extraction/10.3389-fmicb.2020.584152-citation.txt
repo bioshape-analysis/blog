@@ -1,0 +1,17 @@
+AUTHOR=Schmitt Emmanuelle , Coureux Pierre-Damien , Kazan Ramy , Bourgeois Gabrielle , Lazennec-Schurdevin Christine , Mechulam Yves 
+
+TITLE=Recent Advances in Archaeal Translation Initiation
+
+JOURNAL=Frontiers in Microbiology
+
+VOLUME=11
+
+YEAR=2020
+
+URL=https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2020.584152
+
+DOI=10.3389/fmicb.2020.584152
+
+ISSN=1664-302X
+
+ABSTRACT=<p>Translation initiation (TI) allows accurate selection of the initiation codon on a messenger RNA (mRNA) and defines the reading frame. In all domains of life, translation initiation generally occurs within a macromolecular complex made up of the small ribosomal subunit, the mRNA, a specialized methionylated initiator tRNA, and translation initiation factors (IFs). Once the start codon is selected at the P site of the ribosome and the large subunit is associated, the IFs are released and a ribosome competent for elongation is formed. However, even if the general principles are the same in the three domains of life, the molecular mechanisms are different in bacteria, eukaryotes, and archaea and may also vary depending on the mRNA. Because TI mechanisms have evolved lately, their studies bring important information about the evolutionary relationships between extant organisms. In this context, recent structural data on ribosomal complexes and genome-wide studies are particularly valuable. This review focuses on archaeal translation initiation highlighting its relationships with either the eukaryotic or the bacterial world. Eukaryotic features of the archaeal small ribosomal subunit are presented. Ribosome evolution and TI mechanisms diversity in archaeal branches are discussed. Next, the use of leaderless mRNAs and that of leadered mRNAs having Shine-Dalgarno sequences is analyzed. Finally, the current knowledge on TI mechanisms of SD-leadered and leaderless mRNAs is detailed.</p>

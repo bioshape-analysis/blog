@@ -1,6 +1,6 @@
 ---
-title: "Ribosome Exit Tunnel Geometry"
-subtitle: "Extraction Protocol via Space Partioning and DBSCAN"
+title: "3D tessellation of biomolecular cavity"
+subtitle: "Protocol for analyzing the ribosome exit tunnel"
 
 engine: "jupyter"
 author:
@@ -17,8 +17,6 @@ author:
         url: "https://www.math.ubc.ca/"
       - name: Department of Computer Science, UBC
         url: "https://www.cs.ubc.ca/"
-      - name: Department of Zoology, UBC
-        url: "https://zoology.ubc.ca/"
 
 date: "29 June 2024"
 categories: [biology, bioinformatics, surface-reconstruction, computer graphics]    
@@ -43,6 +41,8 @@ execute:
 
 
 ## The ribosome and its exit tunnel
+
+We present a protocol for extracting a representation of the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.
 
 The ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.
 

@@ -10,7 +10,7 @@
 <meta name="author" content="Khanh Dao Duc">
 <meta name="dcterms.date" content="2024-06-29">
 
-<title>Ribosome Exit Tunnel Geometry – bioshape-analysis</title>
+<title>3D tessellation of biomolecular cavity – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -26,7 +26,7 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -69,10 +69,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -149,8 +145,8 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Ribosome Exit Tunnel Geometry</h1>
-            <p class="subtitle lead">Extraction Protocol via Space Partioning and DBSCAN</p>
+      <h1 class="title">3D tessellation of biomolecular cavity</h1>
+            <p class="subtitle lead">Protocol for analyzing the ribosome exit tunnel</p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">biology</div>
                 <div class="quarto-category">bioinformatics</div>
@@ -188,11 +184,6 @@ window.Quarto = {
               Department of Computer Science, UBC
               </a>
             </p>
-          <p class="affiliation">
-              <a href="https://zoology.ubc.ca/">
-              Department of Zoology, UBC
-              </a>
-            </p>
         </div>
     </div>
 
@@ -223,6 +214,7 @@ window.Quarto = {
 
 <section id="the-ribosome-and-its-exit-tunnel" class="level2">
 <h2 class="anchored" data-anchor-id="the-ribosome-and-its-exit-tunnel">The ribosome and its exit tunnel</h2>
+<p>We present a protocol for extracting a representation of the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.</p>
 <p>The ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.</p>
 <p>It is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the <strong>Peptidyl Transferse Center</strong>, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time.</p>
 <p>The built protein exits the ribosome through a channel known as the <strong>Ribosome Exit Tunnel</strong>. The interior geometry of the tunnel influences the escape speed of proteins and can be blocked by ligands and antibiotics making it a crucial site for all processes of life.</p>
@@ -343,11 +335,13 @@ DBSCAN Parameters
 </div>
 </div>
 </div>
-<div id="508fd488" class="cell" data-execution_count="1">
+<div id="5368406d" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e7e8249d31fe4c2d845e7a874e31a2f9","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-2-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -398,11 +392,13 @@ KD Tree Search and Tangent Plane Orientation
 </section>
 <section id="surface-reconstruction" class="level2">
 <h2 class="anchored" data-anchor-id="surface-reconstruction">7. Surface Reconstruction</h2>
-<div id="e93d917b" class="cell" data-execution_count="2">
+<div id="8bd6da3b" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"54b1b214b7a044328efe07a4f8569764","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 
@@ -410,9 +406,6 @@ KD Tree Search and Tangent Plane Orientation
 </section>
 
 </main> <!-- /main -->
-<script type="application/vnd.jupyter.widget-state+json">
-{"state":{"370f51e9f23d49b38900063103a419e1":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"3cf7ec903b9344da900df270b13f4988":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"54b1b214b7a044328efe07a4f8569764":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_3cf7ec903b9344da900df270b13f4988","placeholder":"​","style":"IPY_MODEL_ea009f86796c41ada25c5721b310741f","tabbable":null,"tooltip":null,"value":"<iframe src=\"http://localhost:37793/index.html?ui=P_0x726733641890_1&reconnect=auto\" class=\"pyvista\" style=\"width: 99%; height: 600px; border: 1px solid rgb(221,221,221);\"></iframe>"}},"6639a1b7a5934e70b919194635bcf7ea":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"e7e8249d31fe4c2d845e7a874e31a2f9":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_370f51e9f23d49b38900063103a419e1","placeholder":"​","style":"IPY_MODEL_6639a1b7a5934e70b919194635bcf7ea","tabbable":null,"tooltip":null,"value":"<iframe src=\"http://localhost:37793/index.html?ui=P_0x7266fb297cd0_0&reconnect=auto\" class=\"pyvista\" style=\"width: 99%; height: 600px; border: 1px solid rgb(221,221,221);\"></iframe>"}},"ea009f86796c41ada25c5721b310741f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}}},"version_major":2,"version_minor":0}
-</script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

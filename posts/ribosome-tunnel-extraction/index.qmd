@@ -40,7 +40,7 @@ execute:
 
 
 
-## The ribosome and its exit tunnel
+## The ribosome exit tunnel
 
 We present a protocol for extracting a representation of the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.
 

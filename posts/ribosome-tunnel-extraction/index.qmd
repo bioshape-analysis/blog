@@ -1,7 +1,8 @@
 ---
 title: "3D tessellation of biomolecular cavity"
 subtitle: "Protocol for analyzing the ribosome exit tunnel"
-
+bibliography: references.bib
+csl: nature.csl
 engine: "jupyter"
 author:
   - name: "Artem Kushner" 
@@ -42,7 +43,7 @@ execute:
 
 ## The ribosome and its exit tunnel
 
-We present a protocol for extracting a representation of the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.
+We present a protocol for representing the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.
 
 The ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.
 

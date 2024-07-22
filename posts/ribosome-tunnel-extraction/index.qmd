@@ -1,7 +1,7 @@
 ---
 title: "3D tessellation of biomolecular cavity"
 subtitle: "Protocol for analyzing the ribosome exit tunnel"
-bibliography: references.bib
+bibliography: "references.bib"
 csl: nature.csl
 engine: "jupyter"
 author:
@@ -45,7 +45,7 @@ execute:
 
 We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.
 
-We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [dao2018impact][dao2019differences]
+We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [@dao2018impact; @dao2019differences]
 
 
 <!--
@@ -59,8 +59,9 @@ _Here, we are interested in obtaining a representation of the Exit Tunel's geome
 
 ::: {layout="[[57,70] ]"}
 ![PDB 8OJ0. The structure of human ribosome.](./data/8OJ0.gif){fig-alt=""}
-
+<!--
 ![The locations of the ribosome exit tunnel and the PTC.](./data/ptc_and_tunnel_illustration.png){fig-alt=""}
+-->
 :::
 
 

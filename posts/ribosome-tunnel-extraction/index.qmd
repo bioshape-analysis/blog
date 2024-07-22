@@ -45,7 +45,7 @@ execute:
 
 We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.
 
-We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [@dao2018impact; @dao2019differences]
+We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works [@dao2018impact; @dao2019differences]. The protocol was also design to refine the output obtained from MOLE software [@sehnal2013mole] (see Figure XXX)
 
 
 <!--
@@ -57,8 +57,13 @@ _Here, we are interested in obtaining a representation of the Exit Tunel's geome
 -->
 
 
-::: {layout="[[57,70] ]"}
-![PDB 8OJ0. The structure of human ribosome.](./data/8OJ0.gif){fig-alt=""}
+::: {#fig-intro layout="[1,1]" layout-valign="bottom"}
+
+![Structure of the human ribosome (PDB ID: 8OJ0).](./data/8OJ0.gif){#fig-ribo}
+
+![The ribosome exit tunnel (figure from Dao Duc et al. [@dao2019differences])](./data/ptc_and_tunnel_illustration.png){#fig-ribo2}
+
+The ribosome and the exit tunnel extracted using Mole software [@sehnal2013mole]
 <!--
 ![The locations of the ribosome exit tunnel and the PTC.](./data/ptc_and_tunnel_illustration.png){fig-alt=""}
 -->
@@ -73,7 +78,7 @@ _Here, we are interested in obtaining a representation of the Exit Tunel's geome
 ![Schematic representation of the tunnel geometry surface reconstruction ](./data/visual_protocol.png){fig-alt=""}
 
 
-
+<!--
 ## 0. Mole-based centerline extraction
 
 
@@ -89,6 +94,7 @@ _The algorithm yields an array of varying x,y,z coordinates (henceforth, the $C$
 
 ![](./data/mole1.png){width=50%}
 :::
+-->
 
 ## 1. Bounding Box 
 

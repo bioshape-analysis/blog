@@ -1,0 +1,49 @@
+---
+title: "Extracting cell geometry from AFM"
+subtitle: "Part 1: Static analysis"
+
+engine: "jupyter"
+author:
+  - name: "Clément Soubrier" 
+    email: "c.soubrier @math.ubc.ca"
+    affiliations:
+      - name: KDD Group
+        url: "https://rtviii.xyz/"
+
+  - name: "Khanh Dao Duc" 
+    email: "kdd@math.ubc.ca"
+    affiliations:
+      - name: Department of Mathematics, UBC
+        url: "https://www.math.ubc.ca/"
+      - name: Department of Computer Science, UBC
+        url: "https://www.cs.ubc.ca/"
+
+date: "July 16 2024"
+categories: [biology, bioinformatics]    
+
+callout-icon: false
+# format:
+#   pdf:
+#     include-in-header:
+#       text: |
+#         \usepackage{amsmath}
+
+execute:
+  echo: false
+  freeze: auto
+  pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
+
+---
+
+
+
+
+
+
+## Biological context
+
+## Raw image pre-processing
+
+## Segmentation
+
+## Centerline

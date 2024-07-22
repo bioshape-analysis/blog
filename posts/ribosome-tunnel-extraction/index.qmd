@@ -45,13 +45,16 @@ execute:
 
 We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.
 
-The ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.
+We apply and illustrate the protocol on a ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in the following references 
 
+<!--
 It is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the __Peptidyl Transferse Center__, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time. 
 
 The built protein exits the ribosome through a channel known as the __Ribosome Exit Tunnel__.  The interior geometry of the tunnel influences the escape speed of proteins and can be blocked by ligands and antibiotics making it a crucial site for all processes of life.
 
 _Here, we are interested in obtaining a representation of the Exit Tunel's geometry and describe a protocol for doing so._
+-->
+
 
 ::: {layout="[[57,70] ]"}
 ![PDB 8OJ0. The structure of human ribosome.](./data/8OJ0.gif){fig-alt=""}
@@ -62,7 +65,7 @@ _Here, we are interested in obtaining a representation of the Exit Tunel's geome
 
 
 
-## Tunnel Geometry Extraction: Visual Protocol#
+## Visual Protocol#
 
 
 ![Schematic representation of the tunnel geometry surface reconstruction ](./data/visual_protocol.png){fig-alt=""}

@@ -45,7 +45,8 @@ execute:
 
 We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.
 
-We apply and illustrate the protocol on a ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in the following references 
+We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [dao2018impact][dao2019differences]
+
 
 <!--
 It is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the __Peptidyl Transferse Center__, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time. 
@@ -309,3 +310,5 @@ plotter.show(auto_close=False)
 
 
 ```
+
+## References

@@ -6,11 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Artem Kushner">
+<meta name="author" content="Clément Soubrier">
 <meta name="author" content="Khanh Dao Duc">
-<meta name="dcterms.date" content="2024-06-29">
+<meta name="dcterms.date" content="2024-07-16">
 
-<title>3D tessellation of biomolecular cavity – bioshape-analysis</title>
+<title>Extracting cell geometry from AFM – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,35 +70,6 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -145,13 +116,11 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">3D tessellation of biomolecular cavity</h1>
-            <p class="subtitle lead">Protocol for analyzing the ribosome exit tunnel</p>
+      <h1 class="title">Extracting cell geometry from AFM</h1>
+            <p class="subtitle lead">Part 1: Static analysis</p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">biology</div>
                 <div class="quarto-category">bioinformatics</div>
-                <div class="quarto-category">surface-reconstruction</div>
-                <div class="quarto-category">computer graphics</div>
               </div>
                   </div>
   </div>
@@ -161,7 +130,7 @@ window.Quarto = {
     <div class="quarto-title-meta-heading">Affiliations</div>
     
       <div class="quarto-title-meta-contents">
-      <p class="author">Artem Kushner <a href="mailto:rtkushner@gmail.com" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+      <p class="author">Clément Soubrier <a href="mailto:c.soubrier <span class=" citation"="" data-cites="math.ubc.ca">@math.ubc.ca" class="quarto-title-author-email"&gt;<i class="bi bi-envelope"></i></a> </p>
     </div>
     <div class="quarto-title-meta-contents">
           <p class="affiliation">
@@ -193,7 +162,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">June 29, 2024</p>
+        <p class="date">July 16, 2024</p>
       </div>
     </div>
     
@@ -212,202 +181,17 @@ window.Quarto = {
 
 
 
-<section id="summary-and-background" class="level2">
-<h2 class="anchored" data-anchor-id="summary-and-background">Summary and Background</h2>
-<p>We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.</p>
-<p>We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [dao2018impact][dao2019differences]</p>
-<!--
-It is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the __Peptidyl Transferse Center__, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time. 
-
-The built protein exits the ribosome through a channel known as the __Ribosome Exit Tunnel__.  The interior geometry of the tunnel influences the escape speed of proteins and can be blocked by ligands and antibiotics making it a crucial site for all processes of life.
-
-_Here, we are interested in obtaining a representation of the Exit Tunel's geometry and describe a protocol for doing so._
--->
-<div>
-
-</div>
-<div class="quarto-layout-panel" data-layout="[[57,70] ]">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 44.9%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./data/8OJ0.gif" class="img-fluid figure-img" alt=""></p>
-<figcaption>PDB 8OJ0. The structure of human ribosome.</figcaption>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 55.1%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./data/ptc_and_tunnel_illustration.png" class="img-fluid figure-img" alt=""></p>
-<figcaption>The locations of the ribosome exit tunnel and the PTC.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
+<section id="biological-context" class="level2">
+<h2 class="anchored" data-anchor-id="biological-context">Biological context</h2>
 </section>
-<section id="visual-protocol" class="level2">
-<h2 class="anchored" data-anchor-id="visual-protocol">Visual Protocol</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./data/visual_protocol.png" class="img-fluid figure-img" alt=""></p>
-<figcaption>Schematic representation of the tunnel geometry surface reconstruction</figcaption>
-</figure>
-</div>
+<section id="raw-image-pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="raw-image-pre-processing">Raw image pre-processing</h2>
 </section>
-<section id="mole-based-centerline-extraction" class="level2">
-<h2 class="anchored" data-anchor-id="mole-based-centerline-extraction">0. Mole-based centerline extraction</h2>
-<p>One representation of the ribosome exit tunnel can be obtained via the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3765717/">MOLE</a> software, which is an implementation of the “probe”-based family of algorithms popular for extracting general biomolecular cavities and pores. This step is non-essential if other means of extracting the intial pointcloud are available, but for convenience this will be our starting point.</p>
-<p>A probe is a sphere of varying radius which is “rolled” by the algorithm against the walls of a given molecule tracing out a path and a radius.</p>
-<p><em>The algorithm yields an array of varying x,y,z coordinates (henceforth, the <span class="math inline">\(C\)</span><sub><span class="math inline">\(x,y,z\)</span></sub>) and radius R at each coordinate (henceforth, the <span class="math inline">\(R\)</span><sub><span class="math inline">\(x,y,z\)</span></sub>)</em></p>
-<div>
-
-</div>
-<div class="quarto-layout-panel" data-layout="[[1,1]]">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="./data/mole3.png" class="img-fluid"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="./data/mole1.png" class="img-fluid"></p>
-</div>
-</div>
-</div>
+<section id="segmentation" class="level2">
+<h2 class="anchored" data-anchor-id="segmentation">Segmentation</h2>
 </section>
-<section id="bounding-box" class="level2">
-<h2 class="anchored" data-anchor-id="bounding-box">1. Bounding Box</h2>
-<p>This step captures the subset of atoms enclosing the cavity of interest (the tunnel) from the original structure.</p>
-<div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Parameters
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span class="math inline">\(R_{\mathbf{expansion}}\)</span>: define the radius of expansion to be the value added to <span class="math inline">\(R_{x,y,z}\)</span> of the centerline at every <span class="math inline">\(C_{x,y,z}\)</span></p>
-<p><span class="math inline">\(B\)</span>: The smallest bounding box containing all of the coordinates formed by the expanded centerline</p>
-<p><span class="math inline">\(R_{\mathbf{vdw}}\)</span>: Van der Waals radius of an atom in Ångstroms. Default to the value of 2.</p>
-<p><span class="math inline">\(pc_{B}\)</span>: The pointcloud formed by applying <span class="math inline">\(B\)</span> to the original structure and widening each atom coordinate to include points withing a sphere with radius <span class="math inline">\(R_{\mathbf{vdw}}\)</span></p>
-</div>
-</div>
-</div>
-<ol type="1">
-<li><p>For each <span class="math inline">\(C_{x,y,z}\)</span>, capture atoms whose center belongs to the sphere formed by <span class="math inline">\(R_{x,y,z} + R_{\mathbf{expansion}}\)</span>, filter out duplicates. Call this coordinate set the <span class="math inline">\({\textit{Centerline Expansion Atoms}}\)</span>.</p></li>
-<li><p>Calculate the coordinates of the bounding box <span class="math inline">\(B\)</span> around the <span class="math inline">\(\text{\textit{Centerline Expansion Atoms}}\)</span>.</p></li>
-<li><p>Apply <span class="math inline">\(B\)</span> to the initial structure to extract all atoms that belong to <span class="math inline">\(B\)</span>. Call this <span class="math inline">\(\mathbf{pc^{B}}\)</span>.</p></li>
-<li><p>Widen each coordinate (atom center) <span class="math inline">\(C_{x,y,z}^{pc_{B}}\)</span> inside <span class="math inline">\(pc_{B}\)</span> by <span class="math inline">\(R_{vdw}\)</span> to include a more realistic representation of atoms. This is done by creating a voxel subgrid whose bounding cube is between <span class="math inline">\((C_{x}^{pc_{B}}-R_{vdw},C_{y}^{pc_{B}}-R_{vdw},C_{z}^{pc_{B}}-R_{vdw})\)</span> and <span class="math inline">\((C_{x}^{pc_{B}}+R_{vdw},C_{y}^{pc_{B}}+R_{vdw},C_{z}^{pc_{B}}+R_{vdw})\)</span>, a cube of indices centered at <span class="math inline">\(C_{x,y,z}^{pc_{B}}\)</span>. The resultant coordinate set is <span class="math inline">\(\mathbf{pc_{B}}\)</span>.</p></li>
-<li><p>Anchor the coordinates of the <span class="math inline">\(pc_{B}\)</span> to the origin by subtracting the <span class="math inline">\(\mu(pc_{B})\)</span> of the coordinate set from each <span class="math inline">\(C_{x,y,z}^{pc_{B}}\)</span> and then shifting each <span class="math inline">\(C_{x,y,z}^{pc_{B}}\)</span> upwards by <span class="math inline">\(|\min(x,y,z)|\)</span>. This is done to reduce the amount of empty voxel cells in the following steps, reduce compute.</p></li>
-</ol>
-</section>
-<section id="voxelization" class="level2">
-<h2 class="anchored" data-anchor-id="voxelization">2. Voxelization</h2>
-<ol type="1">
-<li><p>Assume voxel size of <span class="math inline">\(1\)</span> in correspondence to the units of the dataset, Angstroms in our case. (Alternatively, atom-to-sphere expansion in step <strong>1. Bounding Box</strong> should be accordingly scaled).</p></li>
-<li><p>Create a boolean voxel grid with the dimensions of the (<span class="math inline">\(pc_{B}\)</span> + <span class="math inline">\(1\)</span>), call this the <span class="math inline">\(Grid_{index}\)</span> (as opposed to <span class="math inline">\(Grid_{coordinate}\)</span>)</p></li>
-<li><p>Set voxels at <em>index</em> [<span class="math inline">\(C_{x},C_{y},C_{z}\)</span>] for every <span class="math inline">\(C\)</span> in <span class="math inline">\(pc_{B}\)</span> in the <span class="math inline">\(Grid_{index}\)</span> to <span class="math inline">\(1\)</span>. All other voxel are <span class="math inline">\(0\)</span>.</p></li>
-</ol>
-</section>
-<section id="inversion" class="level2">
-<h2 class="anchored" data-anchor-id="inversion">3. Inversion</h2>
-<p>Invert the <span class="math inline">\(Grid_{index}\)</span> to create a representation of the <em>“empty space”</em> inside the exit tunnel.</p>
-</section>
-<section id="dbscan" class="level2">
-<h2 class="anchored" data-anchor-id="dbscan">4. DBSCAN</h2>
-<p>The aim in this step is to extract only the voxels belonging to the “empty space” inside the tunnel and no other. Given that we have a good idea of the Van der Waals radii of the atoms that constitute the walls and have control over the size of the voxel in the <span class="math inline">\(Grid_{index}\)</span>, one method that we can apply is DBSCAN.</p>
-<p>DBSCAN is a density-based clustering non-parametric algorithm that is akin to UMAP/t-SNE.</p>
-<div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-DBSCAN Parameters
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span class="math inline">\(eps\)</span>: The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.</p>
-<p><span class="math inline">\(min\_nbrs\)</span> (<span class="math inline">\(min\_samples\)</span>): If <span class="math inline">\(min\_samples\)</span> is set to a higher value, DBSCAN will find denser clusters, whereas if it is set to a lower value, the found clusters will be more sparse. The metric to use when calculating distance between instances in a feature array.</p>
-<p><span class="math inline">\(metric\)</span>: The metric to use when calculating distance between instances in a feature array. We use the Euclidian distance.</p>
-</div>
-</div>
-</div>
-<div id="f0c511d1" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-2-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="interior-surface-via-delaunay-triangulation" class="level2">
-<h2 class="anchored" data-anchor-id="interior-surface-via-delaunay-triangulation">5. Interior Surface via Delaunay Triangulation</h2>
-<p>The aim of this step is to extract a point cloud containing only the voxels on the surface of convex hull enclosing the interior space of the tunnel.</p>
-<div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Delaunay 3D parameters
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span class="math inline">\(alpha\)</span>: Controls the smoothness of the constructed alpha-shape. For a non-zero <span class="math inline">\(alpha\)</span> value, only vertices, edges, faces, or tetrahedra contained within the circumsphere (of radius <span class="math inline">\(alpha\)</span>) will be output. Otherwise, only tetrahedra will be output.</p>
-<p><span class="math inline">\(tol\)</span>: Tolerance to control discarding of closely spaced points. This tolerance is specified as a fraction of the diagonal length of the bounding box of the points.</p>
-<p><span class="math inline">\(offset\)</span>: Multiplier to control the size of the initial, bounding Delaunay triangulation.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="normal-estimation-orientation" class="level2">
-<h2 class="anchored" data-anchor-id="normal-estimation-orientation">6. Normal Estimation &amp; Orientation</h2>
-<p>The aim of this step is to prepare the convex hull point cloud for the surface reconstruction algorithm. For the final mesh to be smooth and free of artifacts, this step has to assign a normal vector point outwards at each point of the convex hull thus defining a clear boundary between “inner” and “outer” space vis-a-vis the surface.</p>
-<p>One popular method for normal estimation is a KDTree search and for smoothing their orientations a collection of tangent planes is used.</p>
-<div class="callout callout-style-simple callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-KD Tree Search and Tangent Plane Orientation
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span class="math inline">\(kdtree\_radius\)</span>:</p>
-<p><span class="math inline">\(kdtree\_max\_nn\)</span>:</p>
-<p><span class="math inline">\(tangent\_planes\_n\)</span>:</p>
-</div>
-</div>
-</div>
-</section>
-<section id="surface-reconstruction" class="level2">
-<h2 class="anchored" data-anchor-id="surface-reconstruction">7. Surface Reconstruction</h2>
-<div id="972a8143" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="references" class="level2">
-<h2 class="anchored" data-anchor-id="references">References</h2>
+<section id="centerline" class="level2">
+<h2 class="anchored" data-anchor-id="centerline">Centerline</h2>
 
 
 </section>

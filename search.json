@@ -4,35 +4,28 @@
     "href": "index.html",
     "title": "bioshape-analysis",
     "section": "",
-    "text": "3D tessellation of biomolecular cavity\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nbiology\n\n\nbioinformatics\n\n\nsurface-reconstruction\n\n\ncomputer graphics\n\n\n\n\n\n\n\n\n\nJun 29, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
+    "text": "Extracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 16, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavity\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nbiology\n\n\nbioinformatics\n\n\nsurface-reconstruction\n\n\ncomputer graphics\n\n\n\n\n\n\n\n\n\nJun 29, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/ribosome-tunnel-extraction/index.html",
     "href": "posts/ribosome-tunnel-extraction/index.html",
     "title": "3D tessellation of biomolecular cavity",
     "section": "",
-    "text": "We present a protocol for representing the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.\nThe ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.\nIt is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the Peptidyl Transferse Center, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time.\nThe built protein exits the ribosome through a channel known as the Ribosome Exit Tunnel. The interior geometry of the tunnel influences the escape speed of proteins and can be blocked by ligands and antibiotics making it a crucial site for all processes of life.\nHere, we are interested in obtaining a representation of the Exit Tunel’s geometry and describe a protocol for doing so.\n\n\n\n\n\n\n\n\n\nPDB 8OJ0. The structure of human ribosome.\n\n\n\n\n\n\n\nThe locations of the ribosome exit tunnel and the PTC."
+    "text": "We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.\nWe apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [dao2018impact][dao2019differences]\n\n\n\n\n\n\n\n\n\n\nPDB 8OJ0. The structure of human ribosome.\n\n\n\n\n\n\n\nThe locations of the ribosome exit tunnel and the PTC."
   },
   {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#the-ribosome-and-its-exit-tunnel",
-    "href": "posts/ribosome-tunnel-extraction/index.html#the-ribosome-and-its-exit-tunnel",
+    "objectID": "posts/ribosome-tunnel-extraction/index.html#summary-and-background",
+    "href": "posts/ribosome-tunnel-extraction/index.html#summary-and-background",
     "title": "3D tessellation of biomolecular cavity",
     "section": "",
-    "text": "We present a protocol for representing the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.\nThe ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.\nIt is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the Peptidyl Transferse Center, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time.\nThe built protein exits the ribosome through a channel known as the Ribosome Exit Tunnel. The interior geometry of the tunnel influences the escape speed of proteins and can be blocked by ligands and antibiotics making it a crucial site for all processes of life.\nHere, we are interested in obtaining a representation of the Exit Tunel’s geometry and describe a protocol for doing so.\n\n\n\n\n\n\n\n\n\nPDB 8OJ0. The structure of human ribosome.\n\n\n\n\n\n\n\nThe locations of the ribosome exit tunnel and the PTC."
+    "text": "We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.\nWe apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [dao2018impact][dao2019differences]\n\n\n\n\n\n\n\n\n\n\nPDB 8OJ0. The structure of human ribosome.\n\n\n\n\n\n\n\nThe locations of the ribosome exit tunnel and the PTC."
   },
   {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#tunnel-geometry-extraction-visual-protocol",
-    "href": "posts/ribosome-tunnel-extraction/index.html#tunnel-geometry-extraction-visual-protocol",
+    "objectID": "posts/ribosome-tunnel-extraction/index.html#visual-protocol",
+    "href": "posts/ribosome-tunnel-extraction/index.html#visual-protocol",
     "title": "3D tessellation of biomolecular cavity",
-    "section": "Tunnel Geometry Extraction: Visual Protocol",
-    "text": "Tunnel Geometry Extraction: Visual Protocol\n\n\n\nSchematic representation of the tunnel geometry surface reconstruction"
+    "section": "Visual Protocol",
+    "text": "Visual Protocol\n\n\n\nSchematic representation of the tunnel geometry surface reconstruction"
   },
   {
     "objectID": "posts/ribosome-tunnel-extraction/index.html#mole-based-centerline-extraction",
@@ -89,5 +82,40 @@
     "title": "3D tessellation of biomolecular cavity",
     "section": "7. Surface Reconstruction",
     "text": "7. Surface Reconstruction"
+  },
+  {
+    "objectID": "posts/ribosome-tunnel-extraction/index.html#references",
+    "href": "posts/ribosome-tunnel-extraction/index.html#references",
+    "title": "3D tessellation of biomolecular cavity",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#raw-image-pre-processing",
+    "href": "posts/AFM-data/index.html#raw-image-pre-processing",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Raw image pre-processing",
+    "text": "Raw image pre-processing"
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#segmentation",
+    "href": "posts/AFM-data/index.html#segmentation",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Segmentation",
+    "text": "Segmentation"
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#centerline",
+    "href": "posts/AFM-data/index.html#centerline",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Centerline",
+    "text": "Centerline"
   }
 ]

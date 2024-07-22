@@ -1,5 +1,5 @@
 ---
-title: "3D tessellation of biomolecular cavity"
+title: "3D tessellation of biomolecular cavities"
 subtitle: "Protocol for analyzing the ribosome exit tunnel"
 bibliography: "references.bib"
 csl: nature.csl

@@ -43,7 +43,7 @@ execute:
 
 ## The ribosome exit tunnel
 
-We present a protocol for representing the surface of a biomolecular cavity that can further be used for shape analysis and molecular simulations.
+We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.
 
 The ribosome is a complex molecular machine composed of ribosomal RNA (rRNA) and proteins.
 

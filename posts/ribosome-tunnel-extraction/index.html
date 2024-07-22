@@ -10,7 +10,7 @@
 <meta name="author" content="Khanh Dao Duc">
 <meta name="dcterms.date" content="2024-06-29">
 
-<title>3D tessellation of biomolecular cavity – bioshape-analysis</title>
+<title>3D tessellation of biomolecular cavities – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -145,7 +165,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">3D tessellation of biomolecular cavity</h1>
+      <h1 class="title">3D tessellation of biomolecular cavities</h1>
             <p class="subtitle lead">Protocol for analyzing the ribosome exit tunnel</p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">biology</div>
@@ -215,7 +235,7 @@ window.Quarto = {
 <section id="summary-and-background" class="level2">
 <h2 class="anchored" data-anchor-id="summary-and-background">Summary and Background</h2>
 <p>We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.</p>
-<p>We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous work [dao2018impact][dao2019differences]</p>
+<p>We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works<span class="citation" data-cites="dao2018impact dao2019differences"><sup><a href="#ref-dao2018impact" role="doc-biblioref">1</a>,<a href="#ref-dao2019differences" role="doc-biblioref">2</a></sup></span>. The protocol was also design to refine the output obtained from MOLE software<span class="citation" data-cites="sehnal2013mole"><sup><a href="#ref-sehnal2013mole" role="doc-biblioref">3</a></sup></span> (see Figure XXX)</p>
 <!--
 It is central to the protein synthesis in all living organisms. The assembly of most proteins happens at the location known as the __Peptidyl Transferse Center__, where the peptide chain of any given protein is extended with another amino acid like a chain of beads, one bead a time. 
 
@@ -223,28 +243,42 @@ The built protein exits the ribosome through a channel known as the __Ribosome E
 
 _Here, we are interested in obtaining a representation of the Exit Tunel's geometry and describe a protocol for doing so._
 -->
-<div>
-
+<div id="fig-intro" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-intro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row quarto-layout-valign-bottom">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-intro" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ribo" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ribo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/8OJ0.gif" class="img-fluid figure-img" data-ref-parent="fig-intro">
 </div>
-<div class="quarto-layout-panel" data-layout="[[57,70] ]">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 44.9%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./data/8OJ0.gif" class="img-fluid figure-img" alt=""></p>
-<figcaption>PDB 8OJ0. The structure of human ribosome.</figcaption>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ribo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Structure of the human ribosome (PDB ID: 8OJ0).
+</figcaption>
 </figure>
 </div>
 </div>
-<div class="quarto-layout-cell" style="flex-basis: 55.1%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./data/ptc_and_tunnel_illustration.png" class="img-fluid figure-img" alt=""></p>
-<figcaption>The locations of the ribosome exit tunnel and the PTC.</figcaption>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-intro" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ribo2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ribo2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/ptc_and_tunnel_illustration.png" class="img-fluid figure-img" data-ref-parent="fig-intro">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ribo2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) The ribosome exit tunnel (figure from Dao Duc et al.<span class="citation" data-cites="dao2019differences"><sup><a href="#ref-dao2019differences" role="doc-biblioref">2</a></sup></span>)
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-intro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The ribosome and the exit tunnel extracted using Mole software<span class="citation" data-cites="sehnal2013mole"><sup><a href="#ref-sehnal2013mole" role="doc-biblioref">3</a></sup></span> <!--
+![The locations of the ribosome exit tunnel and the PTC.](./data/ptc_and_tunnel_illustration.png){fig-alt=""}
+-->
+</figcaption>
+</figure>
 </div>
 </section>
 <section id="visual-protocol" class="level2">
@@ -255,25 +289,23 @@ _Here, we are interested in obtaining a representation of the Exit Tunel's geome
 <figcaption>Schematic representation of the tunnel geometry surface reconstruction</figcaption>
 </figure>
 </div>
-</section>
-<section id="mole-based-centerline-extraction" class="level2">
-<h2 class="anchored" data-anchor-id="mole-based-centerline-extraction">0. Mole-based centerline extraction</h2>
-<p>One representation of the ribosome exit tunnel can be obtained via the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3765717/">MOLE</a> software, which is an implementation of the “probe”-based family of algorithms popular for extracting general biomolecular cavities and pores. This step is non-essential if other means of extracting the intial pointcloud are available, but for convenience this will be our starting point.</p>
-<p>A probe is a sphere of varying radius which is “rolled” by the algorithm against the walls of a given molecule tracing out a path and a radius.</p>
-<p><em>The algorithm yields an array of varying x,y,z coordinates (henceforth, the <span class="math inline">\(C\)</span><sub><span class="math inline">\(x,y,z\)</span></sub>) and radius R at each coordinate (henceforth, the <span class="math inline">\(R\)</span><sub><span class="math inline">\(x,y,z\)</span></sub>)</em></p>
-<div>
+<!--
+## 0. Mole-based centerline extraction
 
-</div>
-<div class="quarto-layout-panel" data-layout="[[1,1]]">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="./data/mole3.png" class="img-fluid"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="./data/mole1.png" class="img-fluid"></p>
-</div>
-</div>
-</div>
+
+One representation of the ribosome exit tunnel can be obtained via the [ MOLE ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3765717/) software, which is an implementation of the "probe"-based family of algorithms popular for extracting general biomolecular cavities and pores. This step is non-essential if other means of extracting the intial pointcloud are available, but for convenience this will be our starting point.
+
+A probe is a sphere of varying radius which is "rolled" by the algorithm against the walls of a given molecule tracing out a path and a radius.
+
+_The algorithm yields an array of varying x,y,z coordinates (henceforth, the $C$~$x,y,z$~) and radius R at each coordinate (henceforth, the $R$~$x,y,z$~)_
+
+:::{layout="[[1,1]]"}
+
+![](./data/mole3.png){width=50%}
+
+![](./data/mole1.png){width=50%}
+:::
+-->
 </section>
 <section id="bounding-box" class="level2">
 <h2 class="anchored" data-anchor-id="bounding-box">1. Bounding Box</h2>
@@ -339,7 +371,7 @@ DBSCAN Parameters
 </div>
 </div>
 </div>
-<div id="f0c511d1" class="cell" data-execution_count="1">
+<div id="1dc521e8" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -396,7 +428,7 @@ KD Tree Search and Tangent Plane Orientation
 </section>
 <section id="surface-reconstruction" class="level2">
 <h2 class="anchored" data-anchor-id="surface-reconstruction">7. Surface Reconstruction</h2>
-<div id="972a8143" class="cell" data-execution_count="2">
+<div id="d380d218" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -407,12 +439,23 @@ KD Tree Search and Tangent Plane Orientation
 </div>
 </section>
 <section id="references" class="level2">
-<h2 class="anchored" data-anchor-id="references">References</h2>
+
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-dao2018impact" class="csl-entry" role="listitem">
+<div class="csl-left-margin">1. </div><div class="csl-right-inline">Dao Duc, K. &amp; Song, Y. S. The impact of ribosomal interference, codon usage, and exit tunnel interactions on translation elongation rate variation. <em>PLoS genetics</em> <strong>14</strong>, e1007166 (2018).</div>
+</div>
+<div id="ref-dao2019differences" class="csl-entry" role="listitem">
+<div class="csl-left-margin">2. </div><div class="csl-right-inline">Dao Duc, K., Batra, S. S., Bhattacharya, N., Cate, J. H. &amp; Song, Y. S. Differences in the path to exit the ribosome across the three domains of life. <em>Nucleic acids research</em> <strong>47</strong>, 4198–4210 (2019).</div>
+</div>
+<div id="ref-sehnal2013mole" class="csl-entry" role="listitem">
+<div class="csl-left-margin">3. </div><div class="csl-right-inline">Sehnal, D. <em>et al.</em> MOLE 2.0: Advanced approach for analysis of biomacromolecular channels. <em>Journal of cheminformatics</em> <strong>5</strong>, 1–13 (2013).</div>
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

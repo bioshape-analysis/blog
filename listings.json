@@ -2,9 +2,10 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/point-cloud/index.html",
-      "/posts/OTalignment/index.html",
       "/posts/AFM-data/index.html",
+      "/posts/Elastic metric/index.html",
+      "/posts/OTalignment/index.html",
+      "/posts/point-cloud/index.html",
       "/posts/ribosome-tunnel-extraction/index.html"
     ]
   }

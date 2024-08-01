@@ -1,0 +1,12 @@
+{
+  "hash": "6a9717a900c2cf6d27070d65209cce20",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Elastic metric for cell shape analysis\"\n\nengine: \"jupyter\"\nauthor:\n  - name: \"Clément Soubrier\" \n    email: \"c.soubrier @math.ubc.ca\"\n    affiliations:\n      - name: KDD Group\n        url: \"https://rtviii.xyz/\"\n\n  - name: \"Khanh Dao Duc\" \n    email: \"kdd@math.ubc.ca\"\n    affiliations:\n      - name: Department of Mathematics, UBC\n        url: \"https://www.math.ubc.ca/\"\n      - name: Department of Computer Science, UBC\n        url: \"https://www.cs.ubc.ca/\"\n\ndate: \"July 30 2024\"\ncategories: [biology, bioinformatics]    \n\ncallout-icon: false\n# format:\n#   pdf:\n#     include-in-header:\n#       text: |\n#         \\usepackage{amsmath}\n\nexecute:\n  echo: false\n  freeze: auto\n  pip: [\"pyvista\", \"open3d\", \"scikit-learn\", \"mendeleev\", \"compas\", \"matplotlib\"]\n\n---\n\n",
+    "supporting": [
+      "index_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,10 +1,10 @@
 {
-  "hash": "14683965bae0b4988f419a4efe400254",
+  "hash": "2c7eeafaadb31333f3b61b1e481febc2",
   "result": {
     "engine": "jupyter",
-    "markdown": "---\ntitle: \"Extracting cell geometry from AFM\"\nsubtitle: \"Part 1: Static analysis\"\n\nengine: \"jupyter\"\nauthor:\n  - name: \"Clément Soubrier\" \n    email: \"c.soubrier @math.ubc.ca\"\n    affiliations:\n      - name: KDD Group\n        url: \"https://rtviii.xyz/\"\n\n  - name: \"Khanh Dao Duc\" \n    email: \"kdd@math.ubc.ca\"\n    affiliations:\n      - name: Department of Mathematics, UBC\n        url: \"https://www.math.ubc.ca/\"\n      - name: Department of Computer Science, UBC\n        url: \"https://www.cs.ubc.ca/\"\n\ndate: \"July 16 2024\"\ncategories: [biology, bioinformatics]    \n\ncallout-icon: false\n# format:\n#   pdf:\n#     include-in-header:\n#       text: |\n#         \\usepackage{amsmath}\n\nexecute:\n  echo: false\n  freeze: auto\n  pip: [\"pyvista\", \"open3d\", \"scikit-learn\", \"mendeleev\", \"compas\", \"matplotlib\"]\n\n---\n\n\n\n\n\n\n\n\n\n\n## Biological context\n\n## Raw image pre-processing\n\n## Segmentation\n\n## Centerline\n\n",
+    "markdown": "---\ntitle: \"Extracting cell geometry from AFM\"\nsubtitle: \"Part 1: Static analysis\"\n\nengine: \"jupyter\"\nauthor:\n  - name: \"Clément Soubrier\" \n    email: \"c.soubrier @math.ubc.ca\"\n    affiliations:\n      - name: KDD Group\n        url: \"https://rtviii.xyz/\"\n\n  - name: \"Khanh Dao Duc\" \n    email: \"kdd@math.ubc.ca\"\n    affiliations:\n      - name: Department of Mathematics, UBC\n        url: \"https://www.math.ubc.ca/\"\n      - name: Department of Computer Science, UBC\n        url: \"https://www.cs.ubc.ca/\"\n\ndate: \"July 31 2024\"\ncategories: [biology, bioinformatics]    \n\ncallout-icon: false\n# format:\n#   pdf:\n#     include-in-header:\n#       text: |\n#         \\usepackage{amsmath}\n\nexecute:\n  echo: false\n  freeze: auto\n  pip: [\"pyvista\", \"open3d\", \"scikit-learn\", \"mendeleev\", \"compas\", \"matplotlib\"]\n\n---\n\n\n\n\n\n\n\n\n\n\n## Biological context\n\n## Raw image pre-processing\n\n## Segmentation\n\n## Centerline\n\n",
     "supporting": [
-      "index_files"
+      "index_files/figure-html"
     ],
     "filters": [],
     "includes": {}

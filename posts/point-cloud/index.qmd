@@ -18,7 +18,7 @@ author:
       - name: Department of Computer Science, UBC
         url: "https://www.cs.ubc.ca/"
 
-date: "July 16 2024"
+date: "July 28 2024"
 categories: [biology, bioinformatics]    
 
 callout-icon: false

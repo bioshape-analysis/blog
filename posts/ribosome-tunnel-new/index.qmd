@@ -17,3 +17,14 @@ We present a protocol to extract the surface of a biomolecular cavity for shape 
 We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works [@dao2018impact; @dao2019differences]. The protocol was also design to refine the output obtained from MOLE software [@sehnal2013mole]
 
 ![Illustration of the ribosome exit tunnel (from Dao Duc et al., NAR 2019)](./figures/gkz106fig1.jpeg){width=80%}
+
+
+## 0. Data preparation
+
+## 1. Pre-processing
+
+## 2. Voxelization
+
+## 3. Tessellation
+
+## References

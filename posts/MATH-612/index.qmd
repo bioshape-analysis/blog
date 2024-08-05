@@ -1,0 +1,12 @@
+---
+title: "Page creation (MATH 612)"
+subtitle: "Instructions and tips for MATH 612 students"
+date: "August 4 2024"
+categories: [MATH 612]
+---
+
+## Instructions
+
+## Tips
+
+## Using Github

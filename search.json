@@ -7,6 +7,34 @@
     "text": "Extracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nElastic metric for cell shape analysis\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 30, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nbiology\n\n\nbioinformatics\n\n\nsurface-reconstruction\n\n\ncomputer graphics\n\n\n\n\n\n\n\n\n\nJun 29, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
   },
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#raw-image-pre-processing",
+    "href": "posts/AFM-data/index.html#raw-image-pre-processing",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Raw image pre-processing",
+    "text": "Raw image pre-processing"
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#segmentation",
+    "href": "posts/AFM-data/index.html#segmentation",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Segmentation",
+    "text": "Segmentation"
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#centerline",
+    "href": "posts/AFM-data/index.html#centerline",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Centerline",
+    "text": "Centerline"
+  },
+  {
     "objectID": "posts/ribosome-tunnel-extraction/index.html",
     "href": "posts/ribosome-tunnel-extraction/index.html",
     "title": "3D tessellation of biomolecular cavities",
@@ -75,33 +103,5 @@
     "title": "3D tessellation of biomolecular cavities",
     "section": "7. Surface Reconstruction",
     "text": "7. Surface Reconstruction"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
-  },
-  {
-    "objectID": "posts/AFM-data/index.html#raw-image-pre-processing",
-    "href": "posts/AFM-data/index.html#raw-image-pre-processing",
-    "title": "Extracting cell geometry from AFM",
-    "section": "Raw image pre-processing",
-    "text": "Raw image pre-processing"
-  },
-  {
-    "objectID": "posts/AFM-data/index.html#segmentation",
-    "href": "posts/AFM-data/index.html#segmentation",
-    "title": "Extracting cell geometry from AFM",
-    "section": "Segmentation",
-    "text": "Segmentation"
-  },
-  {
-    "objectID": "posts/AFM-data/index.html#centerline",
-    "href": "posts/AFM-data/index.html#centerline",
-    "title": "Extracting cell geometry from AFM",
-    "section": "Centerline",
-    "text": "Centerline"
   }
 ]

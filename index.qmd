@@ -1,5 +1,6 @@
 ---
-title: "bioshape-analysis"
+title: "Biological shape analysis (under construction)"
+subtitle: "Material and Methods for MATH 612 (UBC)" 
 listing:
   contents: posts
   sort: "date desc"

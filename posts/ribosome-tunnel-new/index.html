@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Artem Kushner">
+<meta name="author" content="Khanh Dao Duc">
+<meta name="dcterms.date" content="2024-08-04">
 
-<title>bioshape-analysis</title>
+<title>3D tessellation of biomolecular cavities (new) – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +23,45 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,67 +89,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -138,7 +101,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">bioshape-analysis</span>
     </a>
   </div>
@@ -149,7 +112,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -172,335 +135,103 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">bioshape-analysis</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">3D tessellation of biomolecular cavities (new)</h1>
+            <p class="subtitle lead">Protocol for analyzing the ribosome exit tunnel</p>
+                                <div class="quarto-categories">
+                <div class="quarto-category">example</div>
+                <div class="quarto-category">cryo-EM</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Authors</div>
+      <div class="quarto-title-meta-contents">
+               <p>Artem Kushner </p>
+               <p>Khanh Dao Duc </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 4, 2024</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(8)</span></div><div class="category" data-category="MATH 612">MATH 612 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bioinformatics">bioinformatics <span class="quarto-category-count">(5)</span></div><div class="category" data-category="biology">biology <span class="quarto-category-count">(5)</span></div><div class="category" data-category="computer graphics">computer graphics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cryo-EM">cryo-EM <span class="quarto-category-count">(1)</span></div><div class="category" data-category="example">example <span class="quarto-category-count">(1)</span></div><div class="category" data-category="surface-reconstruction">surface-reconstruction <span class="quarto-category-count">(1)</span></div><div class="category" data-category="theory">theory <span class="quarto-category-count">(1)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#summary-and-background" id="toc-summary-and-background" class="nav-link active" data-scroll-target="#summary-and-background">Summary and Background</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">0. Data preparation</a></li>
+  <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">1. Pre-processing</a></li>
+  <li><a href="#voxelization" id="toc-voxelization" class="nav-link" data-scroll-target="#voxelization">2. Voxelization</a></li>
+  <li><a href="#tessellation" id="toc-tessellation" class="nav-link" data-scroll-target="#tessellation">3. Tessellation</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<section id="summary-and-background" class="level2">
+<h2 class="anchored" data-anchor-id="summary-and-background">Summary and Background</h2>
+<p>We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.</p>
+<p>We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works<span class="citation" data-cites="dao2018impact dao2019differences"><sup><a href="#ref-dao2018impact" role="doc-biblioref">1</a>,<a href="#ref-dao2019differences" role="doc-biblioref">2</a></sup></span>. The protocol was also design to refine the output obtained from MOLE software<span class="citation" data-cites="sehnal2013mole"><sup><a href="#ref-sehnal2013mole" role="doc-biblioref">3</a></sup></span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./figures/gkz106fig1.jpeg" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Illustration of the ribosome exit tunnel (from Dao Duc et al., NAR 2019)</figcaption>
+</figure>
+</div>
+</section>
+<section id="data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation">0. Data preparation</h2>
+</section>
+<section id="pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="pre-processing">1. Pre-processing</h2>
+</section>
+<section id="voxelization" class="level2">
+<h2 class="anchored" data-anchor-id="voxelization">2. Voxelization</h2>
+</section>
+<section id="tessellation" class="level2">
+<h2 class="anchored" data-anchor-id="tessellation">3. Tessellation</h2>
+</section>
+<section id="references" class="level2">
 
 
 
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="theory" data-listing-date-sort="1723161600000" data-listing-file-modified-sort="1723243955593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="2">
-<div class="thumbnail">
-<p><a href="./posts/quasiconformalmap/index.html" class="no-external"></a></p><a href="./posts/quasiconformalmap/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/quasiconformalmap/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/quasiconformalmap/index.html" class="no-external">Quasiconformal mapping in 1D</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/quasiconformalmap/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('theory'); return false;">
-theory
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/quasiconformalmap/index.html" class="no-external">
+</section>
 
-</a>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-dao2018impact" class="csl-entry" role="listitem">
+<div class="csl-left-margin">1. </div><div class="csl-right-inline">Dao Duc, K. &amp; Song, Y. S. The impact of ribosomal interference, codon usage, and exit tunnel interactions on translation elongation rate variation. <em>PLoS genetics</em> <strong>14</strong>, e1007166 (2018).</div>
 </div>
+<div id="ref-dao2019differences" class="csl-entry" role="listitem">
+<div class="csl-left-margin">2. </div><div class="csl-right-inline">Dao Duc, K., Batra, S. S., Bhattacharya, N., Cate, J. H. &amp; Song, Y. S. Differences in the path to exit the ribosome across the three domains of life. <em>Nucleic acids research</em> <strong>47</strong>, 4198–4210 (2019).</div>
 </div>
-<div class="metadata">
-<a href="./posts/quasiconformalmap/index.html" class="no-external">
-<div class="listing-date">
-Aug 9, 2024
+<div id="ref-sehnal2013mole" class="csl-entry" role="listitem">
+<div class="csl-left-margin">3. </div><div class="csl-right-inline">Sehnal, D. <em>et al.</em> MOLE 2.0: Advanced approach for analysis of biomacromolecular channels. <em>Journal of cheminformatics</em> <strong>5</strong>, 1–13 (2013).</div>
 </div>
-<div class="listing-author">
-Clément Soubrier
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="example,cryo-EM" data-listing-date-sort="1722729600000" data-listing-file-modified-sort="1723243955857" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="91">
-<div class="thumbnail">
-<p><a href="./posts/ribosome-tunnel-new/index.html" class="no-external"></a></p><a href="./posts/ribosome-tunnel-new/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/ribosome-tunnel-new/figures/gkz106fig1.jpeg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/ribosome-tunnel-new/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/ribosome-tunnel-new/index.html" class="no-external">3D tessellation of biomolecular cavities (new)</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/ribosome-tunnel-new/index.html" class="no-external">Protocol for analyzing the ribosome exit tunnel</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('example'); return false;">
-example
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('cryo-EM'); return false;">
-cryo-EM
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/ribosome-tunnel-new/index.html" class="no-external">We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/ribosome-tunnel-new/index.html" class="no-external">
-<div class="listing-date">
-Aug 4, 2024
-</div>
-<div class="listing-author">
-Artem Kushner, Khanh Dao Duc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="MATH 612" data-listing-date-sort="1722729600000" data-listing-file-modified-sort="1723243955593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="4">
-<div class="thumbnail">
-<p><a href="./posts/MATH-612/index.html" class="no-external"></a></p><a href="./posts/MATH-612/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/MATH-612/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/MATH-612/index.html" class="no-external">Page creation (MATH 612)</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/MATH-612/index.html" class="no-external">Instructions and tips for MATH 612 students</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('MATH 612'); return false;">
-MATH 612
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/MATH-612/index.html" class="no-external">
-
-</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/MATH-612/index.html" class="no-external">
-<div class="listing-date">
-Aug 4, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="biology,bioinformatics" data-listing-date-sort="1722384000000" data-listing-file-modified-sort="1723243955593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="6">
-<div class="thumbnail">
-<p><a href="./posts/AFM-data/index.html" class="no-external"></a></p><a href="./posts/AFM-data/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/AFM-data/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/AFM-data/index.html" class="no-external">Extracting cell geometry from AFM</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/AFM-data/index.html" class="no-external">Part 1: Static analysis</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('biology'); return false;">
-biology
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('bioinformatics'); return false;">
-bioinformatics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/AFM-data/index.html" class="no-external">
-
-</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/AFM-data/index.html" class="no-external">
-<div class="listing-date">
-Jul 31, 2024
-</div>
-<div class="listing-author">
-Clément Soubrier, Khanh Dao Duc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="biology,bioinformatics" data-listing-date-sort="1722297600000" data-listing-file-modified-sort="1723243955593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="1">
-<div class="thumbnail">
-<p><a href="./posts/Elastic metric/index.html" class="no-external"></a></p><a href="./posts/Elastic metric/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/Elastic metric/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/Elastic metric/index.html" class="no-external">Elastic metric for cell shape analysis</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/Elastic metric/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('biology'); return false;">
-biology
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('bioinformatics'); return false;">
-bioinformatics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/Elastic metric/index.html" class="no-external"></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/Elastic metric/index.html" class="no-external">
-<div class="listing-date">
-Jul 30, 2024
-</div>
-<div class="listing-author">
-Clément Soubrier, Khanh Dao Duc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="biology,bioinformatics" data-listing-date-sort="1722211200000" data-listing-file-modified-sort="1723243955593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="1">
-<div class="thumbnail">
-<p><a href="./posts/OTalignment/index.html" class="no-external"></a></p><a href="./posts/OTalignment/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/OTalignment/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/OTalignment/index.html" class="no-external">Alignment of 3D volumes with Optimal Transport</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/OTalignment/index.html" class="no-external">Application to cryoEM density maps</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('biology'); return false;">
-biology
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('bioinformatics'); return false;">
-bioinformatics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/OTalignment/index.html" class="no-external"></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/OTalignment/index.html" class="no-external">
-<div class="listing-date">
-Jul 29, 2024
-</div>
-<div class="listing-author">
-Clément Soubrier, Khanh Dao Duc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="biology,bioinformatics" data-listing-date-sort="1722124800000" data-listing-file-modified-sort="1723243955593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="1">
-<div class="thumbnail">
-<p><a href="./posts/point-cloud/index.html" class="no-external"></a></p><a href="./posts/point-cloud/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/point-cloud/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/point-cloud/index.html" class="no-external">Point cloud representation of 3D volumes</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/point-cloud/index.html" class="no-external">Application to cryoEM density maps</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('biology'); return false;">
-biology
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('bioinformatics'); return false;">
-bioinformatics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/point-cloud/index.html" class="no-external"></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/point-cloud/index.html" class="no-external">
-<div class="listing-date">
-Jul 28, 2024
-</div>
-<div class="listing-author">
-Clément Soubrier, Khanh Dao Duc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="7" data-categories="biology,bioinformatics,surface-reconstruction,computer graphics" data-listing-date-sort="1719619200000" data-listing-file-modified-sort="1723243955849" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1895">
-<div class="thumbnail">
-<p><a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external"></a></p><a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/ribosome-tunnel-extraction/data/8OJ0.gif"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external">3D tessellation of biomolecular cavities</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external">Protocol for analyzing the ribosome exit tunnel</a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('biology'); return false;">
-biology
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('bioinformatics'); return false;">
-bioinformatics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('surface-reconstruction'); return false;">
-surface-reconstruction
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('computer graphics'); return false;">
-computer graphics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external">We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/ribosome-tunnel-extraction/index.html" class="no-external">
-<div class="listing-date">
-Jun 29, 2024
-</div>
-<div class="listing-author">
-Artem Kushner, Khanh Dao Duc
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -1,0 +1,11 @@
+---
+title: "Quasiconformal mapping in 1D"
+date: "August 9 2024"
+author:
+  - name: "Clément Soubrier" 
+categories: [theory]
+---
+
+## Definition
+
+## Theorem

@@ -6,7 +6,19 @@ categories: [MATH 612]
 ---
 
 ## Instructions
+- Follow all guidelines for assignments and projects.
+- Submit your work through the designated platforms by the due dates.
+- Collaborate with peers but ensure individual work is original.
 
 ## Tips
+- **Jupyter:** Use [Jupyter Notebooks](https://jupyter.org/) for interactive coding and documentation. Great for running small code snippets and visualizing data. Learn more in the [Jupyter Notebook Documentation](https://jupyter-notebook.readthedocs.io/en/stable/).
+- **VS Code:** A powerful IDE for writing and debugging code. Download it [here](https://code.visualstudio.com/), and install relevant extensions for [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [LaTeX](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop).
+- **Environments:** Use virtual environments like [venv](https://docs.python.org/3/library/venv.html) or [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) to manage dependencies and ensure consistent results across different setups.
+- **Quarto:** Use [Quarto](https://quarto.org/) for creating high-quality documents, reports, and presentations from your code. It supports markdown and integrates seamlessly with Jupyter and VS Code for reproducible analysis and publication. Check out the [Quarto Guide](https://quarto.org/docs/guide/) for more information. To get started quickly, you can refer to this [GitHub Repository](https://github.com/riddhibattu/introduction-to-quarto).
 
-## Using Github
+## Using GitHub
+- **Create a GitHub Account:** Sign up at [GitHub.com](https://github.com).
+- **Repositories:** Start by creating a repository to host your project files. Learn how in [GitHub's guide to repositories](https://docs.github.com/en/get-started/quickstart/create-a-repo). Use a [`.gitignore`](https://git-scm.com/docs/gitignore) file to exclude unnecessary files.
+- **Branches:** Work on separate branches (`main`, `dev`, feature branches) to manage different versions of your project. More details in [GitHub's guide on branching](https://guides.github.com/introduction/flow/).
+- **Merges:** Merge changes into the `main` branch only after thorough review and testing. Learn about [merging branches](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches).
+- **Commit Messages:** Write clear, descriptive commit messages to document changes effectively. Follow the [best practices for commit messages](https://cbea.ms/git-commit/).

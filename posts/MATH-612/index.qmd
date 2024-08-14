@@ -5,6 +5,8 @@ date: "August 4 2024"
 categories: [MATH 612]
 ---
 
+![](img/math612.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
 ## Instructions
 - Follow all guidelines for assignments and projects.
 - Submit your work through the designated platforms by the due dates.
@@ -22,3 +24,62 @@ categories: [MATH 612]
 - **Branches:** Work on separate branches (`main`, `dev`, feature branches) to manage different versions of your project. More details in [GitHub's guide on branching](https://guides.github.com/introduction/flow/).
 - **Merges:** Merge changes into the `main` branch only after thorough review and testing. Learn about [merging branches](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches).
 - **Commit Messages:** Write clear, descriptive commit messages to document changes effectively. Follow the [best practices for commit messages](https://cbea.ms/git-commit/).
+
+## Using Quarto to create blog posts
+1. **Log into GitHub:** Make sure you have an account and are logged in.
+2. **Send your account username/email to [kdd@math.ubc.ca](mailto:kdd@math.ubc.ca):** This is needed to be added to the organization.
+3. **Clone the repository:** After being added to the organization, clone the repository: `https://github.com/bioshape-analysis/blog`.
+   ```sh
+   git clone https://github.com/bioshape-analysis/blog`
+   ```
+4. **Create a new branch:** To contribute to the blog, create a new branch using:
+   ```sh
+   git checkout -b <branch_name>
+   ```
+   - Verify your branch and repository location: Use the following command to check if you are in the correct branch and repository:
+     ```sh
+     git status
+     ```
+     This command will show you the current branch you are on and the status of your working directory, ensuring you are working in the right place
+
+5. **Navigate to `posts`:** Go into the `posts` directory ([found here](https://github.com/bioshape-analysis/blog/tree/main/posts)). Create a new folder with a name that represents the content of your blog post.
+6. **Create or upload your content:**
+   - If using Jupyter Notebooks, upload your `.ipynb` file.
+   - If preferred, create a new notebook for your post. Once done, convert it into Quarto using the command:
+     ```sh
+     quarto convert your_jupyter_notebook.ipynb -o output_file.qmd
+     ```
+7. **Edit the YAML in your `.qmd` file:** Ensure your YAML is consistent with the main template. For example:
+   ```yaml
+   ---
+   title: "Title of your blog post"
+   date: "Date" # Format example: August 9 2024
+   author:
+     - name: "Your Name" 
+   categories: [] # [biology, bioinformatics, theory, etc.]
+   bibliography: references.bib # If referencing anything
+   ---
+   ```
+   Feel free to add further formatting, but ensure it remains consistent with the main template.
+8. **Delete your Jupyter notebook:** After converting it to a `.qmd` file, delete the original `.ipynb` file to prevent duplication in the blog post.
+9. **Commit and push your changes:** After completing your `.qmd` file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.
+
+### Additional Information for Quarto:
+
+- **Add Images:**
+  You can add images to your Quarto document using markdown syntax:
+  ```markdown
+  ![Image Description](path/to/image.png)
+  ```
+  To add images from a URL:
+  ```markdown
+  ![Image Description](https://example.com/image.png)
+  ```
+- **Add References:**
+  Manage references by creating a `bibliography.bib` file with your references in BibTeX format. Link the bibliography file in your Quarto document header (YAML).
+  Cite references in your text using the following syntax:
+  ```markdown
+  This is a citation [@citation_key].
+  ```
+- **Other Edits:**
+  Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header.

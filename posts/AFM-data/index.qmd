@@ -52,15 +52,17 @@ Here are some know properties of *M.smegmatis* bacteria :
 
 ![Growth dynamics.](Neto.svg)
 
-#### Data
-
 
 
 
 
 
 ## Raw image pre-processing
+#### Data
+
+Several data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc.
 
 ## Segmentation
+
 
 ## Centerline

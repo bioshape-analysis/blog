@@ -69,7 +69,7 @@ plt.plot(*alpha_shape.exterior.xy, color='red', lw=2, label='Alpha Shape')
 plt.title('2D Alpha Shape')
 plt.xlabel('X')
 plt.ylabel('Y')
-plt.legend()~
+plt.legend()
 plt.grid(True)
 plt.show()
 ```

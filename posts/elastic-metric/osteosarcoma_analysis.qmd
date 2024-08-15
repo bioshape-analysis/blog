@@ -14,7 +14,7 @@ This analysis relies on the *elastic metric between discrete curves* from Geomst
 This notebook is adapted from Florent Michel's submission to the [ICLR 2021 Computational Geometry and Topology challenge](https://github.com/geomstats/challenge-iclr-2021).
 
 <center>
-    <img src="../figs/illustration/cells_image.png" width=600px />
+    <img src="figs/illustration/cells_image.png" width=600px />
 </center>
 
 Figure 1: Representative images of the cell lines using fluorescence microscopy, studied in this notebook (Image credit : Ashok Prasad). The cells nuclei (blue), the actin cytoskeleton (green) and the lipid membrane (red) of each cell are stained and colored. We only focus on the cell shape in our analysis.
@@ -62,7 +62,7 @@ We study a dataset of mouse *Osteosarcoma* imaged cells [(AXCFP2019)](#Reference
 Each cell comes from a raw image containing a set of cells, which was thresholded to generate binarized images.
 
 <td>
-    <img src="../figs/illustration/binarized_cells.png" width=400px />
+    <img src="figs/illustration/binarized_cells.png" width=400px />
 </td>
 
 After binarizing the images, contouring was used to isolate each cell, and to extract their boundaries as a counter-clockwise ordered list of 2D coordinates, which corresponds to the representation of discrete curve in Geomstats. We load these discrete curves into the notebook.

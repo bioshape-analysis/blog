@@ -1,0 +1,2437 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: Shape Analysis of Cancer Cells\n",
+        "jupyter: python3\n",
+        "---\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "Lead author: Nina Miolane.\n",
+        "\n",
+        "This notebook studies *Osteosarcoma* (bone cancer) cells and the impact of drug treatment on their *morphological shapes*, by analyzing cell images obtained from fluorescence microscopy. \n",
+        "\n",
+        "This analysis relies on the *elastic metric between discrete curves* from Geomstats. We will study to which extent this metric can detect how the cell shape is associated with the response to treatment.\n",
+        "\n",
+        "This notebook is adapted from Florent Michel's submission to the [ICLR 2021 Computational Geometry and Topology challenge](https://github.com/geomstats/challenge-iclr-2021).\n",
+        "\n",
+        "<center>\n",
+        "    <img src=\"../figs/illustration/cells_image.png\" width=600px />\n",
+        "</center>\n",
+        "\n",
+        "Figure 1: Representative images of the cell lines using fluorescence microscopy, studied in this notebook (Image credit : Ashok Prasad). The cells nuclei (blue), the actin cytoskeleton (green) and the lipid membrane (red) of each cell are stained and colored. We only focus on the cell shape in our analysis.\n",
+        "\n",
+        "# 1. Introduction and Motivation\n",
+        "\n",
+        "Biological cells adopt a variety of shapes, determined by multiple processes and biophysical forces under the control of the cell. These shapes can be studied with different quantitative measures that reflect the cellular morphology [(MGCKCKDDRTWSBCC2018)](#References). With the emergence of large-scale biological cell image data, morphological studies have many applications. For example, measures of irregularity and spreading of cells allow accurate classification and discrimination between cancer cell lines treated with different drugs [(AXCFP2019)](#References).\n",
+        "\n",
+        "As metrics defined on the shape space of curves, the *elastic metrics* [(SKJJ2010)](#References) implemented in Geomstats are a potential tool for analyzing and comparing biological cell shapes. Their associated geodesics and geodesic distances provide a natural framework for optimally matching, deforming, and comparing cell shapes.\n"
+      ],
+      "id": "3720e516"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from decimal import Decimal\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "import geomstats.backend as gs\n",
+        "import numpy as np\n",
+        "from common import *\n",
+        "import random\n",
+        "import os\n",
+        "import scipy.stats as stats\n",
+        "from sklearn import manifold\n",
+        "\n",
+        "gs.random.seed(2021)"
+      ],
+      "id": "a24517f7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "base_path = \"/home/wanxinli/dyn/dyn/\"\n",
+        "data_path = os.path.join(base_path, \"datasets\")\n",
+        "\n",
+        "dataset_name = 'osteosarcoma'\n",
+        "figs_dir = os.path.join(\"/home/wanxinli/dyn/dyn/figs\", dataset_name)\n",
+        "savefig = False\n",
+        "\n",
+        "# If compute for the first time, we need to compute pairwise distances and run DeCOr-MDS\n",
+        "# Otherwise, we can just use the pre-computed results\n",
+        "first_time = False\n",
+        "if savefig:\n",
+        "    print(f\"Will save figs to {figs_dir}\")"
+      ],
+      "id": "fc0a3a8b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# 2. Dataset Description\n",
+        "\n",
+        "We study a dataset of mouse *Osteosarcoma* imaged cells [(AXCFP2019)](#References). The dataset contains two different cancer cell lines : *DLM8* and *DUNN*, respectively representing a more agressive and a less agressive cancer.  Among these cells, some have also been treated with different single drugs that perturb the cellular cytoskeleton. Overall, we can label each cell according to their cell line (*DLM8* and *DUNN*), and also if it is a *control* cell (no treatment), or has been treated with one of the following drugs : *Jasp* (jasplakinolide) and *Cytd* (cytochalasin D).\n",
+        "\n",
+        "Each cell comes from a raw image containing a set of cells, which was thresholded to generate binarized images.\n",
+        "\n",
+        "<td>\n",
+        "    <img src=\"../figs/illustration/binarized_cells.png\" width=400px />\n",
+        "</td>\n",
+        "\n",
+        "After binarizing the images, contouring was used to isolate each cell, and to extract their boundaries as a counter-clockwise ordered list of 2D coordinates, which corresponds to the representation of discrete curve in Geomstats. We load these discrete curves into the notebook.\n"
+      ],
+      "id": "d231daaa"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import geomstats.datasets.utils as data_utils\n",
+        "\n",
+        "cells, lines, treatments = data_utils.load_cells()\n",
+        "print(f\"Total number of cells : {len(cells)}\")"
+      ],
+      "id": "b7d3e917",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The cells are grouped by treatment class in the dataset : \n",
+        "- the *control* cells, \n",
+        "- the cells treated with *Cytd*,\n",
+        "- and the ones treated with *Jasp*. \n",
+        "\n",
+        "Additionally, in each of these classes, there are two cell lines : \n",
+        "- the *DLM8* cells, and\n",
+        "- the *DUNN* ones.\n",
+        "\n",
+        "Before using the dataset, we check for duplicates in the dataset.\n",
+        "\n",
+        "We compute the pairwise distance between two cells. If the pairwise distance is smaller than 0.1, we visualize the corresponding cells to check they are duplicates.\n"
+      ],
+      "id": "ab0a4c82"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "tol = 1e-1\n",
+        "for i, cell_i in enumerate(cells):\n",
+        "    for j, cell_j in enumerate(cells):\n",
+        "        if i != j and cell_i.shape[0] == cell_j.shape[0]:\n",
+        "            dist = np.sum(np.sqrt(np.sum((cell_i-cell_j)**2,axis=1)))\n",
+        "            if dist < tol:\n",
+        "                print(f\"cell indices are: {i} and {j}, {lines[i]}, {lines[j]}, {treatments[i]}, {treatments[j]}\")"
+      ],
+      "id": "502099bc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pair_indices = [363, 396]\n",
+        "\n",
+        "fig = plt.figure(figsize=(10, 5))\n",
+        "fig.add_subplot(121)\n",
+        "index_0 = pair_indices[0]\n",
+        "plt.scatter(cells[index_0][:, 0], cells[index_0][:, 1], s=4)\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(f\"Cell {index_0}\")\n",
+        "\n",
+        "fig.add_subplot(122)\n",
+        "index_1 = pair_indices[1]\n",
+        "plt.scatter(cells[index_1][:, 0], cells[index_1][:, 1], s=4)\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(f\"Cell {index_1}\")"
+      ],
+      "id": "219028e0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pair_indices = [513, 519]\n",
+        "\n",
+        "fig = plt.figure(figsize=(10, 5))\n",
+        "fig.add_subplot(121)\n",
+        "index_0 = pair_indices[0]\n",
+        "plt.scatter(cells[index_0][:, 0], cells[index_0][:, 1], s=4)\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(f\"Cell {index_0}\")\n",
+        "\n",
+        "fig.add_subplot(122)\n",
+        "index_1 = pair_indices[1]\n",
+        "plt.scatter(cells[index_1][:, 0], cells[index_1][:, 1], s=4)\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(f\"Cell {index_1}\")"
+      ],
+      "id": "ab3c0c29",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Check the category indices in order to remove corresponding cells in `ds_align`\n"
+      ],
+      "id": "a578774e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "delete_indices = [363, 396, 513, 519]\n",
+        "category_count = {}\n",
+        "global_count = 0\n",
+        "for i in range(len(cells)):\n",
+        "    treatment = treatments[i]\n",
+        "    line = lines[i]\n",
+        "    if treatment not in category_count:\n",
+        "        category_count[treatment] = {}\n",
+        "    if line not in category_count[treatment]:\n",
+        "        category_count[treatment][line] = 0\n",
+        "    # if global_count in delete_indices:\n",
+        "    #     print(treatment, line, category_count[treatment][line])\n",
+        "    category_count[treatment][line] += 1\n",
+        "    global_count += 1"
+      ],
+      "id": "43ee48fd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Since 363th, 396th and 513th, 519th are duplicates of each other and after visualization we see they are poor quality cells with overlapping adjacent cells, we remove them from our dataset. \n"
+      ],
+      "id": "b8fa3514"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def remove_cells(cells, lines, treatments, delete_indices):\n",
+        "    \"\"\" \n",
+        "    Remove cells of control group from cells, lines and treatments\n",
+        "\n",
+        "    :param list[int] delete_indices: the indices to delete\n",
+        "    \"\"\"\n",
+        "    delete_indices = sorted(delete_indices, reverse=True) # to prevent change in index when deleting elements\n",
+        "    \n",
+        "    # Delete elements\n",
+        "    cells = del_arr_elements(cells, delete_indices)\n",
+        "    lines = list(np.delete(np.array(lines), delete_indices, axis=0))\n",
+        "    treatments = list(np.delete(np.array(treatments), delete_indices, axis=0))\n",
+        "\n",
+        "    return cells, lines, treatments"
+      ],
+      "id": "17954dc7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "delete_indices = [363, 396, 513, 519]\n",
+        "cells, lines, treatments = remove_cells(cells, lines, treatments, delete_indices)\n",
+        "# print(len(cells), len(lines), len(treatments))"
+      ],
+      "id": "3409e968",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "This is shown by displaying the unique elements in the lists `treatments` and `lines`:\n"
+      ],
+      "id": "ccb45be0"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import pandas as pd\n",
+        "\n",
+        "TREATMENTS = gs.unique(treatments)\n",
+        "print(TREATMENTS)\n",
+        "LINES = gs.unique(lines)\n",
+        "print(LINES)\n",
+        "METRICS = ['SRV', 'Linear']"
+      ],
+      "id": "64045e6d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The size of each class is displayed below:\n"
+      ],
+      "id": "575d000b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "ds = {}\n",
+        "\n",
+        "n_cells_arr = gs.zeros((3, 2))\n",
+        "\n",
+        "for i, treatment in enumerate(TREATMENTS):\n",
+        "    print(f\"{treatment} :\")\n",
+        "    ds[treatment] = {}\n",
+        "    for j, line in enumerate(LINES):\n",
+        "        to_keep = gs.array(\n",
+        "            [\n",
+        "                one_treatment == treatment and one_line == line\n",
+        "                for one_treatment, one_line in zip(treatments, lines)\n",
+        "            ]\n",
+        "        )\n",
+        "        ds[treatment][line] = [\n",
+        "            cell_i for cell_i, to_keep_i in zip(cells, to_keep) if to_keep_i\n",
+        "        ]\n",
+        "        nb = len(ds[treatment][line])\n",
+        "        print(f\"\\t {nb} {line}\")\n",
+        "        n_cells_arr[i, j] = nb\n",
+        "\n",
+        "n_cells_df = pd.DataFrame({\"dlm8\": n_cells_arr[:, 0], \"dunn\": n_cells_arr[:, 1]})\n",
+        "n_cells_df = n_cells_df.set_index(TREATMENTS)\n",
+        "\n",
+        "display(n_cells_df)\n",
+        "# display(ds)"
+      ],
+      "id": "18e2f663",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We have organized the cell data into the dictionnary `ds`. Before proceeding to the actual data analysis, we provide an auxiliary function `apply_func_to_ds`.\n"
+      ],
+      "id": "ebe6a5a7"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def apply_func_to_ds(input_ds, func):\n",
+        "    \"\"\"Apply the input function func to the input dictionnary input_ds.\n",
+        "\n",
+        "    This function goes through the dictionnary structure and applies\n",
+        "    func to every cell in input_ds[treatment][line].\n",
+        "\n",
+        "    It stores the result in a dictionnary output_ds that is returned\n",
+        "    to the user.\n",
+        "\n",
+        "    Parameters\n",
+        "    ----------\n",
+        "    input_ds : dict\n",
+        "        Input dictionnary, with keys treatment-line.\n",
+        "    func : callable\n",
+        "        Function to be applied to the values of the dictionnary, i.e.\n",
+        "        the cells.\n",
+        "\n",
+        "    Returns\n",
+        "    -------\n",
+        "    output_ds : dict\n",
+        "        Output dictionnary, with the same keys as input_ds.\n",
+        "    \"\"\"\n",
+        "    output_ds = {}\n",
+        "    for treatment in TREATMENTS:\n",
+        "        output_ds[treatment] = {}\n",
+        "        for line in LINES:\n",
+        "            output_list = []\n",
+        "            for one_cell in input_ds[treatment][line]:\n",
+        "                output_list.append(func(one_cell))\n",
+        "            output_ds[treatment][line] = gs.array(output_list)\n",
+        "    return output_ds"
+      ],
+      "id": "10c9f012",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Now we can move on to the actual data analysis, starting with a preprocessing of the cell boundaries.\n",
+        "\n",
+        "# 3. Preprocessing \n",
+        "\n",
+        "### Interpolation: Encoding Discrete Curves With Same Number of Points\n",
+        "\n",
+        "As we need discrete curves with the same number of sampled points to compute pairwise distances, the following interpolation is applied to each curve, after setting the number of sampling points.\n",
+        "\n",
+        "To set up the number of sampling points, you can edit the following line in the next cell:\n"
+      ],
+      "id": "f65fe727"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def interpolate(curve, nb_points):\n",
+        "    \"\"\"Interpolate a discrete curve with nb_points from a discrete curve.\n",
+        "\n",
+        "    Returns\n",
+        "    -------\n",
+        "    interpolation : discrete curve with nb_points points\n",
+        "    \"\"\"\n",
+        "    old_length = curve.shape[0]\n",
+        "    interpolation = gs.zeros((nb_points, 2))\n",
+        "    incr = old_length / nb_points\n",
+        "    pos = 0\n",
+        "    for i in range(nb_points):\n",
+        "        index = int(gs.floor(pos))\n",
+        "        interpolation[i] = curve[index] + (pos - index) * (\n",
+        "            curve[(index + 1) % old_length] - curve[index]\n",
+        "        )\n",
+        "        pos += incr\n",
+        "    return interpolation\n",
+        "\n",
+        "\n",
+        "k_sampling_points = 2000"
+      ],
+      "id": "698dbef7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "To illustrate the result of this interpolation, we compare for a randomly chosen cell the original curve with the correponding interpolated one (to visualize another cell, you can simply re-run the code).\n"
+      ],
+      "id": "f40cf224"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "index = 0\n",
+        "cell_rand = cells[index]\n",
+        "cell_interpolation = interpolate(cell_rand, k_sampling_points)\n",
+        "\n",
+        "fig = plt.figure(figsize=(15, 5))\n",
+        "\n",
+        "fig.add_subplot(121)\n",
+        "plt.scatter(cell_rand[:, 0], cell_rand[:, 1], color='black', s=4)\n",
+        "\n",
+        "plt.plot(cell_rand[:, 0], cell_rand[:, 1])\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(f\"Original curve ({len(cell_rand)} points)\")\n",
+        "plt.axis(\"off\")\n",
+        "\n",
+        "fig.add_subplot(122)\n",
+        "plt.scatter(cell_interpolation[:, 0], cell_interpolation[:, 1], color='black', s=4)\n",
+        "\n",
+        "plt.plot(cell_interpolation[:, 0], cell_interpolation[:, 1])\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(f\"Interpolated curve ({k_sampling_points} points)\")\n",
+        "plt.axis(\"off\")\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, \"interpolation.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, \"interpolation.pdf\"))"
+      ],
+      "id": "073cead0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "As the interpolation is working as expected, we use the auxiliary function `apply_func_to_ds` to apply the function `func=interpolate` to the dataset `ds`, i.e. the dictionnary containing the cells boundaries.\n",
+        "\n",
+        "We obtain a new dictionnary, `ds_interp`, with the interpolated cell boundaries.\n"
+      ],
+      "id": "361caee8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "ds_interp = apply_func_to_ds(\n",
+        "    input_ds=ds, func=lambda x: interpolate(x, k_sampling_points)\n",
+        ")"
+      ],
+      "id": "d9a5ecdc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The shape of an array of cells in `ds_interp[treatment][cell]` is therefore: `(\"number of cells in treatment-line\", \"number of sampling points\", 2)`, where 2 refers to the fact that we are considering cell shapes in 2D. \n",
+        "\n",
+        "### Visualization of Interpolated Dataset of Curves\n",
+        "\n",
+        "We visualize the curves obtained, for a sample of control cells and treated cells (top row shows control, i.e. non-treated cells; bottom rows shows treated cells) across cell lines (left and blue for dlm8 and right and orange for dunn).\n"
+      ],
+      "id": "a278780f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "n_cells_to_plot = 5\n",
+        "# radius = 800\n",
+        "\n",
+        "fig = plt.figure(figsize=(16, 6))\n",
+        "count = 1\n",
+        "for i, treatment in enumerate(TREATMENTS):\n",
+        "    for line in LINES:\n",
+        "        cell_data = ds_interp[treatment][line]\n",
+        "        for i_to_plot in range(n_cells_to_plot):\n",
+        "            cell = gs.random.choice(cell_data)\n",
+        "            fig.add_subplot(3, 2 * n_cells_to_plot, count)\n",
+        "            count += 1\n",
+        "            plt.plot(cell[:, 0], cell[:, 1], color=\"C\" + str(i))\n",
+        "            # plt.xlim(-radius, radius)\n",
+        "            # plt.ylim(-radius, radius)\n",
+        "            plt.axis(\"equal\")\n",
+        "            plt.axis(\"off\")\n",
+        "            if i_to_plot == n_cells_to_plot // 2:\n",
+        "                plt.title(f\"{treatment}   -   {line}\", fontsize=20)\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, \"sample_cells.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, \"sample_cells.pdf\"))"
+      ],
+      "id": "8dc15eaf",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Visual inspection of these curves seems to indicate more protusions appearing in treated cells, compared with control ones. This is in agreement with the physiological impact of the drugs, which are known to perturb the internal cytoskeleton connected to the cell membrane. Using the elastic metric, our goal will be to see if we can quantitatively confirm these differences.\n",
+        "\n",
+        "### Remove duplicate sample points in curves\n",
+        "\n",
+        "During interpolation it is likely that some of the discrete curves in the dataset are downsampled from higher number of discrete data points to lower number of data points. Hence, two sampled data points that are close enough may end up overlapping after interpolation and hence such data points have to be dealt with specifically. \n"
+      ],
+      "id": "244ce41e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import numpy as np\n",
+        "\n",
+        "def preprocess(curve, tol=1e-10):\n",
+        "    \"\"\"Preprocess curve to ensure that there are no consecutive duplicate points.\n",
+        "\n",
+        "    Returns\n",
+        "    -------\n",
+        "    curve : discrete curve\n",
+        "    \"\"\"\n",
+        "\n",
+        "    dist = curve[1:] - curve[:-1]\n",
+        "    dist_norm = np.sqrt(np.sum(np.square(dist), axis=1))\n",
+        "\n",
+        "    if np.any( dist_norm < tol ):\n",
+        "        for i in range(len(curve)-1):\n",
+        "            if np.sqrt(np.sum(np.square(curve[i+1] - curve[i]), axis=0)) < tol:\n",
+        "                curve[i+1] = (curve[i] + curve[i+2]) / 2\n",
+        "\n",
+        "    return curve"
+      ],
+      "id": "40cb92e1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "ds_proc = apply_func_to_ds(ds_interp, func=lambda x: preprocess(x))"
+      ],
+      "id": "1da119e5",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Check we did not loss any cells after duplicates\n"
+      ],
+      "id": "b29c440d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "for treatment in TREATMENTS:\n",
+        "    for line in LINES:\n",
+        "        for metric in METRICS:\n",
+        "            print(f\"{treatment} and {line} using {metric}: {len(ds_proc[treatment][line])}\")"
+      ],
+      "id": "634cf6a5",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Alignment\n",
+        "\n",
+        "Our goal is to study the cell boundaries in our dataset, as points in a shape space of closed curves quotiented by translation, scaling, and rotation, so these transformations do not affect our measure of distance between curves.\n",
+        "\n",
+        "In practice, we apply functions that were initially designed to center (substract the barycenter), rescale (divide by the Frobenius norm) and then reparameterize (only for SRV metric).\n",
+        "\n",
+        "Since the alignment procedure takes 30 minutes, we ran `osteosarocoma_align.py` and saved the results in `~/dyn/datasets/osteosarcoma/aligned`\n",
+        "\n",
+        "Load aligned cells from txt files. These files were generated by calling `align` function in `common.py`.\n",
+        "\n",
+        "We get the aligned cells from preprocessed dataset.\n",
+        "\n",
+        "Furthermore, we align the barycenters of the cells to the barycenter of the projected base curve, and (optionally) flip the cell.\n"
+      ],
+      "id": "1bb4be94"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def align_barycenter(cell, centroid_x, centroid_y, flip):\n",
+        "    \"\"\" \n",
+        "    Align the the barycenter of the cell to ref centeriod and flip the cell against the xaxis of the centriod if flip is True. \n",
+        "\n",
+        "    :param 2D np array cell: cell to align\n",
+        "    :param float centroid_x: the x coordinates of the projected BASE_CURVE\n",
+        "    :param float centroid_y: the y coordinates of the projected BASE_CURVE\n",
+        "    :param bool flip: flip the cell against x = centroid x if True \n",
+        "    \"\"\"\n",
+        "    \n",
+        "    cell_bc = np.mean(cell, axis=0)\n",
+        "    aligned_cell = cell+[centroid_x, centroid_y]-cell_bc\n",
+        "\n",
+        "    if flip:\n",
+        "        aligned_cell[:, 0] = 2*centroid_x-aligned_cell[:, 0]\n",
+        "        # Flip the order of the points\n",
+        "        med_index = int(np.floor(aligned_cell.shape[0]/2))\n",
+        "        flipped_aligned_cell = np.concatenate((aligned_cell[med_index:], aligned_cell[:med_index]), axis=0)\n",
+        "        flipped_aligned_cell = np.flipud(flipped_aligned_cell)\n",
+        "        aligned_cell = flipped_aligned_cell\n",
+        "    return aligned_cell\n",
+        "\n",
+        "def get_centroid(base_curve):\n",
+        "    total_space = DiscreteCurvesStartingAtOrigin(k_sampling_points=k_sampling_points)\n",
+        "    proj_base_curve = total_space.projection(base_curve)\n",
+        "    base_centroid = np.mean(proj_base_curve, axis=0)\n",
+        "    return base_centroid[0], base_centroid[1]"
+      ],
+      "id": "3ea65e22",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "delete_indices = [363, 396, 513, 519]\n",
+        "\n",
+        "aligned_base_folder = os.path.join(data_path, dataset_name, \"aligned\")\n",
+        "\n",
+        "BASE_CURVE = generate_ellipse(k_sampling_points)\n",
+        "centroid_x, centroid_y = get_centroid(BASE_CURVE)\n",
+        "\n",
+        "ds_align = {}\n",
+        "\n",
+        "for metric in METRICS:\n",
+        "    ds_align[metric] = {}\n",
+        "    if metric == 'SRV':\n",
+        "        aligned_folder = os.path.join(aligned_base_folder, 'projection_rescale_rotation_reparameterization')\n",
+        "    elif metric == 'Linear':\n",
+        "        aligned_folder = os.path.join(aligned_base_folder, 'projection_rescale_rotation_reparameterization')\n",
+        "    for treatment in TREATMENTS:\n",
+        "        ds_align[metric][treatment] = {}\n",
+        "        for line in LINES:\n",
+        "            ds_align[metric][treatment][line] = []\n",
+        "            cell_num = len(ds_proc[treatment][line])\n",
+        "            if line == 'dlm8' and (treatment == 'cytd' or treatment == 'jasp'):\n",
+        "                cell_num += 2\n",
+        "            for i in range(cell_num):\n",
+        "                # Do not load duplicate cells\n",
+        "                # cytd dlm8 45\n",
+        "                # cytd dlm8 78\n",
+        "                # jasp dlm8 20\n",
+        "                # jasp dlm8 26\n",
+        "\n",
+        "                if (treatment == 'cytd' and line == 'dlm8' and (i == 45 or i == 78)) or \\\n",
+        "                    (treatment == 'jasp' and line == 'dlm8' and (i == 20 or i == 26)):\n",
+        "                    continue\n",
+        "                \n",
+        "                file_path = os.path.join(aligned_folder, f\"{treatment}_{line}_{i}.txt\")\n",
+        "                if os.path.exists(file_path):\n",
+        "                    cell = np.loadtxt(file_path)\n",
+        "                    ds_align[metric][treatment][line].append(cell)\n"
+      ],
+      "id": "e5609539",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Check we did not loss any cells after alignment\n"
+      ],
+      "id": "731eba5f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "for treatment in TREATMENTS:\n",
+        "    for line in LINES:\n",
+        "        for metric in METRICS:\n",
+        "            print(f\"{treatment} and {line} using {metric}: {len(ds_align[metric][treatment][line])}\")"
+      ],
+      "id": "5f3344b7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Update `lines` and `treatments`\n"
+      ],
+      "id": "db95d0ac"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "treatments = []\n",
+        "lines = []\n",
+        "for treatment in TREATMENTS:\n",
+        "    for line in LINES:\n",
+        "        treatments.extend([treatment]*len(ds_align['SRV'][treatment][line]))\n",
+        "        lines.extend([line]*len(ds_align['SRV'][treatment][line]))\n",
+        "\n",
+        "treatments = np.array(treatments)\n",
+        "lines = np.array(lines)\n",
+        "print(\"treatment length is:\", len(treatments), \"lines length is:\", len(lines))"
+      ],
+      "id": "42e35f12",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Visualize reference cell, unaligned cell and aligned cell.\n"
+      ],
+      "id": "acf28b9d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "index = 0\n",
+        "metric = 'SRV'\n",
+        "unaligned_cell = ds_proc[\"control\"][\"dlm8\"][index]\n",
+        "aligned_cell = ds_align[metric][\"control\"][\"dlm8\"][index]\n",
+        "\n",
+        "first_round_aligned_folder = os.path.join(aligned_base_folder, 'projection_rescale_rotation_reparameterization_first_round')\n",
+        "reference_path = os.path.join(first_round_aligned_folder, f\"reference.txt\")\n",
+        "mean_first_round = np.loadtxt(reference_path)\n",
+        "\n",
+        "fig = plt.figure(figsize=(15, 5))\n",
+        "\n",
+        "fig.add_subplot(131)\n",
+        "plt.plot(mean_first_round[:, 0], mean_first_round[:, 1])\n",
+        "plt.plot([mean_first_round[-1, 0], mean_first_round[0, 0]], [mean_first_round[-1, 1], mean_first_round[0, 1]], 'tab:blue')\n",
+        "plt.scatter(mean_first_round[:, 0], mean_first_round[:, 1], s=4, c='black')\n",
+        "plt.plot(mean_first_round[0, 0], mean_first_round[0, 1], \"ro\")\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(\"Reference curve\")\n",
+        "\n",
+        "fig.add_subplot(132)\n",
+        "plt.plot(unaligned_cell[:, 0], unaligned_cell[:, 1])\n",
+        "plt.scatter(unaligned_cell[:, 0], unaligned_cell[:, 1], s=4, c='black')\n",
+        "plt.plot(unaligned_cell[0, 0], unaligned_cell[0, 1], \"ro\")\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(\"Unaligned curve\")\n",
+        "\n",
+        "fig.add_subplot(133)\n",
+        "plt.plot(aligned_cell[:, 0], aligned_cell[:, 1])\n",
+        "plt.scatter(aligned_cell[:, 0], aligned_cell[:, 1], s=4, c='black')\n",
+        "plt.plot(aligned_cell[0, 0], aligned_cell[0, 1], \"ro\")\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(\"Aligned curve\")\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, \"alignment.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, \"alignment.pdf\"))"
+      ],
+      "id": "c3406a2a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "In the plot above, the red dot shows the start of the parametrization of each curve. The right curve has been rotated from the curve in the middle, to be aligned with the left (reference) curve, which represents the first cell of the dataset. The starting point (in red) of this right curve has been also set to align with the reference.\n",
+        "\n",
+        "# 4 Data Analysis\n",
+        "\n",
+        "## Compute Mean Cell Shape of the Whole Dataset: \"Global\" Mean Shape\n",
+        "\n",
+        "We want to compute the mean cell shape of the whole dataset. Thus, we first combine all the cell shape data into a single array.\n"
+      ],
+      "id": "2ad6772c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "CURVES_SPACE_SRV = DiscreteCurvesStartingAtOrigin(ambient_dim=2, k_sampling_points=k_sampling_points)"
+      ],
+      "id": "3eb97660",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "cell_shapes_list = {}\n",
+        "for metric in METRICS:\n",
+        "    cell_shapes_list[metric] = []\n",
+        "    for treatment in TREATMENTS:\n",
+        "        for line in LINES:\n",
+        "            cell_shapes_list[metric].extend(ds_align[metric][treatment][line])\n",
+        "\n",
+        "cell_shapes = {}\n",
+        "for metric in METRICS:\n",
+        "    cell_shapes[metric] = gs.array(cell_shapes_list[metric])\n",
+        "print(cell_shapes['SRV'].shape)"
+      ],
+      "id": "a603f7fc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Remove outliers using DeCOr-MDS, together for DUNN and DLM8 cell lines.\n"
+      ],
+      "id": "76f9f78f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def linear_dist(cell1, cell2):\n",
+        "    return gs.linalg.norm(cell1 - cell2)\n",
+        "\n",
+        "def srv_dist(cell1, cell2):\n",
+        "    CURVES_SPACE_SRV.equip_with_metric(SRVMetric)\n",
+        "    return CURVES_SPACE_SRV.metric.dist(cell1, cell2)\n",
+        " \n",
+        "# compute pairwise distances, we only need to compute it once and save the results \n",
+        "pairwise_dists = {}\n",
+        "\n",
+        "if first_time:\n",
+        "    metric = 'SRV'\n",
+        "    pairwise_dists[metric] = parallel_dist(cell_shapes[metric], srv_dist, k_sampling_points)\n",
+        "\n",
+        "    metric = 'Linear' \n",
+        "    pairwise_dists[metric] = parallel_dist(cell_shapes[metric], linear_dist, k_sampling_points)\n",
+        "\n",
+        "    for metric in METRICS:\n",
+        "        np.savetxt(os.path.join(data_path, dataset_name, \"distance_matrix\", f\"{metric}_matrix.txt\"), pairwise_dists[metric])\n",
+        "else:\n",
+        "    for metric in METRICS:\n",
+        "        pairwise_dists[metric] = np.loadtxt(os.path.join(data_path, dataset_name, \"distance_matrix\", f\"{metric}_matrix.txt\"))"
+      ],
+      "id": "27e5f3b1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# to remove 132 and 199\n",
+        "one_cell = cell_shapes['Linear'][199]\n",
+        "plt.plot(one_cell[:, 0], one_cell[:, 1], c=f\"gray\")"
+      ],
+      "id": "cc1db15b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# run DeCOr-MDS\n",
+        "metric = 'SRV'\n",
+        "dim_start = 2 # we know the subspace dimension is 3, we set start and end to 3 to reduce runtime \n",
+        "dim_end = 10\n",
+        "# dim_start = 3\n",
+        "# dim_end = 3\n",
+        "std_multi = 1\n",
+        "if first_time:\n",
+        "    subspace_dim, outlier_indices = find_subspace_dim(pairwise_dists[metric], dim_start, dim_end, std_multi)\n",
+        "    print(f\"subspace dimension is: {subspace_dim}\")\n",
+        "    print(f\"outlier_indices are: {outlier_indices}\")"
+      ],
+      "id": "688a37ac",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Visualize outlier cells to see if they are artifacts\n"
+      ],
+      "id": "611ebed8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "if first_time:\n",
+        "    fig, axes = plt.subplots(\n",
+        "        nrows= 1,\n",
+        "        ncols=len(outlier_indices),\n",
+        "        figsize=(2*len(outlier_indices), 2),\n",
+        "    )\n",
+        "\n",
+        "    for i, outlier_index in enumerate(outlier_indices):\n",
+        "        one_cell = cell_shapes[metric][outlier_index]\n",
+        "        ax = axes[i]\n",
+        "        ax.plot(one_cell[:, 0], one_cell[:, 1], c=f\"C{j}\")\n",
+        "        ax.set_title(f\"{outlier_index}\", fontsize=14)\n",
+        "        # Turn off tick labels\n",
+        "        ax.set_yticklabels([])\n",
+        "        ax.set_xticklabels([])\n",
+        "        ax.set_xticks([])\n",
+        "        ax.set_yticks([])\n",
+        "        ax.spines[\"top\"].set_visible(False)\n",
+        "        ax.spines[\"right\"].set_visible(False)\n",
+        "        ax.spines[\"bottom\"].set_visible(False)\n",
+        "        ax.spines[\"left\"].set_visible(False)\n",
+        "\n",
+        "    plt.tight_layout()\n",
+        "    plt.suptitle(f\"\", y=-0.01, fontsize=24)\n",
+        "    # plt.savefig(os.path.join(figs_dir, \"outlier.svg\"))"
+      ],
+      "id": "c63b4375",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "delete_indices = [132, 199]\n",
+        "\n",
+        "\n",
+        "fig, axes = plt.subplots(\n",
+        "    nrows= 1,\n",
+        "    ncols=len(delete_indices),\n",
+        "    figsize=(2*len(delete_indices), 2),\n",
+        ")\n",
+        "\n",
+        "\n",
+        "for i, outlier_index in enumerate(delete_indices):\n",
+        "    one_cell = cell_shapes[metric][outlier_index]\n",
+        "    ax = axes[i]\n",
+        "    ax.plot(one_cell[:, 0], one_cell[:, 1], c=f\"gray\")\n",
+        "    ax.set_title(f\"{outlier_index}\", fontsize=14)\n",
+        "    # ax.axis(\"off\")\n",
+        "    # Turn off tick labels\n",
+        "    ax.set_yticklabels([])\n",
+        "    ax.set_xticklabels([])\n",
+        "    ax.set_xticks([])\n",
+        "    ax.set_yticks([])\n",
+        "    ax.spines[\"top\"].set_visible(False)\n",
+        "    ax.spines[\"right\"].set_visible(False)\n",
+        "    ax.spines[\"bottom\"].set_visible(False)\n",
+        "    ax.spines[\"left\"].set_visible(False)\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "plt.suptitle(f\"\", y=-0.01, fontsize=24)\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, \"delete_outlier.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, \"delete_outlier.pdf\"))"
+      ],
+      "id": "8fb694c0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "After visual inspection, we decide to remove the outlier cells\n"
+      ],
+      "id": "35ba9f72"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def remove_ds_two_layer(ds, delete_indices):\n",
+        "    global_i = sum(len(v) for values in ds.values() for v in values.values())-1\n",
+        "\n",
+        "    for treatment in reversed(list(ds.keys())):\n",
+        "        treatment_values = ds[treatment]\n",
+        "        for line in reversed(list(treatment_values.keys())):\n",
+        "            line_cells = treatment_values[line]\n",
+        "            for i, _ in reversed(list(enumerate(line_cells))):\n",
+        "                if global_i in delete_indices:\n",
+        "                    print(np.array(ds[treatment][line][:i]).shape, np.array(ds[treatment][line][i+1:]).shape)\n",
+        "                    if len(np.array(ds[treatment][line][:i]).shape) == 1:\n",
+        "                        ds[treatment][line] = np.array(ds[treatment][line][i+1:])\n",
+        "                    elif len(np.array(ds[treatment][line][i+1:]).shape) == 1:\n",
+        "                        ds[treatment][line] = np.array(ds[treatment][line][:i])\n",
+        "                    else:\n",
+        "                        ds[treatment][line] = np.concatenate((np.array(ds[treatment][line][:i]), np.array(ds[treatment][line][i+1:])), axis=0)            \n",
+        "                global_i -= 1\n",
+        "    return ds\n",
+        "\n",
+        "\n",
+        "\n",
+        "def remove_cells_two_layer(cells, cell_shapes, lines, treatments, pairwise_dists, ds_proc, ds_align, delete_indices):\n",
+        "    \"\"\" \n",
+        "    Remove cells of control group from cells, cell_shapes, ds,\n",
+        "    the parameters returned from load_treated_osteosarcoma_cells\n",
+        "    Also update n_cells\n",
+        "\n",
+        "    :param list[int] delete_indices: the indices to delete\n",
+        "    \"\"\"\n",
+        "    delete_indices = sorted(delete_indices, reverse=True) # to prevent change in index when deleting elements\n",
+        "    \n",
+        "    # Delete elements\n",
+        "    cells = del_arr_elements(cells, delete_indices)    \n",
+        "    lines = list(np.delete(np.array(lines), delete_indices, axis=0))\n",
+        "    treatments = list(np.delete(np.array(treatments), delete_indices, axis=0))\n",
+        "    ds_proc = remove_ds_two_layer(ds_proc, delete_indices)\n",
+        "    \n",
+        "    for metric in METRICS:\n",
+        "        cell_shapes[metric] = np.delete(np.array(cell_shapes[metric]), delete_indices, axis=0)\n",
+        "        ds_align[metric] = remove_ds_two_layer(ds_align[metric], delete_indices)\n",
+        "        pairwise_dists[metric] = np.delete(pairwise_dists[metric], delete_indices, axis=0)\n",
+        "        pairwise_dists[metric] = np.delete(pairwise_dists[metric], delete_indices, axis=1)\n",
+        "\n",
+        "\n",
+        "    return cells, cell_shapes, lines, treatments, pairwise_dists, ds_proc, ds_align"
+      ],
+      "id": "8e493a08",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "cells, cell_shapes, lines, treatments, pairwise_dists, ds_proc, ds_align = remove_cells_two_layer(cells, cell_shapes, lines, treatments, pairwise_dists, ds_proc, ds_align, delete_indices)"
+      ],
+      "id": "325267a8",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Check we did not loss any other cells after the removal\n"
+      ],
+      "id": "27e7c27c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def check_num(cell_shapes, treatments, lines, pairwise_dists, ds_align):\n",
+        "    \n",
+        "    print(f\"treatments number is: {len(treatments)}, lines number is: {len(lines)}\")\n",
+        "    for metric in METRICS:\n",
+        "        print(f\"pairwise_dists for {metric} shape is: {pairwise_dists[metric].shape}\")\n",
+        "        print(f\"cell_shapes for {metric} number is : {len(cell_shapes[metric])}\")\n",
+        "        \n",
+        "        for line in LINES:\n",
+        "            for treatment in TREATMENTS:\n",
+        "                print(f\"ds_align {treatment} {line} using {metric}: {len(ds_align[metric][treatment][line])}\")"
+      ],
+      "id": "0b9408a4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "check_num(cell_shapes, treatments, lines, pairwise_dists, ds_align)"
+      ],
+      "id": "b2dddc3b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We compute the mean cell shape by using the SRV metric defined on the space of curves' shapes. The space of curves' shape is a manifold: we use the Frechet mean, associated to the SRV metric, to get the mean cell shape.\n",
+        "\n",
+        "Do not include cells with duplicate points when calculating the mean shapes\n"
+      ],
+      "id": "7a319b0a"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def check_duplicate(cell):\n",
+        "    \"\"\" \n",
+        "    Return true if there are duplicate points in the cell\n",
+        "    \"\"\"\n",
+        "    for i in range(cell.shape[0]-1):\n",
+        "        cur_coord = cell[i]\n",
+        "        next_coord = cell[i+1]\n",
+        "        if np.linalg.norm(cur_coord-next_coord) == 0:\n",
+        "            return True\n",
+        "        \n",
+        "    # Checking the last point vs the first poit\n",
+        "    if np.linalg.norm(cell[-1]-cell[0]) == 0:\n",
+        "        return True\n",
+        "    \n",
+        "    return False"
+      ],
+      "id": "81cf8e9e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "delete_indices = []\n",
+        "for metric in METRICS:\n",
+        "    for i, cell in reversed(list(enumerate(cell_shapes[metric]))):\n",
+        "        if check_duplicate(cell):\n",
+        "            if i not in delete_indices:\n",
+        "                delete_indices.append(i)\n",
+        "\n",
+        "\n",
+        "cells, cell_shapes, lines, treatments, pairwise_dists, ds_proc, ds_align = \\\n",
+        "    remove_cells_two_layer(cells, cell_shapes, lines, treatments, pairwise_dists, ds_proc, ds_align, delete_indices)\n"
+      ],
+      "id": "084c421a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Recheck cell number after removing cells with duplicated points\n"
+      ],
+      "id": "c9892034"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "check_num(cell_shapes, treatments, lines, pairwise_dists, ds_align)"
+      ],
+      "id": "519a869c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from geomstats.learning.frechet_mean import FrechetMean\n",
+        "\n",
+        "metric = 'SRV'\n",
+        "CURVES_SPACE_SRV = DiscreteCurvesStartingAtOrigin(ambient_dim=2, k_sampling_points=k_sampling_points)\n",
+        "mean = FrechetMean(CURVES_SPACE_SRV)\n",
+        "print(cell_shapes[metric].shape)\n",
+        "cells = cell_shapes[metric]\n",
+        "mean.fit(cells)\n",
+        "\n",
+        "mean_estimate = mean.estimate_"
+      ],
+      "id": "87f2fd86",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mean_estimate_aligned = {}\n",
+        "\n",
+        "mean_estimate_clean = mean_estimate[~gs.isnan(gs.sum(mean_estimate, axis=1)), :]\n",
+        "mean_estimate_aligned[metric] = (\n",
+        "    mean_estimate_clean - gs.mean(mean_estimate_clean, axis=0)\n",
+        ")"
+      ],
+      "id": "7ce5cfe8",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Also we compute the linear mean\n"
+      ],
+      "id": "bbf32d1e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'Linear'\n",
+        "linear_mean_estimate = gs.mean(cell_shapes[metric], axis=0)\n",
+        "linear_mean_estimate_clean = linear_mean_estimate[~gs.isnan(gs.sum(linear_mean_estimate, axis=1)), :]\n",
+        "\n",
+        "mean_estimate_aligned[metric] =  (\n",
+        "    linear_mean_estimate_clean - gs.mean(linear_mean_estimate_clean, axis=0)\n",
+        ")"
+      ],
+      "id": "26cca029",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Plot SRV mean cell versus linear mean cell\n"
+      ],
+      "id": "98b543ee"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig = plt.figure(figsize=(6, 3))\n",
+        "\n",
+        "fig.add_subplot(121)\n",
+        "metric = 'SRV'\n",
+        "plt.plot(mean_estimate_aligned[metric][:, 0], mean_estimate_aligned[metric][:, 1])\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(\"SRV\")\n",
+        "plt.axis(\"off\")\n",
+        "\n",
+        "fig.add_subplot(122)\n",
+        "metric = 'Linear'\n",
+        "plt.plot(mean_estimate_aligned[metric][:, 0], mean_estimate_aligned[metric][:, 1])\n",
+        "plt.axis(\"equal\")\n",
+        "plt.title(\"Linear\")\n",
+        "plt.axis(\"off\")\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, \"global_mean.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, \"global_mean.pdf\"))"
+      ],
+      "id": "7e5e757b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Analyze Distances to the \"Global\"  Mean Shape\n",
+        "\n",
+        "We consider each of the subgroups of cells, defined by their treatment and cell line. We wish to study how far each of this group is from the global mean shape. We compute the list of distances to the global mean shape.\n"
+      ],
+      "id": "b011fcfc"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'SRV'\n",
+        "dists_to_global_mean = {}\n",
+        "dists_to_global_mean_list = {}\n",
+        "print(mean_estimate_aligned[metric].shape)\n",
+        "\n",
+        "dists_to_global_mean[metric] = apply_func_to_ds(\n",
+        "    ds_align[metric], \n",
+        "    func=lambda x: CURVES_SPACE_SRV.metric.dist(x, mean_estimate_aligned[metric])\n",
+        ")\n",
+        "\n",
+        "dists_to_global_mean_list[metric] = []\n",
+        "for t in TREATMENTS:\n",
+        "    for l in LINES:\n",
+        "        dists_to_global_mean_list[metric].extend(dists_to_global_mean[metric][t][l])"
+      ],
+      "id": "9f2fad33",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Compute distances to linear mean\n"
+      ],
+      "id": "10d7d3d1"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'Linear'\n",
+        "dists_to_global_mean[metric] = apply_func_to_ds(\n",
+        "    ds_align[metric], func=lambda x: gs.linalg.norm(mean_estimate_aligned[metric] - x) \n",
+        ")\n",
+        "\n",
+        "dists_to_global_mean_list[metric] = []\n",
+        "for t in TREATMENTS:\n",
+        "    for l in LINES:\n",
+        "        dists_to_global_mean_list[metric].extend(dists_to_global_mean[metric][t][l])"
+      ],
+      "id": "f805d8fa",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, axs = plt.subplots(1, 2, sharex=False, sharey=False, tight_layout=True, figsize=(8, 4))\n",
+        "\n",
+        "line = 'dlm8'\n",
+        "kde_dict = {}\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    distances = []\n",
+        "    min_dists = min(dists_to_global_mean_list[metric])\n",
+        "    max_dists = max(dists_to_global_mean_list[metric])\n",
+        "    xx = gs.linspace(gs.floor(min_dists), gs.ceil(max_dists), k_sampling_points)\n",
+        "    kde_dict[metric] = {}\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        distances = dists_to_global_mean[metric][treatment][line][~gs.isnan(dists_to_global_mean[metric][treatment][line])]\n",
+        "        \n",
+        "        \n",
+        "        axs[j].hist(distances, bins=20, alpha=0.4, density=True, label=treatment, color=f\"C{i}\")\n",
+        "        kde = stats.gaussian_kde(distances)\n",
+        "        kde_dict[metric][treatment] = kde\n",
+        "        axs[j].plot(xx, kde(xx), color=f\"C{i}\")\n",
+        "        axs[j].set_xlim((min_dists, max_dists))\n",
+        "        axs[j].legend(fontsize=12)\n",
+        "\n",
+        "        axs[j].set_title(f\"{metric}\", fontsize=14)\n",
+        "        axs[j].set_ylabel(\"Fraction of cells\", fontsize=14)\n",
+        "\n",
+        "\n",
+        "# fig.suptitle(\"Histograms of SRV distances to global mean cell\", fontsize=20)\n",
+        "        \n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_histogram.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_histogram.pdf\"))"
+      ],
+      "id": "3e2a19d6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Calculate the ratio of overlapping regions formed by the kde curves\n"
+      ],
+      "id": "6597b8d6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def calc_ratio(kde1, kde2, min, max):\n",
+        "    xx = np.linspace(min, max, 1000)\n",
+        "    kde1_values = kde1(xx)\n",
+        "    kde2_values = kde2(xx)\n",
+        "\n",
+        "    overlap = np.minimum(kde1_values, kde2_values)\n",
+        "    overlap_area = np.trapz(overlap, xx)\n",
+        "\n",
+        "    bound = np.maximum(kde1_values, kde2_values)\n",
+        "    bound_area =  np.trapz(bound, xx)\n",
+        "\n",
+        "    return overlap_area/bound_area"
+      ],
+      "id": "c74c0fd6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "for metric in METRICS:\n",
+        "    min_dists = min(dists_to_global_mean_list[metric])\n",
+        "    max_dists = max(dists_to_global_mean_list[metric])\n",
+        "    for i, tmt1 in enumerate(TREATMENTS):\n",
+        "        for j in range(i+1, len(TREATMENTS)):\n",
+        "            tmt2 = TREATMENTS[j]\n",
+        "            ratio = calc_ratio(kde_dict[metric][tmt1], kde_dict[metric][tmt2], min_dists, max_dists)\n",
+        "            print(f\"Overlap ratio for {line} between {tmt1} and {tmt2} using {metric} metric is: {round(ratio, 2)}\")"
+      ],
+      "id": "280d2f3a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, axs = plt.subplots(1, 2, sharex=False, sharey=False, tight_layout=True, figsize=(8, 4))\n",
+        "\n",
+        "line = 'dunn'\n",
+        "\n",
+        "np.set_printoptions(precision=12)\n",
+        "\n",
+        "kde_dict = {}\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    distances = []\n",
+        "    min_dists = min(dists_to_global_mean_list[metric])\n",
+        "    max_dists = max(dists_to_global_mean_list[metric])\n",
+        "    xx = gs.linspace(gs.floor(min_dists), gs.ceil(max_dists), k_sampling_points)\n",
+        "    kde_dict[metric] = {}\n",
+        "    \n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        \n",
+        "        distances = dists_to_global_mean[metric][treatment][line][~gs.isnan(dists_to_global_mean[metric][treatment][line])]\n",
+        "        counts, bin_edges, _ = axs[j].hist(distances, bins=20, alpha=0.4, density=True, label=treatment, color=f\"C{i}\")\n",
+        "        print(treatment, metric)\n",
+        "        print(\"counts are:\", counts)\n",
+        "        print(\"bin_edges are:\", bin_edges)\n",
+        "        kde = stats.gaussian_kde(distances)\n",
+        "        kde_dict[metric][treatment] = kde\n",
+        "        axs[j].plot(xx, kde(xx), color=f\"C{i}\")\n",
+        "        axs[j].set_xlim((min_dists, max_dists))\n",
+        "        axs[j].legend(fontsize=12)\n",
+        "\n",
+        "        axs[j].set_title(f\"{metric}\", fontsize=14)\n",
+        "        axs[j].set_ylabel(\"Fraction of cells\", fontsize=14)\n",
+        "\n",
+        "\n",
+        "# fig.suptitle(\"Histograms of SRV distances to global mean cell\", fontsize=20)\n",
+        "        \n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_histogram.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_histogram.pdf\"))"
+      ],
+      "id": "88c6b296",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Calculate the ratio of overlapping regions formed by the three kde curves \n"
+      ],
+      "id": "e1d12a24"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "for metric in METRICS:\n",
+        "    min_dists = min(dists_to_global_mean_list[metric])\n",
+        "    max_dists = max(dists_to_global_mean_list[metric])\n",
+        "    for i, tmt1 in enumerate(TREATMENTS):\n",
+        "        for j in range(i+1, len(TREATMENTS)):\n",
+        "            tmt2 = TREATMENTS[j]\n",
+        "            ratio = calc_ratio(kde_dict[metric][tmt1], kde_dict[metric][tmt2], min_dists, max_dists)\n",
+        "            print(f\"Overlap ratio for {line} between {tmt1} and {tmt2} using {metric} metric is: {round(ratio, 2)}\")"
+      ],
+      "id": "eb7b48d5",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Conduct T-test to test if the two samples have the same expected average\n"
+      ],
+      "id": "f5f2b84b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "for line in LINES:\n",
+        "    for i in range(len(TREATMENTS)):\n",
+        "        tmt1 = TREATMENTS[i]\n",
+        "        for j in range(i+1, len(TREATMENTS)):\n",
+        "            tmt2 = TREATMENTS[j]\n",
+        "            for metric in METRICS:\n",
+        "                distance1 = dists_to_global_mean[metric][tmt1][line][~gs.isnan(dists_to_global_mean[metric][tmt1][line])]\n",
+        "                distance2 = dists_to_global_mean[metric][tmt2][line][~gs.isnan(dists_to_global_mean[metric][tmt2][line])]\n",
+        "                t_statistic, p_value = stats.ttest_ind(distance1, distance2)\n",
+        "                print(f\"Significance of differences for {line} between {tmt1} and {tmt2} using {metric} metric is: {'%.2e' % Decimal(p_value)}\")"
+      ],
+      "id": "ecfb5b25",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Let's analyze bi-modal distribution for the control group of dunn cell line using SRV metric\n",
+        "\n",
+        "We consider two groups: cells with [3.42551653, 3.43015473) - distance to the mean, cells with [3.47189855, 3.47653676) distance to the mean, and find the modes of the two groups\n"
+      ],
+      "id": "2bb4e80f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "line = 'dunn'\n",
+        "treatment = 'control'\n",
+        "metric = 'SRV'\n",
+        "distances = dists_to_global_mean[metric][treatment][line]\n",
+        "print(min(distances), max(distances))\n",
+        "group_1_left = 0.208744255891 \n",
+        "group_1_right = 0.227075666936\n",
+        "group_2_left =  0.337064133205 \n",
+        "group_2_right =  0.35539554425\n",
+        "group_1_indices = [i for i, element in enumerate(distances) if element <= group_1_right and element > group_1_left]\n",
+        "group_2_indices = [i for i, element in enumerate(distances) if element <= group_2_right and element > group_2_left]\n",
+        "print(group_1_indices)\n",
+        "print(group_2_indices)\n",
+        "group_1_cells = gs.array(ds_align[metric][treatment][line])[group_1_indices,:,:]\n",
+        "group_2_cells = gs.array(ds_align[metric][treatment][line])[group_2_indices,:,:]\n",
+        "\n",
+        "col_num = max(len(group_1_indices), len(group_2_indices))\n",
+        "fig = plt.figure(figsize=(2*col_num, 2))\n",
+        "count = 1\n",
+        "for index in range(len(group_1_indices)):\n",
+        "    cell = group_1_cells[index]\n",
+        "    fig.add_subplot(2, col_num, count)\n",
+        "    count += 1\n",
+        "    plt.plot(cell[:, 0], cell[:, 1])\n",
+        "    plt.axis(\"equal\")\n",
+        "    plt.axis(\"off\")\n",
+        "\n",
+        "count = max(len(group_1_indices), len(group_2_indices))+1\n",
+        "for index in range(len(group_2_indices)):\n",
+        "    cell = group_2_cells[index]\n",
+        "    fig.add_subplot(2, col_num, count)\n",
+        "    count += 1\n",
+        "    plt.plot(cell[:, 0], cell[:, 1])\n",
+        "    plt.axis(\"equal\")\n",
+        "    plt.axis(\"off\")\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_bimodal_mean.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_bimodal_mean.pdf\"))"
+      ],
+      "id": "0713ce05",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Visualization of the Mean of each Treatment\n",
+        "\n",
+        "The mean distances to the global mean shape differ. We also plot the mean shape for each of the subgroup, to get intuition on how the mean shape of each subgroup looks like.\n",
+        "\n",
+        "We first calculate the SRV mean\n"
+      ],
+      "id": "caa36451"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mean_treatment_cells = {}\n",
+        "metric = 'SRV'\n",
+        "for treatment in TREATMENTS:\n",
+        "    treatment_cells = []\n",
+        "    for line in LINES:\n",
+        "        treatment_cells.extend(ds_align[metric][treatment][line])\n",
+        "    mean_estimator = FrechetMean(space=CURVES_SPACE_SRV)\n",
+        "    mean_estimator.fit(CURVES_SPACE_SRV.projection(gs.array(treatment_cells)))\n",
+        "    mean_treatment_cells[treatment] = mean_estimator.estimate_"
+      ],
+      "id": "08fcd9bf",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mean_line_cells = {}\n",
+        "for line in LINES:\n",
+        "    line_cells = []\n",
+        "    for treatment in TREATMENTS:\n",
+        "        line_cells.extend(ds_align[metric][treatment][line])\n",
+        "    mean_estimator = FrechetMean(space=CURVES_SPACE_SRV)\n",
+        "    mean_estimator.fit(CURVES_SPACE_SRV.projection(gs.array(line_cells)))\n",
+        "    mean_line_cells[line] = mean_estimator.estimate_"
+      ],
+      "id": "1eed4629",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mean_cells = {}\n",
+        "metric = 'SRV'\n",
+        "mean_cells[metric] = {}\n",
+        "for treatment in TREATMENTS:\n",
+        "    mean_cells[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        mean_estimator = FrechetMean(space=CURVES_SPACE_SRV)\n",
+        "        mean_estimator.fit(CURVES_SPACE_SRV.projection(gs.array(ds_align[metric][treatment][line])))\n",
+        "        mean_cells[metric][treatment][line] = mean_estimator.estimate_"
+      ],
+      "id": "68019cbd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We then calculate the linear mean\n"
+      ],
+      "id": "f63a7321"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'Linear'\n",
+        "mean_cells[metric] = {}\n",
+        "for treatment in TREATMENTS:\n",
+        "    mean_cells[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        mean_cells[metric][treatment][line] = gs.mean(ds_align[metric][treatment][line], axis=0)"
+      ],
+      "id": "ff4ef752",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "While the mean shapes of the control groups (for both cell lines) look regular, we observe that:\n",
+        "- the mean shape for cytd is the most irregular (for both cell lines)\n",
+        "- while the mean shape for jasp is more elongated for dlm8 cell line, and more irregular for dunn cell line.\n",
+        "\n",
+        "# Distance of the Cell Shapes to their Own Mean Shape\n",
+        "\n",
+        "Lastly, we evaluate how each subgroup of cell shapes is distributed around the mean shape of their specific subgroup.\n"
+      ],
+      "id": "79f56956"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "dists_to_own_mean = {}\n",
+        "\n",
+        "for metric in METRICS:\n",
+        "    dists_to_own_mean[metric] = {}\n",
+        "    for treatment in TREATMENTS:\n",
+        "        dists_to_own_mean[metric][treatment] = {}\n",
+        "        for line in LINES:\n",
+        "            dists = []\n",
+        "            ids = []\n",
+        "            for i_curve, curve in enumerate(ds_align[metric][treatment][line]):\n",
+        "                if metric == 'SRV':\n",
+        "                    one_dist = CURVES_SPACE_SRV.metric.dist(curve, mean_cells[metric][treatment][line])\n",
+        "                else:\n",
+        "                    one_dist = gs.linalg.norm(curve - mean_cells[metric][treatment][line])\n",
+        "                if ~gs.isnan(one_dist):\n",
+        "                    dists.append(one_dist)\n",
+        "                else:\n",
+        "                    ids.append(i_curve)\n",
+        "            dists_to_own_mean[metric][treatment][line] = dists"
+      ],
+      "id": "d5a9d1c1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Align with ellipse\n",
+        "\n",
+        "line = 'dunn'\n",
+        "\n",
+        "fig, axes = plt.subplots(\n",
+        "    ncols=len(TREATMENTS),\n",
+        "    nrows=len(METRICS),\n",
+        "    figsize=(2.5*len(TREATMENTS), 2*len(METRICS)))\n",
+        "\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        ax = axes[j, i]\n",
+        "        mean_cell = mean_cells[metric][treatment][line]\n",
+        "        ax.plot(mean_cell[:, 0], mean_cell[:, 1], color=f\"C{i}\")\n",
+        "        ax.axis(\"equal\")\n",
+        "        ax.axis(\"off\")\n",
+        "        ax.set_title(f\"{metric}-{treatment}\", fontsize=20)\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_own_mean.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_own_mean.pdf\"))"
+      ],
+      "id": "542bf2c2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "line = 'dlm8'\n",
+        "\n",
+        "fig, axes = plt.subplots(\n",
+        "    ncols=len(TREATMENTS),\n",
+        "    nrows=len(METRICS),\n",
+        "    figsize=(2.5*len(TREATMENTS), 2*len(METRICS)))\n",
+        "\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        ax = axes[j, i]\n",
+        "        mean_cell = mean_cells[metric][treatment][line]\n",
+        "        ax.plot(mean_cell[:, 0], mean_cell[:, 1], color=f\"C{i}\")\n",
+        "        ax.axis(\"equal\")\n",
+        "        ax.axis(\"off\")\n",
+        "        ax.set_title(f\"{metric}-{treatment}\", fontsize=20)\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_own_mean.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_own_mean.pdf\"))"
+      ],
+      "id": "d45a7b62",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We observe for the linear mean, the means go narrower as going right. This is caused by the start points for the cells align exactly on the right with the start point of the reference cell.\n",
+        "\n",
+        "We notice this artifactual pattern only happens for the linear means (espectially for the cytd group). Can we argue this is an advantage for SRV (reparameterization + SRV mean)? \n",
+        "\n",
+        "The above code find a given number of quantiles within the distance's histogram, using SRV metric and own mean, and plots the corresponding cell, for each treatment and each cell line.\n"
+      ],
+      "id": "0755e5a9"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import scipy.stats as ss\n",
+        "\n",
+        "line = 'dunn'\n",
+        "n_quantiles = 10\n",
+        "\n",
+        "fig, axes = plt.subplots(\n",
+        "    nrows=len(TREATMENTS)*len(METRICS),\n",
+        "    ncols=n_quantiles,\n",
+        "    figsize=(20, 2 * len(TREATMENTS) * len(METRICS)),\n",
+        ")\n",
+        "\n",
+        "ranks = {}\n",
+        "\n",
+        "for i, treatment in enumerate(TREATMENTS):\n",
+        "    ranks[treatment] = {}\n",
+        "    for j, metric in enumerate(METRICS):\n",
+        "        \n",
+        "        dists_list = dists_to_own_mean[metric][treatment][line]\n",
+        "        dists_list = [d + 0.0001 * gs.random.rand(1)[0] for d in dists_list]\n",
+        "        cells_list = list(ds_align[metric][treatment][line])\n",
+        "        assert len(dists_list) == len(cells_list)\n",
+        "        n_cells = len(dists_list)\n",
+        "\n",
+        "        ranks[treatment][metric] = ss.rankdata(dists_list)\n",
+        "\n",
+        "        zipped_lists = zip(dists_list, cells_list)\n",
+        "        sorted_pairs = sorted(zipped_lists)\n",
+        "\n",
+        "        tuples = zip(*sorted_pairs)\n",
+        "        sorted_dists_list, sorted_cells_list = [list(t) for t in tuples]\n",
+        "        for i_quantile in range(n_quantiles):\n",
+        "            quantile = int(0.1 * n_cells * i_quantile)\n",
+        "            one_cell = sorted_cells_list[quantile]\n",
+        "            ax = axes[2*i+j, i_quantile]\n",
+        "            ax.plot(one_cell[:, 0], one_cell[:, 1], c=f\"C{i}\")\n",
+        "            ax.set_title(f\"0.{i_quantile} quantile\", fontsize=14)\n",
+        "            # ax.axis(\"off\")\n",
+        "            # Turn off tick labels\n",
+        "            ax.set_yticklabels([])\n",
+        "            ax.set_xticklabels([])\n",
+        "            ax.set_xticks([])\n",
+        "            ax.set_yticks([])\n",
+        "            ax.spines[\"top\"].set_visible(False)\n",
+        "            ax.spines[\"right\"].set_visible(False)\n",
+        "            ax.spines[\"bottom\"].set_visible(False)\n",
+        "            ax.spines[\"left\"].set_visible(False)\n",
+        "            if i_quantile == 0:\n",
+        "                ax.set_ylabel(f\"{metric} - \\n {treatment}\", rotation=90, fontsize=18)\n",
+        "plt.tight_layout()\n",
+        "# plt.suptitle(f\"Quantiles for linear metric using own mean\", y=-0.01, fontsize=24)\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_quantile.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_quantile.pdf\"))"
+      ],
+      "id": "814e6296",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We do not observe any clear patterns between the rank of the cells with distances using SRV metric and with the linear metric.\n"
+      ],
+      "id": "f09068aa"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "line = 'dlm8'\n",
+        "n_quantiles = 10\n",
+        "\n",
+        "fig, axes = plt.subplots(\n",
+        "    nrows=len(TREATMENTS)*len(METRICS),\n",
+        "    ncols=n_quantiles,\n",
+        "    figsize=(20, 2 * len(TREATMENTS) * len(METRICS)),\n",
+        ")\n",
+        "\n",
+        "for i, treatment in enumerate(TREATMENTS):\n",
+        "    for j, metric in enumerate(METRICS):\n",
+        "        dists_list = dists_to_own_mean[metric][treatment][line]\n",
+        "        dists_list = [d + 0.0001 * gs.random.rand(1)[0] for d in dists_list]\n",
+        "        cells_list = list(ds_align[metric][treatment][line])\n",
+        "        assert len(dists_list) == len(dists_list)\n",
+        "        n_cells = len(dists_list)\n",
+        "\n",
+        "        zipped_lists = zip(dists_list, cells_list)\n",
+        "        sorted_pairs = sorted(zipped_lists)\n",
+        "\n",
+        "        tuples = zip(*sorted_pairs)\n",
+        "        sorted_dists_list, sorted_cells_list = [list(t) for t in tuples]\n",
+        "        for i_quantile in range(n_quantiles):\n",
+        "            quantile = int(0.1 * n_cells * i_quantile)\n",
+        "            one_cell = sorted_cells_list[quantile]\n",
+        "            ax = axes[2*i+j, i_quantile]\n",
+        "            ax.plot(one_cell[:, 0], one_cell[:, 1], c=f\"C{i}\")\n",
+        "            ax.set_title(f\"0.{i_quantile} quantile\", fontsize=14)\n",
+        "            # ax.axis(\"off\")\n",
+        "            # Turn off tick labels\n",
+        "            ax.set_yticklabels([])\n",
+        "            ax.set_xticklabels([])\n",
+        "            ax.set_xticks([])\n",
+        "            ax.set_yticks([])\n",
+        "            ax.spines[\"top\"].set_visible(False)\n",
+        "            ax.spines[\"right\"].set_visible(False)\n",
+        "            ax.spines[\"bottom\"].set_visible(False)\n",
+        "            ax.spines[\"left\"].set_visible(False)\n",
+        "            if i_quantile == 0:\n",
+        "                ax.set_ylabel(f\"{metric} - \\n {treatment}\", rotation=90, fontsize=18)\n",
+        "plt.tight_layout()\n",
+        "# plt.suptitle(f\"Quantiles for linear metric using own mean\", y=-0.01, fontsize=24)\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_quantile.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_quantile.pdf\"))"
+      ],
+      "id": "c1b44668",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The above code find a given number of quantiles within the distance's histogram, using linear metric and own mean, and plots the corresponding cell, for each treatment and each cell line.\n",
+        "\n",
+        "# Dimensionality Reduction\n",
+        "\n",
+        "We use the following experiments to illustrate how SRV metric can help with dimensionality reduction \n"
+      ],
+      "id": "5a8d07df"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def scaled_stress(pos, pairwise_dists):\n",
+        "    \"\"\" \n",
+        "    Calculate the scaled stress invariant to scaling using the original stress \\\n",
+        "    statistics and actual pairwise distances\n",
+        "\n",
+        "    :param float unscaled_stress: the original stress\n",
+        "    :param 2D np.array[float] pairwise_dists: pairwise distance\n",
+        "    \"\"\"\n",
+        "    \n",
+        "    # compute pairwise distance of pos\n",
+        "    pairwise_pos = np.empty(shape=(pos.shape[0], pos.shape[0]))\n",
+        "    for i in range(pos.shape[0]):\n",
+        "        for j in range(pos.shape[0]):\n",
+        "            pairwise_pos[i,j] = np.sqrt(np.sum(pos[i]-pos[j])**2)\n",
+        "    \n",
+        "    print(pairwise_pos)\n",
+        "    stress = np.sqrt(np.sum((pairwise_dists-pairwise_pos)**2))\n",
+        "    \n",
+        "    return stress/np.sqrt(np.sum(pairwise_dists**2))"
+      ],
+      "id": "120af4dd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds = {}\n",
+        "pos = {}\n",
+        "dims = range(2, 11)\n",
+        "stresses = {}\n",
+        "\n",
+        "for metric in METRICS:\n",
+        "    mds[metric] = {}\n",
+        "    pos[metric] = {}\n",
+        "    stresses[metric] = []\n",
+        "    for dim in dims:\n",
+        "        mds[metric][dim] = manifold.MDS(n_components=dim, random_state=0, dissimilarity=\"precomputed\") # random_state set to 10\n",
+        "        pos[metric][dim] = mds[metric][dim].fit(pairwise_dists[metric]).embedding_\n",
+        "        stress_val = mds[metric][dim].stress_\n",
+        "        scaled_stress_val = np.sqrt(stress_val/((pairwise_dists[metric]**2).sum()/2))\n",
+        "        # scaled_stress_val = scaled_stress(pos[metric][dim], pairwise_dists[metric])\n",
+        "\n",
+        "        print(f\"the unscaled stress for {metric} model is for {dim}:\", stress_val)\n",
+        "        stresses[metric].append(scaled_stress_val)"
+      ],
+      "id": "dae2957b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "plt.figure(figsize = (4,4))\n",
+        "for metric in METRICS:\n",
+        "    plt.scatter(dims, stresses[metric], label=metric)\n",
+        "    plt.plot(dims, stresses[metric])\n",
+        "plt.xticks(dims)\n",
+        "plt.legend()\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"MDS_stress.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"MDS_stress.pdf\"))"
+      ],
+      "id": "1b70972c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "In terms of the scaled stress statistics, we observe linear metric perform better than SRV metric. That is, linear metric preserves the pairwise distances in embedded dimension better than the SRV metric.\n",
+        "\n",
+        "Calculate MDS statistics for dimension 2\n"
+      ],
+      "id": "e1bac065"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'SRV'\n",
+        "mds = manifold.MDS(n_components=2, random_state=0, dissimilarity=\"precomputed\")\n",
+        "pos = mds.fit(pairwise_dists[metric]).embedding_"
+      ],
+      "id": "9e73ee46",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "MDS embedding of cell treatments (control, cytd and jasp) for different cell lines (dunn and dlm8)\n"
+      ],
+      "id": "269c7463"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "embs = {}\n",
+        "embs[metric] = {}\n",
+        "index = 0\n",
+        "for treatment in TREATMENTS:\n",
+        "    embs[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        cell_num = len(ds_align[metric][treatment][line])   \n",
+        "        embs[metric][treatment][line] = pos[index:index+cell_num]\n",
+        "        index += cell_num"
+      ],
+      "id": "73f85e4d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We draw a comparison with linear metric using the following code\n"
+      ],
+      "id": "4225eed1"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'Linear'\n",
+        "mds = manifold.MDS(n_components=2, random_state=0, dissimilarity=\"precomputed\")\n",
+        "pos = mds.fit(pairwise_dists[metric]).embedding_\n",
+        "print(\"the stress for linear model is:\", mds.stress_)"
+      ],
+      "id": "99b2f6c9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "embs[metric] = {}\n",
+        "index = 0\n",
+        "for treatment in TREATMENTS:\n",
+        "    embs[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        cell_num = len(ds_align[metric][treatment][line])   \n",
+        "        embs[metric][treatment][line] = pos[index:index+cell_num]\n",
+        "        index += cell_num"
+      ],
+      "id": "3de7ca35",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The stress for MDS embedding using the linear metric is better than SRV metric. \n",
+        "\n",
+        "However, if we can make a better interpretation of the visual result of SRV metric, we could still argue SRV is better at capturing cell heterogeneity. \n"
+      ],
+      "id": "d0406dd8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "embs[metric] = {}\n",
+        "index = 0\n",
+        "for treatment in TREATMENTS:\n",
+        "    embs[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        cell_num = len(ds_align[metric][treatment][line])   \n",
+        "        embs[metric][treatment][line] = pos[index:index+cell_num]\n",
+        "        index += cell_num"
+      ],
+      "id": "32776d28",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, axs = plt.subplots(1, 2, sharex=False, sharey=False, tight_layout=True, figsize=(8, 4))\n",
+        "\n",
+        "line = 'dunn'\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        cur_embs = embs[metric][treatment][line]\n",
+        "        axs[j].scatter(\n",
+        "                cur_embs[:, 0],\n",
+        "                cur_embs[:, 1],\n",
+        "                label=treatment,\n",
+        "                s=10,\n",
+        "                alpha=0.4\n",
+        "            )\n",
+        "        # axs[j].set_xlim(-3.5*1e-5, 3.5*1e-5)\n",
+        "        axs[j].set_xlabel(\"First Dimension\")\n",
+        "        axs[j].set_ylabel(\"Second Dimension\")\n",
+        "        axs[j].legend()\n",
+        "        axs[j].set_title(f\"{metric}\")\n",
+        "# fig.suptitle(\"MDS of cell shapes using SRV metric\", fontsize=20)\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_2D.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_2D.pdf\"))"
+      ],
+      "id": "b5ef359b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, axs = plt.subplots(1, 2, sharex=False, sharey=False, tight_layout=True, figsize=(8, 4))\n",
+        "\n",
+        "line = 'dlm8'\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    distances = []\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        cur_embs = embs[metric][treatment][line]\n",
+        "        axs[j].scatter(\n",
+        "                cur_embs[:, 0],\n",
+        "                cur_embs[:, 1],\n",
+        "                label=treatment,\n",
+        "                s=10,\n",
+        "                alpha=0.4\n",
+        "            )\n",
+        "        # axs[j].set_xlim(-3.5*1e-5, 3.5*1e-5)\n",
+        "        axs[j].set_xlabel(\"First Dimension\")\n",
+        "        axs[j].set_ylabel(\"Second Dimension\")\n",
+        "        axs[j].legend()\n",
+        "        axs[j].set_title(f\"{metric}\")\n",
+        "# fig.suptitle(\"MDS of cell shapes using SRV metric\", fontsize=20)\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_2D.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_2D.pdf\"))"
+      ],
+      "id": "d454b647",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We also consider embedding in 3D. \n"
+      ],
+      "id": "db771c69"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'SRV'\n",
+        "mds = manifold.MDS(n_components=3, random_state=0, dissimilarity=\"precomputed\")\n",
+        "pos = mds.fit(pairwise_dists[metric]).embedding_"
+      ],
+      "id": "f9b318ba",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "embs = {}\n",
+        "embs[metric] = {}\n",
+        "index = 0\n",
+        "for treatment in TREATMENTS:\n",
+        "    embs[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        cell_num = len(ds_align[metric][treatment][line])   \n",
+        "        embs[metric][treatment][line] = pos[index:index+cell_num]\n",
+        "        index += cell_num"
+      ],
+      "id": "37fad160",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "metric = 'Linear'\n",
+        "mds = manifold.MDS(n_components=3, random_state=1, dissimilarity=\"precomputed\")\n",
+        "pos = mds.fit(pairwise_dists[metric]).embedding_\n",
+        "print(\"the stress for linear model is:\", mds.stress_)"
+      ],
+      "id": "e159587a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "embs[metric] = {}\n",
+        "index = 0\n",
+        "for treatment in TREATMENTS:\n",
+        "    embs[metric][treatment] = {}\n",
+        "    for line in LINES:\n",
+        "        cell_num = len(ds_align[metric][treatment][line])   \n",
+        "        embs[metric][treatment][line] = pos[index:index+cell_num]\n",
+        "        index += cell_num"
+      ],
+      "id": "0a47ea2d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, axs = plt.subplots(1, 2, sharex=False, sharey=False, tight_layout=True, figsize=(8, 4), subplot_kw=dict(projection='3d'))\n",
+        "\n",
+        "line = 'dunn'\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    distances = []\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        cur_embs = embs[metric][treatment][line]\n",
+        "        axs[j].scatter(\n",
+        "                cur_embs[:, 0],\n",
+        "                cur_embs[:, 1],\n",
+        "                cur_embs[:, 2],\n",
+        "                label=treatment,\n",
+        "                s=10,\n",
+        "                alpha=0.4\n",
+        "            )\n",
+        "        axs[j].set_xlabel(\"First Dimension\")\n",
+        "        axs[j].set_ylabel(\"Second Dimension\")\n",
+        "        axs[j].legend()\n",
+        "        axs[j].set_title(f\"{metric}\")\n",
+        "# fig.suptitle(\"MDS of cell shapes using linear metric\", fontsize=20)\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_3D.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_3D.pdf\"))"
+      ],
+      "id": "1d26bd78",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, axs = plt.subplots(1, 2, sharex=False, sharey=False, tight_layout=True, figsize=(8, 4), subplot_kw=dict(projection='3d'))\n",
+        "\n",
+        "line = 'dlm8'\n",
+        "for j, metric in enumerate(METRICS):\n",
+        "    distances = []\n",
+        "    for i, treatment in enumerate(TREATMENTS):\n",
+        "        cur_embs = embs[metric][treatment][line]\n",
+        "        axs[j].scatter(\n",
+        "                cur_embs[:, 0],\n",
+        "                cur_embs[:, 1],\n",
+        "                cur_embs[:, 2],\n",
+        "                label=treatment,\n",
+        "                s=10,\n",
+        "                alpha=0.4\n",
+        "            )\n",
+        "        # axs[j].set_xlim(-3.5*1e-5, 3.5*1e-5)\n",
+        "        axs[j].set_xlabel(\"First Dimension\")\n",
+        "        axs[j].set_ylabel(\"Second Dimension\")\n",
+        "        axs[j].legend()\n",
+        "        axs[j].set_title(f\"{metric}\")\n",
+        "# fig.suptitle(\"MDS of cell shapes using linear metric\", fontsize=20)\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "\n",
+        "if savefig:\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_3D.svg\"))\n",
+        "    plt.savefig(os.path.join(figs_dir, f\"{line}_MDS_3D.pdf\"))"
+      ],
+      "id": "30024404",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Multi-class (3-class) classification \n",
+        "\n",
+        "We now consider one cell line at the same time, to investigate the effects of the drugs on the cell shapes. Applying the MDS again gives the following results:\n",
+        "\n",
+        "Since the detected subspace dimension for this dataset is 3, we perform the classification based on 3D embeddings.\n"
+      ],
+      "id": "199a661a"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from sklearn.metrics import precision_score, recall_score, accuracy_score\n",
+        "\n",
+        "def svm_5_fold_classification(X, y):\n",
+        "    # Initialize a Support Vector Classifier\n",
+        "    svm_classifier = svm.SVC(kernel='poly', degree=4)\n",
+        "\n",
+        "    # Prepare to split the data into 5 folds, maintaining the percentage of samples for each class\n",
+        "    skf = StratifiedKFold(n_splits=5)\n",
+        "    \n",
+        "    # To store precision and recall per class for each fold\n",
+        "    precisions_per_class = []\n",
+        "    recalls_per_class = []\n",
+        "    accuracy_per_class = []\n",
+        "\n",
+        "    # Perform 5-fold cross-validation\n",
+        "    for train_index, test_index in skf.split(X, y):\n",
+        "        # Splitting data into training and test sets\n",
+        "        X_train, X_test = X[train_index], X[test_index]\n",
+        "        y_train, y_test = y[train_index], y[test_index]\n",
+        "\n",
+        "        # Train the model\n",
+        "        svm_classifier.fit(X_train, y_train)\n",
+        "        \n",
+        "        # Predict on the test data\n",
+        "        y_pred = svm_classifier.predict(X_test)\n",
+        "\n",
+        "        # Calculate precision and recall per class\n",
+        "        precision = precision_score(y_test, y_pred, average=None, zero_division=np.nan)\n",
+        "        recall = recall_score(y_test, y_pred, average=None, zero_division=np.nan)\n",
+        "        accuracy = accuracy_score(y_test, y_pred)\n",
+        "\n",
+        "        # Store results from each fold\n",
+        "        precisions_per_class.append(precision)\n",
+        "        recalls_per_class.append(recall)\n",
+        "        accuracy_per_class.append(accuracy)\n",
+        "    \n",
+        "    # Calculate the mean precision and recall per class across all folds\n",
+        "    mean_precisions = np.mean(precisions_per_class, axis=0)\n",
+        "    mean_recalls = np.mean(recalls_per_class, axis=0)\n",
+        "    mean_accuracies = np.mean(accuracy_per_class, axis=0)\n",
+        "    \n",
+        "    print(\"Mean precisions per class across all folds:\", round(np.mean(mean_precisions), 2))\n",
+        "    print(\"Mean recalls per class across all folds:\", round(np.mean(mean_recalls), 2))\n",
+        "    print(\"Mean accuracies per class across all folds:\", round(mean_accuracies, 2))\n",
+        "\n",
+        "    return mean_precisions, mean_recalls"
+      ],
+      "id": "82899a8e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "lines = gs.array(lines)\n",
+        "treatments = gs.array(treatments)"
+      ],
+      "id": "3eacdf6f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "for line in LINES:\n",
+        "    for metric in METRICS:\n",
+        "        control_indexes = gs.where((lines == line) & (treatments == \"control\"))[0]\n",
+        "        cytd_indexes = gs.where((lines == line) & (treatments == \"cytd\"))[0]\n",
+        "        jasp_indexes = gs.where((lines == line) & (treatments == \"jasp\"))[0]\n",
+        "        treatment_indexes = gs.where((lines == line) & (treatments != 'control'))[0]\n",
+        "\n",
+        "        # indexes = gs.concatenate((jasp_indexes, cytd_indexes, control_indexes))\n",
+        "        indexes = gs.concatenate((control_indexes, treatment_indexes))\n",
+        "        matrix = pairwise_dists[metric][indexes][:, indexes]\n",
+        "\n",
+        "        mds = manifold.MDS(n_components=2, random_state = 10, dissimilarity=\"precomputed\")\n",
+        "        pos = mds.fit(matrix).embedding_\n",
+        "\n",
+        "        line_treatments = treatments[lines == line]\n",
+        "        line_treatments_strings, line_treatments_labels = np.unique(line_treatments, return_inverse=True)\n",
+        "        # print(line_treatments_strings)\n",
+        "        # print(line_treatments_labels)\n",
+        "\n",
+        "        for i, label in enumerate(line_treatments_labels):\n",
+        "            if line_treatments_strings[label] == 'cytd' or line_treatments_strings[label] == 'jasp':\n",
+        "                line_treatments_labels[i] = len(line_treatments_strings)\n",
+        "            \n",
+        "\n",
+        "        print(f\"Using {metric} on {line}\")\n",
+        "        # print(line_treatments_labels)\n",
+        "        svm_5_fold_classification(pos, line_treatments_labels)"
+      ],
+      "id": "691913cb",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/home/wanxinli/.local/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

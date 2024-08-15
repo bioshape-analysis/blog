@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -147,7 +181,11 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
   <li><a href="#tips" id="toc-tips" class="nav-link" data-scroll-target="#tips">Tips</a></li>
-  <li><a href="#using-github" id="toc-using-github" class="nav-link" data-scroll-target="#using-github">Using Github</a></li>
+  <li><a href="#using-github" id="toc-using-github" class="nav-link" data-scroll-target="#using-github">Using GitHub</a></li>
+  <li><a href="#using-quarto-to-create-blog-posts" id="toc-using-quarto-to-create-blog-posts" class="nav-link" data-scroll-target="#using-quarto-to-create-blog-posts">Using Quarto to create blog posts</a>
+  <ul class="collapse">
+  <li><a href="#additional-information-for-quarto" id="toc-additional-information-for-quarto" class="nav-link" data-scroll-target="#additional-information-for-quarto">Additional Information for Quarto:</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -158,16 +196,82 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<p><img src="img/math612.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:65.0%"></p>
 <section id="instructions" class="level2">
 <h2 class="anchored" data-anchor-id="instructions">Instructions</h2>
+<ul>
+<li>Follow all guidelines for assignments and projects.</li>
+<li>Submit your work through the designated platforms by the due dates.</li>
+<li>Collaborate with peers but ensure individual work is original.</li>
+</ul>
 </section>
 <section id="tips" class="level2">
 <h2 class="anchored" data-anchor-id="tips">Tips</h2>
+<ul>
+<li><strong>Jupyter:</strong> Use <a href="https://jupyter.org/">Jupyter Notebooks</a> for interactive coding and documentation. Great for running small code snippets and visualizing data. Learn more in the <a href="https://jupyter-notebook.readthedocs.io/en/stable/">Jupyter Notebook Documentation</a>.</li>
+<li><strong>VS Code:</strong> A powerful IDE for writing and debugging code. Download it <a href="https://code.visualstudio.com/">here</a>, and install relevant extensions for <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a> and <a href="https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop">LaTeX</a>.</li>
+<li><strong>Environments:</strong> Use virtual environments like <a href="https://docs.python.org/3/library/venv.html">venv</a> or <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</a> to manage dependencies and ensure consistent results across different setups.</li>
+<li><strong>Quarto:</strong> Use <a href="https://quarto.org/">Quarto</a> for creating high-quality documents, reports, and presentations from your code. It supports markdown and integrates seamlessly with Jupyter and VS Code for reproducible analysis and publication. Check out the <a href="https://quarto.org/docs/guide/">Quarto Guide</a> for more information. To get started quickly, you can refer to this <a href="https://github.com/riddhibattu/introduction-to-quarto">GitHub Repository</a>.</li>
+</ul>
 </section>
 <section id="using-github" class="level2">
-<h2 class="anchored" data-anchor-id="using-github">Using Github</h2>
+<h2 class="anchored" data-anchor-id="using-github">Using GitHub</h2>
+<ul>
+<li><strong>Create a GitHub Account:</strong> Sign up at <a href="https://github.com">GitHub.com</a>.</li>
+<li><strong>Repositories:</strong> Start by creating a repository to host your project files. Learn how in <a href="https://docs.github.com/en/get-started/quickstart/create-a-repo">GitHub’s guide to repositories</a>. Use a <a href="https://git-scm.com/docs/gitignore"><code>.gitignore</code></a> file to exclude unnecessary files.</li>
+<li><strong>Branches:</strong> Work on separate branches (<code>main</code>, <code>dev</code>, feature branches) to manage different versions of your project. More details in <a href="https://guides.github.com/introduction/flow/">GitHub’s guide on branching</a>.</li>
+<li><strong>Merges:</strong> Merge changes into the <code>main</code> branch only after thorough review and testing. Learn about <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">merging branches</a>.</li>
+<li><strong>Commit Messages:</strong> Write clear, descriptive commit messages to document changes effectively. Follow the <a href="https://cbea.ms/git-commit/">best practices for commit messages</a>.</li>
+</ul>
+</section>
+<section id="using-quarto-to-create-blog-posts" class="level2">
+<h2 class="anchored" data-anchor-id="using-quarto-to-create-blog-posts">Using Quarto to create blog posts</h2>
+<ol type="1">
+<li><p><strong>Log into GitHub:</strong> Make sure you have an account and are logged in.</p></li>
+<li><p><strong>Send your account username/email to <a href="mailto:kdd@math.ubc.ca">kdd@math.ubc.ca</a>:</strong> This is needed to be added to the organization.</p></li>
+<li><p><strong>Clone the repository:</strong> After being added to the organization, clone the repository: <code>https://github.com/bioshape-analysis/blog</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/bioshape-analysis/blog<span class="kw">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Create a new branch:</strong> To contribute to the blog, create a new branch using:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> <span class="op">&lt;</span>branch_name<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><p>Verify your branch and repository location: Use the following command to check if you are in the correct branch and repository:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This command will show you the current branch you are on and the status of your working directory, ensuring you are working in the right place</p></li>
+</ul></li>
+<li><p><strong>Navigate to <code>posts</code>:</strong> Go into the <code>posts</code> directory (<a href="https://github.com/bioshape-analysis/blog/tree/main/posts">found here</a>). Create a new folder with a name that represents the content of your blog post.</p></li>
+<li><p><strong>Create or upload your content:</strong></p>
+<ul>
+<li><p>If using Jupyter Notebooks, upload your <code>.ipynb</code> file.</p></li>
+<li><p>If preferred, create a new notebook for your post. Once done, convert it into Quarto using the command:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> convert your_jupyter_notebook.ipynb <span class="at">-o</span> output_file.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul></li>
+<li><p><strong>Edit the YAML in your <code>.qmd</code> file:</strong> Ensure your YAML is consistent with the main template. For example:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Title of your blog post"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"Date"</span><span class="co"> # Format example: August 9 2024</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Your Name"</span><span class="at"> </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span><span class="co"> # [biology, bioinformatics, theory, etc.]</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> references.bib</span><span class="co"> # If referencing anything</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Feel free to add further formatting, but ensure it remains consistent with the main template.</p></li>
+<li><p><strong>Delete your Jupyter notebook:</strong> After converting it to a <code>.qmd</code> file, delete the original <code>.ipynb</code> file to prevent duplication in the blog post.</p></li>
+<li><p><strong>Commit and push your changes:</strong> After completing your <code>.qmd</code> file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.</p></li>
+</ol>
+<section id="additional-information-for-quarto" class="level3">
+<h3 class="anchored" data-anchor-id="additional-information-for-quarto">Additional Information for Quarto:</h3>
+<ul>
+<li><p><strong>Add Images:</strong> You can add images to your Quarto document using markdown syntax:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="al">![Image Description](path/to/image.png)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To add images from a URL:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="al">![Image Description](https://example.com/image.png)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Add References:</strong> Manage references by creating a <code>bibliography.bib</code> file with your references in BibTeX format. Link the bibliography file in your Quarto document header (YAML). Cite references in your text using the following syntax:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>This is a citation <span class="co">[</span><span class="ot">@citation_key</span><span class="co">]</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Other Edits:</strong> Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header.</p></li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

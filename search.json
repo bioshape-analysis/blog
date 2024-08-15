@@ -98,6 +98,41 @@
     "text": "MDS\nThe Multidimensional Scaling (MDS) method developed by Li et al.3 was applied on the pairwise distance matrix to visualize the geometric similarity of tunnels. Each data point represents a single tunnel structure, and the Euclidean distance between data points represents the similarity.\n\n\n\nMDS plot of tunnel structures across prokaryotes and eukaryotes"
   },
   {
+    "objectID": "posts/cryo_ET/demo.html",
+    "href": "posts/cryo_ET/demo.html",
+    "title": "Simulation of tomograms of membrane-embedded spike proteins",
+    "section": "",
+    "text": "Cryogenic electron tomography (cryo-ET) is an imaging technique to reconstruct high-resolution 3d structure, usually of biological macromolecules. Samples (usually small cells like bacteria and viruses) are prepared in standard aqueous median (unlike cryo-EM, where samples are frozen) are imaged in transmission electron microscope (TEM). The samples are tilted to different angles (e.g. from \\(-60^\\circ\\) to \\(+60^\\circ\\)), and images are obtained at every incremented degree (usually every \\(1^\\circ\\) or \\(2^\\circ\\)).\nThe main advantage of cryo-ET is that it allows the cells and macromolecules to be imaged at undisturbed state. This is very crucial in many applications such as drug discovery, when we need to know the in-situ binding state of the target of interest (e.g. viral spike protein) with the drug.\n\n\n\nTomographic slices of SARS-CoV-2 virions, with spike proteins embedded in the membrane(Shi et al. 2023)\n\n\nIn order to reconstruct macromolecules, tomographic slices need to be processed through a pipeline. A typical cryo-ET data processing pipeline includes: tilt series alignment, CTF estimation, tomogram reconstruction, particle picking, iterative subtomogram alignment and averaging, and heterogeneity analysis. Unlike cryo-EM, many algorithms for cryo-ET processing are still under development. Therefore, a large database of cryo-ET to test and tune algorithms is important. Unfortunately, collecting cryo-ET data is both time and money-consuming, and the current database of cryo-ET is not large enough, especially for deep learning training which requires a large amount of data. Therefore, simulation becomes a substitute to generate a large amount of data in a short time and at low expense."
+  },
+  {
+    "objectID": "posts/cryo_ET/demo.html#background",
+    "href": "posts/cryo_ET/demo.html#background",
+    "title": "Simulation of tomograms of membrane-embedded spike proteins",
+    "section": "",
+    "text": "Cryogenic electron tomography (cryo-ET) is an imaging technique to reconstruct high-resolution 3d structure, usually of biological macromolecules. Samples (usually small cells like bacteria and viruses) are prepared in standard aqueous median (unlike cryo-EM, where samples are frozen) are imaged in transmission electron microscope (TEM). The samples are tilted to different angles (e.g. from \\(-60^\\circ\\) to \\(+60^\\circ\\)), and images are obtained at every incremented degree (usually every \\(1^\\circ\\) or \\(2^\\circ\\)).\nThe main advantage of cryo-ET is that it allows the cells and macromolecules to be imaged at undisturbed state. This is very crucial in many applications such as drug discovery, when we need to know the in-situ binding state of the target of interest (e.g. viral spike protein) with the drug.\n\n\n\nTomographic slices of SARS-CoV-2 virions, with spike proteins embedded in the membrane(Shi et al. 2023)\n\n\nIn order to reconstruct macromolecules, tomographic slices need to be processed through a pipeline. A typical cryo-ET data processing pipeline includes: tilt series alignment, CTF estimation, tomogram reconstruction, particle picking, iterative subtomogram alignment and averaging, and heterogeneity analysis. Unlike cryo-EM, many algorithms for cryo-ET processing are still under development. Therefore, a large database of cryo-ET to test and tune algorithms is important. Unfortunately, collecting cryo-ET data is both time and money-consuming, and the current database of cryo-ET is not large enough, especially for deep learning training which requires a large amount of data. Therefore, simulation becomes a substitute to generate a large amount of data in a short time and at low expense."
+  },
+  {
+    "objectID": "posts/cryo_ET/demo.html#workflow",
+    "href": "posts/cryo_ET/demo.html#workflow",
+    "title": "Simulation of tomograms of membrane-embedded spike proteins",
+    "section": "Workflow",
+    "text": "Workflow\nWe will use the Membrane Embedded Proteins Simulator (MEPSi), a tool incorporated in PyCoAn to simulate SARS-CoV-2 spike protein. Before doing so, I will briefly go through the workflow of MEPSi.\n\n1. Density modeling\n\n\n2. Basis tilt series generation\n\n\n3. CTF\n\n\n4. Noise\n\n\n5. Tomogram generation"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Biological shape analysis (under construction)",
+    "section": "",
+    "text": "Simulation of tomograms of membrane-embedded spike proteins\n\n\n\n\n\n\ncryo-ET\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nQiyu Wang\n\n\n\n\n\n\n\n\n\n\n\n\nMulti Dimensional Scaling of ribosome exit tunnel shapes\n\n\nAnalyze and compare the geometry of the ribosome exit tunnel\n\n\n\ncryo-EM\n\n\nribosome\n\n\nMDS\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nShiqi Yu, Artem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAnalysis of Eye Tracking Data\n\n\n\n\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nLisa\n\n\n\n\n\n\n\n\n\n\n\n\nAlpha Shapes in 2D and 3D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 14, 2024\n\n\nWenjun Zhao\n\n\n\n\n\n\n\n\n\n\n\n\nHand gesture classification with EMG data using Riemannian metrics\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nGeomstats\n\n\n\n\n\n\n\n\n\n\n\n\nQuasiconformal mapping in 1D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nClément Soubrier\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities (new)\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nexample\n\n\ncryo-EM\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPage creation (MATH 612)\n\n\nInstructions and tips for MATH 612 students\n\n\n\nMATH 612\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nExtracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nElastic metric for cell shape analysis\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 30, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
     "objectID": "posts/ribosome-tunnel-new/index.html",
     "href": "posts/ribosome-tunnel-new/index.html",
     "title": "3D tessellation of biomolecular cavities (new)",
@@ -138,20 +173,6 @@
     "title": "3D tessellation of biomolecular cavities (new)",
     "section": "3. Tessellation",
     "text": "3. Tessellation"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Biological shape analysis (under construction)",
-    "section": "",
-    "text": "Multi Dimensional Scaling of ribosome exit tunnel shapes\n\n\nAnalyze and compare the geometry of the ribosome exit tunnel\n\n\n\ncryo-EM\n\n\nribosome\n\n\nMDS\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nShiqi Yu, Artem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAnalysis of Eye Tracking Data\n\n\n\n\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nLisa\n\n\n\n\n\n\n\n\n\n\n\n\nAlpha Shapes in 2D and 3D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 14, 2024\n\n\nWenjun Zhao\n\n\n\n\n\n\n\n\n\n\n\n\nHand gesture classification with EMG data using Riemannian metrics\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nGeomstats\n\n\n\n\n\n\n\n\n\n\n\n\nQuasiconformal mapping in 1D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nClément Soubrier\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities (new)\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nexample\n\n\ncryo-EM\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPage creation (MATH 612)\n\n\nInstructions and tips for MATH 612 students\n\n\n\nMATH 612\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nExtracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nElastic metric for cell shape analysis\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 30, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/MATH-612/index.html#instructions",

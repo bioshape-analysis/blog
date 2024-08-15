@@ -1,0 +1,109 @@
+---
+title: "Alpha Shapes in 2D and 3D"
+date: "August 14 2024"
+jupyter: python3
+author:
+  - name: "Wenjun Zhao" 
+categories: [theory]
+---
+
+## Introduction
+
+Alpha shapes are a generalization of the convex hull used in computational geometry. They are particularly useful for understanding the shape of a point cloud in both 2D and 3D spaces. In this document, we will explore alpha shapes in both dimensions using Python.
+
+## 2D Alpha Shape
+
+To illustrate alpha shapes in 2D, we'll use the `alphashape` library. Let's start by generating a set of random points and compute their alpha shape.
+
+First we create point cloud points:
+
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import alphashape
+from matplotlib.path import Path
+from scipy.spatial import ConvexHull
+
+def generate_flower_shape(num_petals, num_points_per_petal):
+    angles = np.linspace(0, 2 * np.pi, num_points_per_petal, endpoint=False)
+    r = 1 + 0.5 * np.sin(num_petals * angles)
+    
+    x = r* np.cos(angles)
+    
+    y = r * np.sin(angles)
+    
+    return np.column_stack((x, y))
+
+def generate_random_points_within_polygon(polygon, num_points):
+    """Generate random points inside a given polygon."""
+    min_x, max_x = polygon[:, 0].min(), polygon[:, 0].max()
+    min_y, max_y = polygon[:, 1].min(), polygon[:, 1].max()
+    
+    points = []
+    while len(points) < num_points:
+        x = np.random.uniform(min_x, max_x)
+        y = np.random.uniform(min_y, max_y)
+        if Path(polygon).contains_point((x, y)):
+            points.append((x, y))
+    
+    return np.array(points)
+
+plt.figure(figsize=(8, 6))
+points = generate_flower_shape(num_petals=6, num_points_per_petal=100)
+points = generate_random_points_within_polygon(points, 1000)
+plt.scatter(points[:, 0], points[:, 1], s=10, color='blue', label='Points')
+```
+
+
+Try run this with alpha shape radius 0.1:
+
+```{python}
+
+
+
+
+# Create alpha shape
+alpha = 0.1
+alpha_shape = alphashape.alphashape(points, alpha)
+
+# Plot points and alpha shape
+plt.figure(figsize=(8, 6))
+plt.scatter(points[:, 0], points[:, 1], s=10, color='blue', label='Points')
+plt.plot(*alpha_shape.exterior.xy, color='red', lw=2, label='Alpha Shape')
+plt.title('2D Alpha Shape')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+Oops, it seems the radius we picked is too big! Let's try a few other choices.
+
+```{python}
+alpha_values = [0.1, 5.0, 10.0, 15.0]
+# Plot the flower shape and alpha shapes with varying alpha values
+fig, axes = plt.subplots(2, 2, figsize=(6,6))
+axes = axes.flatten()
+
+for i, alpha in enumerate(alpha_values):
+    # Compute alpha shape
+    alpha_shape = alphashape.alphashape(points, alpha)
+    
+    # Plot the points and the alpha shape
+    ax = axes[i]
+    #print(alpha_shape.type)
+    if alpha_shape.type == 'Polygon':
+        ax.plot(*alpha_shape.exterior.xy, color='red', lw=2, label='Alpha Shape')
+    ax.scatter(points[:, 0], points[:, 1], color='orange', s=10, label='Point Cloud')
+    
+    
+    
+    ax.set_title(f'Alpha Shape with alpha={alpha}')
+    ax.legend()
+    ax.grid(True)
+
+plt.tight_layout()
+plt.show()
+```

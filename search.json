@@ -98,6 +98,20 @@
     "text": "Using Quarto to create blog posts\n\nLog into GitHub: Make sure you have an account and are logged in.\nSend your account username/email to kdd@math.ubc.ca: This is needed to be added to the organization.\nClone the repository: After being added to the organization, clone the repository: https://github.com/bioshape-analysis/blog.\ngit clone https://github.com/bioshape-analysis/blog`\nCreate a new branch: To contribute to the blog, create a new branch using:\ngit checkout -b &lt;branch_name&gt;\n\nVerify your branch and repository location: Use the following command to check if you are in the correct branch and repository:\ngit status\nThis command will show you the current branch you are on and the status of your working directory, ensuring you are working in the right place\n\nNavigate to posts: Go into the posts directory (found here). Create a new folder with a name that represents the content of your blog post.\nCreate or upload your content:\n\nIf using Jupyter Notebooks, upload your .ipynb file.\nIf preferred, create a new notebook for your post. Once done, convert it into Quarto using the command:\nquarto convert your_jupyter_notebook.ipynb -o output_file.qmd\n\nEdit the YAML in your .qmd file: Ensure your YAML is consistent with the main template. For example:\n---\ntitle: \"Title of your blog post\"\ndate: \"Date\" # Format example: August 9 2024\nauthor:\n  - name: \"Your Name\" \ncategories: [] # [biology, bioinformatics, theory, etc.]\nbibliography: references.bib # If referencing anything\n---\nFeel free to add further formatting, but ensure it remains consistent with the main template.\nDelete your Jupyter notebook: After converting it to a .qmd file, delete the original .ipynb file to prevent duplication in the blog post.\nCommit and push your changes: After completing your .qmd file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.\n\n\nAdditional Information for Quarto:\n\nAdd Images: You can add images to your Quarto document using markdown syntax:\n![Image Description](path/to/image.png)\nTo add images from a URL:\n![Image Description](https://example.com/image.png)\nAdd References: Manage references by creating a bibliography.bib file with your references in BibTeX format. Link the bibliography file in your Quarto document header (YAML). Cite references in your text using the following syntax:\nThis is a citation [@citation_key].\nOther Edits: Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header."
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Biological shape analysis (under construction)",
+    "section": "",
+    "text": "Hand gesture classification with EMG data using Riemannian metrics\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nGeomstats\n\n\n\n\n\n\n\n\n\n\n\n\nQuasiconformal mapping in 1D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nClément Soubrier\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities (new)\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nexample\n\n\ncryo-EM\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPage creation (MATH 612)\n\n\nInstructions and tips for MATH 612 students\n\n\n\nMATH 612\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nExtracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nElastic metric for cell shape analysis\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 30, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
     "objectID": "posts/ribosome-tunnel-new/index.html",
     "href": "posts/ribosome-tunnel-new/index.html",
     "title": "3D tessellation of biomolecular cavities (new)",
@@ -138,89 +152,5 @@
     "title": "3D tessellation of biomolecular cavities (new)",
     "section": "3. Tessellation",
     "text": "3. Tessellation"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Biological shape analysis (under construction)",
-    "section": "",
-    "text": "Hand gesture classification with EMG data using Riemannian metrics\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nGeomstats\n\n\n\n\n\n\n\n\n\n\n\n\nQuasiconformal mapping in 1D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nClément Soubrier\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities (new)\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nexample\n\n\ncryo-EM\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPage creation (MATH 612)\n\n\nInstructions and tips for MATH 612 students\n\n\n\nMATH 612\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nExtracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nElastic metric for cell shape analysis\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 30, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nbiology\n\n\nbioinformatics\n\n\nsurface-reconstruction\n\n\ncomputer graphics\n\n\n\n\n\n\n\n\n\nJun 29, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html",
-    "href": "posts/ribosome-tunnel-extraction/index.html",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "",
-    "text": "We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.\nWe apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works1,2. The protocol was also design to refine the output obtained from MOLE software3 (see Figure XXX)\n\n\n\n\n\n\n\n\n\n\n\n\n(a) Structure of the human ribosome (PDB ID: 8OJ0).\n\n\n\n\n\n\n\n\n\n\n\n(b) The ribosome exit tunnel (figure from Dao Duc et al.2)\n\n\n\n\n\n\n\nFigure 1: The ribosome and the exit tunnel extracted using Mole software3"
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#summary-and-background",
-    "href": "posts/ribosome-tunnel-extraction/index.html#summary-and-background",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "",
-    "text": "We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.\nWe apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works1,2. The protocol was also design to refine the output obtained from MOLE software3 (see Figure XXX)\n\n\n\n\n\n\n\n\n\n\n\n\n(a) Structure of the human ribosome (PDB ID: 8OJ0).\n\n\n\n\n\n\n\n\n\n\n\n(b) The ribosome exit tunnel (figure from Dao Duc et al.2)\n\n\n\n\n\n\n\nFigure 1: The ribosome and the exit tunnel extracted using Mole software3"
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#visual-protocol",
-    "href": "posts/ribosome-tunnel-extraction/index.html#visual-protocol",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "Visual Protocol",
-    "text": "Visual Protocol\n\n\n\nSchematic representation of the tunnel geometry surface reconstruction"
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#bounding-box",
-    "href": "posts/ribosome-tunnel-extraction/index.html#bounding-box",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "1. Bounding Box",
-    "text": "1. Bounding Box\nThis step captures the subset of atoms enclosing the cavity of interest (the tunnel) from the original structure.\n\n\n\n\n\n\nParameters\n\n\n\n\n\n\\(R_{\\mathbf{expansion}}\\): define the radius of expansion to be the value added to \\(R_{x,y,z}\\) of the centerline at every \\(C_{x,y,z}\\)\n\\(B\\): The smallest bounding box containing all of the coordinates formed by the expanded centerline\n\\(R_{\\mathbf{vdw}}\\): Van der Waals radius of an atom in Ångstroms. Default to the value of 2.\n\\(pc_{B}\\): The pointcloud formed by applying \\(B\\) to the original structure and widening each atom coordinate to include points withing a sphere with radius \\(R_{\\mathbf{vdw}}\\)\n\n\n\n\nFor each \\(C_{x,y,z}\\), capture atoms whose center belongs to the sphere formed by \\(R_{x,y,z} + R_{\\mathbf{expansion}}\\), filter out duplicates. Call this coordinate set the \\({\\textit{Centerline Expansion Atoms}}\\).\nCalculate the coordinates of the bounding box \\(B\\) around the \\(\\text{\\textit{Centerline Expansion Atoms}}\\).\nApply \\(B\\) to the initial structure to extract all atoms that belong to \\(B\\). Call this \\(\\mathbf{pc^{B}}\\).\nWiden each coordinate (atom center) \\(C_{x,y,z}^{pc_{B}}\\) inside \\(pc_{B}\\) by \\(R_{vdw}\\) to include a more realistic representation of atoms. This is done by creating a voxel subgrid whose bounding cube is between \\((C_{x}^{pc_{B}}-R_{vdw},C_{y}^{pc_{B}}-R_{vdw},C_{z}^{pc_{B}}-R_{vdw})\\) and \\((C_{x}^{pc_{B}}+R_{vdw},C_{y}^{pc_{B}}+R_{vdw},C_{z}^{pc_{B}}+R_{vdw})\\), a cube of indices centered at \\(C_{x,y,z}^{pc_{B}}\\). The resultant coordinate set is \\(\\mathbf{pc_{B}}\\).\nAnchor the coordinates of the \\(pc_{B}\\) to the origin by subtracting the \\(\\mu(pc_{B})\\) of the coordinate set from each \\(C_{x,y,z}^{pc_{B}}\\) and then shifting each \\(C_{x,y,z}^{pc_{B}}\\) upwards by \\(|\\min(x,y,z)|\\). This is done to reduce the amount of empty voxel cells in the following steps, reduce compute."
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#voxelization",
-    "href": "posts/ribosome-tunnel-extraction/index.html#voxelization",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "2. Voxelization",
-    "text": "2. Voxelization\n\nAssume voxel size of \\(1\\) in correspondence to the units of the dataset, Angstroms in our case. (Alternatively, atom-to-sphere expansion in step 1. Bounding Box should be accordingly scaled).\nCreate a boolean voxel grid with the dimensions of the (\\(pc_{B}\\) + \\(1\\)), call this the \\(Grid_{index}\\) (as opposed to \\(Grid_{coordinate}\\))\nSet voxels at index [\\(C_{x},C_{y},C_{z}\\)] for every \\(C\\) in \\(pc_{B}\\) in the \\(Grid_{index}\\) to \\(1\\). All other voxel are \\(0\\)."
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#inversion",
-    "href": "posts/ribosome-tunnel-extraction/index.html#inversion",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "3. Inversion",
-    "text": "3. Inversion\nInvert the \\(Grid_{index}\\) to create a representation of the “empty space” inside the exit tunnel."
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#dbscan",
-    "href": "posts/ribosome-tunnel-extraction/index.html#dbscan",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "4. DBSCAN",
-    "text": "4. DBSCAN\nThe aim in this step is to extract only the voxels belonging to the “empty space” inside the tunnel and no other. Given that we have a good idea of the Van der Waals radii of the atoms that constitute the walls and have control over the size of the voxel in the \\(Grid_{index}\\), one method that we can apply is DBSCAN.\nDBSCAN is a density-based clustering non-parametric algorithm that is akin to UMAP/t-SNE.\n\n\n\n\n\n\nDBSCAN Parameters\n\n\n\n\n\n\\(eps\\): The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.\n\\(min\\_nbrs\\) (\\(min\\_samples\\)): If \\(min\\_samples\\) is set to a higher value, DBSCAN will find denser clusters, whereas if it is set to a lower value, the found clusters will be more sparse. The metric to use when calculating distance between instances in a feature array.\n\\(metric\\): The metric to use when calculating distance between instances in a feature array. We use the Euclidian distance."
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#interior-surface-via-delaunay-triangulation",
-    "href": "posts/ribosome-tunnel-extraction/index.html#interior-surface-via-delaunay-triangulation",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "5. Interior Surface via Delaunay Triangulation",
-    "text": "5. Interior Surface via Delaunay Triangulation\nThe aim of this step is to extract a point cloud containing only the voxels on the surface of convex hull enclosing the interior space of the tunnel.\n\n\n\n\n\n\nDelaunay 3D parameters\n\n\n\n\n\n\\(alpha\\): Controls the smoothness of the constructed alpha-shape. For a non-zero \\(alpha\\) value, only vertices, edges, faces, or tetrahedra contained within the circumsphere (of radius \\(alpha\\)) will be output. Otherwise, only tetrahedra will be output.\n\\(tol\\): Tolerance to control discarding of closely spaced points. This tolerance is specified as a fraction of the diagonal length of the bounding box of the points.\n\\(offset\\): Multiplier to control the size of the initial, bounding Delaunay triangulation."
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#normal-estimation-orientation",
-    "href": "posts/ribosome-tunnel-extraction/index.html#normal-estimation-orientation",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "6. Normal Estimation & Orientation",
-    "text": "6. Normal Estimation & Orientation\nThe aim of this step is to prepare the convex hull point cloud for the surface reconstruction algorithm. For the final mesh to be smooth and free of artifacts, this step has to assign a normal vector point outwards at each point of the convex hull thus defining a clear boundary between “inner” and “outer” space vis-a-vis the surface.\nOne popular method for normal estimation is a KDTree search and for smoothing their orientations a collection of tangent planes is used.\n\n\n\n\n\n\nKD Tree Search and Tangent Plane Orientation\n\n\n\n\n\n\\(kdtree\\_radius\\):\n\\(kdtree\\_max\\_nn\\):\n\\(tangent\\_planes\\_n\\):"
-  },
-  {
-    "objectID": "posts/ribosome-tunnel-extraction/index.html#surface-reconstruction",
-    "href": "posts/ribosome-tunnel-extraction/index.html#surface-reconstruction",
-    "title": "3D tessellation of biomolecular cavities",
-    "section": "7. Surface Reconstruction",
-    "text": "7. Surface Reconstruction"
   }
 ]

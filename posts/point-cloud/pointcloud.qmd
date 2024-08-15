@@ -4,8 +4,8 @@ subtitle: "Application to cryoEM density maps"
 
 engine: "jupyter"
 author:
-  - name: "Clément Soubrier" 
-    email: "c.soubrier @math.ubc.ca"
+  - name: "Aryan Tajmir Riahi" 
+    email: "artajmir@cs.ubc.ca"
     affiliations:
       - name: KDD Group
         url: "https://rtviii.xyz/"
@@ -19,15 +19,17 @@ author:
         url: "https://www.cs.ubc.ca/"
 
 date: "August 15 2024"
-categories: [biology, bioinformatics]    
+categories: [biology, bioinformatics]   
+bibliography: references.bib
+--- 
 
 # Introduction
 
-In the context of cryo-EM, many computationaly exhaustive methods rely on simpler representations of cryo-EM density maps to overcome their scalability challenges. There are many choices to the form of the simpler representation, such as vectors (ref vesper) or mixture of gussians (ref). In this post we discuss a format which is probably the simplest and that is using a set of points (called point cloud). 
+In the context of cryo-EM, many computationaly exhaustive methods rely on simpler representations of cryo-EM density maps to overcome their scalability challenges. There are many choices to the form of the simpler representation, such as vectors [@han2021vesper] or mixture of gussians [@kawabata2008multiple]. In this post we discuss a format which is probably the simplest and that is using a set of points (called point cloud). 
 
 This problem can be formulated in a much more general sense rather than cryo-EM. In this sense we are given a probability distribution over $\mathbb{R}^3$ and we want to generate a set of 3D points that represent this distribution. The naive approach to find such a point cloud is to just sample points from the distribution. Although this approach is guaranteed to find a good representation, it needs lots of points to cover the distribution evenly. Since methods used in this field can be computationally intensive with cubic or higher time complexity, generating a point cloud that covers the give distribution with a smaller point cloud could lead to a significant improvement in their runtime.
 
-In this approach, we present two methods for generating a point cloud from a cryo-EM density map or a distribution in general. The first one is based on the Topological Representing Network (TRN) (ref) and the second one combines the usage the Optimal Transport (OT) theory and and some computational geometry object named Centroidal Vornoi Tessellation (CVT).
+In this approach, we present two methods for generating a point cloud from a cryo-EM density map or a distribution in general. The first one is based on the Topological Representing Network (TRN) [@martinetz1994topology] and the second one combines the usage the Optimal Transport (OT) theory and and some computational geometry object named Centroidal Vornoi Tessellation (CVT).
 
 
 ## Data

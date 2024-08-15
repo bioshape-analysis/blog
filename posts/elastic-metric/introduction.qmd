@@ -1,8 +1,8 @@
 ---
 title: "Elastic metric"
 bibliography: refs.bib
-engine: "jupyter"
-jupyter: "python3"
+# engine: "jupyter"
+# jupyter: "python3"
 author:
   - name: "Wanxin Li" 
 
@@ -19,7 +19,7 @@ callout-icon: false
 execute:
   echo: false
   freeze: auto
-  pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
+  # pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
 
 ---
 This page introduces basic concepts for elastic metric, including the definition of elastic metric, square root velocity metric, geodesic distance and Fréchet mean. 

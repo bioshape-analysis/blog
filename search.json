@@ -7,11 +7,25 @@
     "text": "Theorem"
   },
   {
+    "objectID": "posts/AFM-data/index.html",
+    "href": "posts/AFM-data/index.html",
+    "title": "Extracting cell geometry from AFM",
+    "section": "",
+    "text": "We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature."
+  },
+  {
+    "objectID": "posts/AFM-data/index.html#biological-context",
+    "href": "posts/AFM-data/index.html#biological-context",
+    "title": "Extracting cell geometry from AFM",
+    "section": "Biological context",
+    "text": "Biological context\nMycobacterium smegmatis is Grahm-positive rod shape bacterium. It is 3 to 5 \\(\\mu m\\) long and around 500 \\(nm\\) wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as M.tuberculosis (responsible for the tubercuosis) or M.abscessus, with which it shares the same cell wall structure(Tyagi and Sharma 2002) . In particular M.smegmatis has a fast growth (3-4 hours doubling time compared to 24h for M. tuberculosis), allowing for faster experimental protocols.\nHere are some know properties of M.smegmatis bacteria :\n\nThey present variation of cell diameter along their longitudinal axis (Eskandarian et al. 2017). The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this proile.\n\n\n\n\n3D image of M.smegmatis. The orange line represents the height profile.\n\n\n\nThey grow following a biphasic and asymetrical polar dynamics(Hannebelle et al. 2020). The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).\n\n\n\n\nGrowth dynamics."
+  },
+  {
     "objectID": "posts/AFM-data/index.html#raw-image-pre-processing",
     "href": "posts/AFM-data/index.html#raw-image-pre-processing",
     "title": "Extracting cell geometry from AFM",
     "section": "Raw image pre-processing",
-    "text": "Raw image pre-processing"
+    "text": "Raw image pre-processing\n\nData\nSeveral data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc."
   },
   {
     "objectID": "posts/AFM-data/index.html#segmentation",
@@ -19,13 +33,6 @@
     "title": "Extracting cell geometry from AFM",
     "section": "Segmentation",
     "text": "Segmentation"
-  },
-  {
-    "objectID": "posts/AFM-data/index.html#centerline",
-    "href": "posts/AFM-data/index.html#centerline",
-    "title": "Extracting cell geometry from AFM",
-    "section": "Centerline",
-    "text": "Centerline"
   },
   {
     "objectID": "posts/AlphaShape/index.html",

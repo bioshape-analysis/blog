@@ -23,7 +23,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -70,6 +90,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -130,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
     <div class="quarto-title-meta-heading">Affiliations</div>
     
       <div class="quarto-title-meta-contents">
-      <p class="author">Clément Soubrier <a href="mailto:c.soubrier <span class=" citation"="" data-cites="math.ubc.ca">@math.ubc.ca" class="quarto-title-author-email"&gt;<i class="bi bi-envelope"></i></a> </p>
+      <p class="author">Clément Soubrier <a href="mailto:c.soubrier@math.ubc.ca" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
     </div>
     <div class="quarto-title-meta-contents">
           <p class="affiliation">
@@ -192,22 +241,58 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<p>We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature.</p>
 <section id="biological-context" class="level2">
 <h2 class="anchored" data-anchor-id="biological-context">Biological context</h2>
+<p><em>Mycobacterium smegmatis</em> is Grahm-positive rod shape bacterium. It is 3 to 5 <span class="math inline">\(\mu m\)</span> long and around 500 <span class="math inline">\(nm\)</span> wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as <em>M.tuberculosis</em> (responsible for the tubercuosis) or <em>M.abscessus</em>, with which it shares the same cell wall structure<span class="citation" data-cites="tyagi2002mycobacterium">(<a href="#ref-tyagi2002mycobacterium" role="doc-biblioref">Tyagi and Sharma 2002</a>)</span> . In particular <em>M.smegmatis</em> has a fast growth (3-4 hours doubling time compared to 24h for <em>M. tuberculosis</em>), allowing for faster experimental protocols.</p>
+<p>Here are some know properties of <em>M.smegmatis</em> bacteria :</p>
+<ul>
+<li>They present variation of cell diameter along their longitudinal axis <span class="citation" data-cites="eskandarian2017division">(<a href="#ref-eskandarian2017division" role="doc-biblioref">Eskandarian et al. 2017</a>)</span>. The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this proile.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="3D_cell.png" class="img-fluid figure-img"></p>
+<figcaption>3D image of <em>M.smegmatis</em>. The orange line represents the height profile.</figcaption>
+</figure>
+</div>
+<ul>
+<li>They grow following a biphasic and asymetrical polar dynamics<span class="citation" data-cites="hannebelle2020biphasic">(<a href="#ref-hannebelle2020biphasic" role="doc-biblioref">Hannebelle et al. 2020</a>)</span>. The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Neto.svg" class="img-fluid figure-img"></p>
+<figcaption>Growth dynamics.</figcaption>
+</figure>
+</div>
 </section>
 <section id="raw-image-pre-processing" class="level2">
 <h2 class="anchored" data-anchor-id="raw-image-pre-processing">Raw image pre-processing</h2>
+<section id="data" class="level4">
+<h4 class="anchored" data-anchor-id="data">Data</h4>
+<p>Several data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc.</p>
+</section>
 </section>
 <section id="segmentation" class="level2">
 <h2 class="anchored" data-anchor-id="segmentation">Segmentation</h2>
 </section>
 <section id="centerline" class="level2">
-<h2 class="anchored" data-anchor-id="centerline">Centerline</h2>
+
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">Centerline</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-eskandarian2017division" class="csl-entry" role="listitem">
+Eskandarian, Haig A, Pascal D Odermatt, Joëlle XY Ven, Melanie Hannebelle, Adrian P Nievergelt, Neeraj Dhar, John D McKinney, and Georg E Fantner. 2017. <span>“Division Site Selection Linked to Inherited Cell Surface Wave Troughs in Mycobacteria.”</span> <em>Nature Microbiology</em> 2 (9): 1–6.
+</div>
+<div id="ref-hannebelle2020biphasic" class="csl-entry" role="listitem">
+Hannebelle, Mélanie, Joëlle XY Ven, Chiara Toniolo, Haig A Eskandarian, Gaëlle Vuaridel-Thurre, John D McKinney, and Georg E Fantner. 2020. <span>“A Biphasic Growth Model for Cell Pole Elongation in Mycobacteria.”</span> <em>Nature Communications</em> 11 (1): 1–10.
+</div>
+<div id="ref-tyagi2002mycobacterium" class="csl-entry" role="listitem">
+Tyagi, Jaya Sivaswami, and Deepak Sharma. 2002. <span>“Mycobacterium Smegmatis and Tuberculosis.”</span> <em>Trends in Microbiology</em> 10 (2): 68–69.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

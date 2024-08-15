@@ -1,10 +1,11 @@
 ---
 title: Shape Analysis of Cancer Cells
+author: Wanxin Li
+date: "August 15, 2024"
+categories: [biology, bioinformatics] 
 ---
 
-
-
-Lead author: Nina Miolane.
+This notebook is adapted from [this notebook](https://github.com/geomstats/geomstats/blob/main/notebooks/11_real_world_applications__cell_shapes_analysis.ipynb) (Lead author: Nina Miolane). 
 
 This notebook studies *Osteosarcoma* (bone cancer) cells and the impact of drug treatment on their *morphological shapes*, by analyzing cell images obtained from fluorescence microscopy. 
 

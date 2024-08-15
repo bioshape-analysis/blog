@@ -1,5 +1,5 @@
 ---
-title: "Multi Dimemsional Scaling of ribosome exit tunnel shapes"
+title: "Multi Dimensional Scaling of ribosome exit tunnel shapes"
 subtitle: "Analyze and compare the geometry of the ribosome exit tunnel"
 bibliography: references.bib
 csl: nature.csl
@@ -9,7 +9,7 @@ author:
   - name: "Khanh Dao Duc" 
 
 date: "August 15 2024"
-categories: [example, cryo-EM, MDS]    
+categories: [cryo-EM,ribosome, MDS]    
 ---
 
 ## Summary and Background

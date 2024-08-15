@@ -2,16 +2,15 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/MATH-612/index.html",
       "/posts/cryo_ET/demo.html",
       "/posts/sy mds tunnel/index.html",
       "/posts/ET/ey.html",
       "/posts/elastic-metric/introduction.html",
       "/posts/elastic-metric/osteosarcoma_analysis.html",
       "/posts/AlphaShape/index.html",
-      "/posts/convert-notebook-to-quarto/12_rwa_emg_sign_classification.html",
       "/posts/quasiconformalmap/index.html",
       "/posts/ribosome-tunnel-new/index.html",
-      "/posts/MATH-612/index.html",
       "/posts/AFM-data/index.html",
       "/posts/elastic-metric/index.html",
       "/posts/OTalignment/index.html",

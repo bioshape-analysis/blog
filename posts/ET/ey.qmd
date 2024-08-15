@@ -1,0 +1,57 @@
+---
+title: "Analysis of Eye Tracking Data"
+date: "August 15 2024" # Format example: August 9 2024
+author:
+  - name: "Lisa" 
+categories: [bioinformatics] # [biology, bioinformatics, theory, etc.]
+# bibliography: references.bib # If referencing anything
+toc: true
+number-sections: true
+---
+## Eye Tracking & Backagroud
+
+- Eye Tracking
+
+Eye tracking (ET) is a process by which a device measures the gaze of a participant – with a number of variables that can be captured, such as duration of fixation, re-fixation (go-backs), saccades, blinking, pupillary response. The ‘strong eye-mind hypothesis’ provides the theoretical ground where the underlying assumption is that duration of fixation is a reflection of preference, and that information is processed with immediacy. ET also is a non-invasive technique that has recently garnered attention in autism research as a method to elucidate or gather more information about the supposed central cognitive deficit (Flack-Ytter et al., 2013, Senju et al., 2009).
+
+- Experimental set up
+
+22 youth (13-17) with high functioning autism and without autism will be recruited into this study.Students will be brought into a quiet room and asked to read a manga comic displayed on a monitor connected to the eye tracking device (Tobii pro eye tracker, provided by Professor Conati’s lab)
+
+## Visualisation
+
+One way of visualizing your data in Tobii Pro Lab is by creating Heat maps. Heat maps visualize where a participant's (or a group of participants') fixations or gaze data samples were distributed on a still image or a video frame. The distribution of the data is represented with colors.Each sample corresponds to a gaze point from the eye tracker, consistently sampled every 1.6 to 33 milliseconds (depending on the sampling data rate of the eye tracker). When using an I-VT Filter, it will group the raw eye tracking samples into fixations. The duration of each fixation depends on the gaze filter used to identify the fixations.
+
+![Heatmap](Capture d'écran 2024-08-15 210952.png)
+
+## Features
+
+- Data processing of eye tracking recordings
+
+To run a statistical study on the data recorded, we carried out in two stages data processing. First using Tobio Pro Lab, then the EMADAT package.
+Following the experiments, the files are processed using Tobii Pro Lab software. We delimited the AOI for each page, manually pointed the gazes points for the 22 participants on the 12 selected pages. Then exported the data for each participant in a tsv format.
+
+Then EMDAT was used to generate the datasets. Indeed, to extract the gaze features we used EMDAT python 2.7. EMDAT stands for Eye Movement Data Analysis Toolkit, it is an open-source toolkit developed by our group. EMDAT receives three types of input folder: a folder containing the recordings from Tobii in a tsv format, a Segment folder containing the timestamp for the start and end of page reading for each participant, and an AOI folder containing the coordinates and the time spent per participant of each AOI per page. We have also automated the writing of the Segments and AOIs folders.  Then we run the EMDAT script for each page. EMDAT also validates the quality of the recordings per page, here the parameter has been set to VALIDITY_METHOD = 1 (see documentation).  In particular, we found that the quality of the data did not diminish over the course of the recordings.
+
+- Eye tracking features
+
+Upon following the data processing protocol, we extracted the following features:
+
++ **number of fixation** (quantitative feature): The number of fixations denoted by \texttt{Num Fixations} is defined as the total number of fixations recorded over the total duration spent on a page by a participant.
+
++ **mean fixation duration** (duration feature): The mean fixation duration denoted by \texttt{Mean Fixation Duration} is defined as as the average fixation duration during page reading.
+
++ **standard deviation of the relative path angle** (spatial feature): The standard deviation of the relative path angle denoted by \texttt{Std Rel Path Angle} is defined as as the average fixation duration during page reading.the standard deviation of the relative angle between two successive saccades. This component enables us to capture the consistency of a participant's gaze pattern. The greater the standard deviation, the more likely the participant is to look across the different areas of a page.
+
+
+## T-test
+       
+First, we wondered whether there were any major differences in the way the two groups read. To do this, we compared the two populations along the three axes - quantitative, duration and spatial - defined in the previous section. To quantify these differences, we used a t-test to compare the means of the distributions, and a Kolmogorov-Smirnov test to compare the distributions. 
+Concerning the total number of fixations per page, the two populations seem to have the same characteristics (p-value>0.1 and Cohen's d=0.2) and to be from the same distribution (two sided K-s test p-value>0.1). 
+However, on the other two criteria, the autistic adolescents had a shorter mean fixation time and a lower standard deviation (p-value<0.05, Cohen's d > 0.5), and their associated distribution was lower than that of the control population (less K-S test p-value>0.1).
+
+|                                    |         **T-test**                       |             **K-S test**                               |
+|-----------------------------------:|:-----------------------------------------|:-------------------------------------------------------|
+|            **Num fixations**       | No statistically significant differences in the mean number of fixation *(small effect size, two-sided p-value > 0.1)* | The distributions of the number of fixations per page look similar across the two populations *(KS two-sided p-value > 0.1)* |
+| **Mean fixation duration**         | ND seems to have a shorter mean duration fixation *(Negative medium effect size, two-sided p-value < 0.01)* | The ND mean fixation duration distribution is smaller than the NT mean fixation duration distribution *(KS less p-value > 0.1)* |
+| **Standard deviation relative path angle** | ND seems to have on average a smaller std *(Negative medium effect size, two-sided p-value < 0.01)* | The ND std relative path angle distribution is smaller than the NT std relative path angle distribution *(KS less p-value > 0.1)* |

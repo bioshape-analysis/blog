@@ -1,0 +1,27 @@
+---
+title: "Simulation of tomograms of membrane-embedded spike proteins"
+bibliography: references.bib
+date: "August 15 2024" # Format example: August 9 2024
+author:
+  - name: "Qiyu Wang" 
+categories: [cryo-ET] # [biology, bioinformatics, theory, etc.]
+---
+## Background
+Cryogenic electron tomography (cryo-ET) is an imaging technique to reconstruct high-resolution 3d structure, usually of biological macromolecules. Samples (usually small cells like bacteria and viruses) are prepared in standard aqueous median (unlike cryo-EM, where samples are frozen) are imaged in transmission electron microscope (TEM). The samples are tilted to different angles (e.g. from $-60^\circ$ to $+60^\circ$), and images are obtained at every incremented degree (usually every $1^\circ$ or $2^\circ$). 
+
+The main advantage of cryo-ET is that it allows the cells and macromolecules to be imaged at undisturbed state. This is very crucial in many applications such as drug discovery, when we need to know the in-situ binding state of the target of interest (e.g. viral spike protein) with the drug.
+
+![Tomographic slices of SARS-CoV-2 virions, with spike proteins embedded in the membrane[@Shi2023]](img/et_example.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+In order to reconstruct macromolecules, tomographic slices need to be processed through a pipeline. A typical cryo-ET data processing pipeline includes: tilt series alignment, CTF estimation, tomogram reconstruction, particle picking, iterative subtomogram alignment and averaging, and heterogeneity analysis. Unlike cryo-EM, many algorithms for cryo-ET processing are still under development. Therefore, a large database of cryo-ET to test and tune algorithms is important. Unfortunately, collecting cryo-ET data is both time and money-consuming, and the current database of cryo-ET is not large enough, especially for deep learning training which requires a large amount of data. Therefore, simulation becomes a substitute to generate a large amount of data in a short time and at low expense.
+
+## Workflow
+We will use the Membrane Embedded Proteins Simulator (MEPSi), a tool incorporated in PyCoAn to simulate SARS-CoV-2 spike protein. Before doing so, I will briefly go through the workflow of MEPSi.
+
+### 1. Density modeling
+### 2. Basis tilt series generation
+### 3. CTF
+### 4. Noise
+### 5. Tomogram generation
+## References
+

@@ -2,42 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/quasiconformalmap/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.626Z</lastmod>
+    <lastmod>2024-08-15T22:11:17.780Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/AFM-data/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.610Z</lastmod>
+    <lastmod>2024-08-15T22:11:17.764Z</lastmod>
   </url>
   <url>
-    <loc>https://bioshape-analysis.github.io/blog/posts/convert-notebook-to-quarto/12_rwa_emg_sign_classification.html</loc>
-    <lastmod>2024-08-15T17:53:44.622Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bioshape-analysis.github.io/blog/posts/MATH-612/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.622Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bioshape-analysis.github.io/blog/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.610Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bioshape-analysis.github.io/blog/about.html</loc>
-    <lastmod>2024-08-15T17:53:44.610Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.630Z</lastmod>
+    <loc>https://bioshape-analysis.github.io/blog/posts/AlphaShape/index.html</loc>
+    <lastmod>2024-08-15T22:11:17.764Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/OTalignment/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.622Z</lastmod>
+    <lastmod>2024-08-15T22:11:17.780Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/index.html</loc>
+    <lastmod>2024-08-15T22:11:17.788Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/about.html</loc>
+    <lastmod>2024-08-15T22:11:17.764Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/index.html</loc>
+    <lastmod>2024-08-15T22:11:17.764Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/posts/MATH-612/index.html</loc>
+    <lastmod>2024-08-15T22:11:17.780Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/posts/convert-notebook-to-quarto/12_rwa_emg_sign_classification.html</loc>
+    <lastmod>2024-08-15T22:11:17.780Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/Elastic metric/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.610Z</lastmod>
+    <lastmod>2024-08-15T22:11:17.764Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/point-cloud/index.html</loc>
-    <lastmod>2024-08-15T17:53:44.626Z</lastmod>
+    <lastmod>2024-08-15T22:11:17.780Z</lastmod>
   </url>
 </urlset>

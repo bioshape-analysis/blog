@@ -1,7 +1,27 @@
 ---
-title: Introduction
-jupyter: python3
----
+title: "Point cloud representation of 3D volumes"
+subtitle: "Application to cryoEM density maps"
+
+engine: "jupyter"
+author:
+  - name: "Clément Soubrier" 
+    email: "c.soubrier @math.ubc.ca"
+    affiliations:
+      - name: KDD Group
+        url: "https://rtviii.xyz/"
+
+  - name: "Khanh Dao Duc" 
+    email: "kdd@math.ubc.ca"
+    affiliations:
+      - name: Department of Mathematics, UBC
+        url: "https://www.math.ubc.ca/"
+      - name: Department of Computer Science, UBC
+        url: "https://www.cs.ubc.ca/"
+
+date: "August 15 2024"
+categories: [biology, bioinformatics]    
+
+# Introduction
 
 In the context of cryo-EM, many computationaly exhaustive methods rely on simpler representations of cryo-EM density maps to overcome their scalability challenges. There are many choices to the form of the simpler representation, such as vectors (ref vesper) or mixture of gussians (ref). In this post we discuss a format which is probably the simplest and that is using a set of points (called point cloud). 
 

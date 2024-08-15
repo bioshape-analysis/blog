@@ -2,10 +2,10 @@
 title: "Extracting cell geometry from AFM"
 subtitle: "Part 1: Static analysis"
 
-engine: "jupyter"
+
 author:
   - name: "Clément Soubrier" 
-    email: "c.soubrier @math.ubc.ca"
+    email: "c.soubrier@math.ubc.ca"
     affiliations:
       - name: KDD Group
         url: "https://rtviii.xyz/"
@@ -22,25 +22,42 @@ date: "July 31 2024"
 categories: [biology, bioinformatics]    
 
 callout-icon: false
-# format:
-#   pdf:
-#     include-in-header:
-#       text: |
-#         \usepackage{amsmath}
+format:
+  html:
+    code-fold: true
+bibliography: bibliography.bib
 
 execute:
   echo: false
   freeze: auto
-  pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
 
 ---
 
 
 
 
-
+We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature.
 
 ## Biological context
+*Mycobacterium smegmatis* is Grahm-positive rod shape bacterium. It is 3 to 5 $\mu m$ long and around 500 $nm$ wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as *M.tuberculosis* (responsible for the tubercuosis) or *M.abscessus*, with which it shares the same cell wall structure[@tyagi2002mycobacterium] . In particular *M.smegmatis* has a fast growth (3-4 hours doubling time compared to 24h for *M. tuberculosis*), allowing for faster experimental protocols. 
+
+
+Here are some know properties of *M.smegmatis* bacteria :
+
+* They present variation of cell diameter along their longitudinal axis [@eskandarian2017division]. The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this proile.
+
+![3D image of *M.smegmatis*. The orange line represents the height profile.](3D_cell.png)
+
+* They grow following a biphasic and asymetrical polar dynamics[@hannebelle2020biphasic]. The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).
+
+![Growth dynamics.](Neto.svg)
+
+#### Data
+
+
+
+
+
 
 ## Raw image pre-processing
 

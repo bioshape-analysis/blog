@@ -1,5 +1,5 @@
 ---
-title: "Extracting cell geometry from AFM"
+title: "Extracting cell geometry from Atomic Force Microscopy"
 subtitle: "Part 1: Static analysis"
 
 

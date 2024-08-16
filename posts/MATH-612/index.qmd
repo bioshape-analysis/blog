@@ -30,7 +30,7 @@ categories: [MATH 612]
 2. **Send your account username/email to [kdd@math.ubc.ca](mailto:kdd@math.ubc.ca):** This is needed to be added to the organization.
 3. **Clone the repository:** After being added to the organization, clone the repository: `https://github.com/bioshape-analysis/blog`.
    ```sh
-   git clone https://github.com/bioshape-analysis/blog`
+   git clone https://github.com/bioshape-analysis/blog
    ```
 4. **Create a new branch:** To contribute to the blog, create a new branch using:
    ```sh
@@ -83,3 +83,34 @@ categories: [MATH 612]
   ```
 - **Other Edits:**
   Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header.
+
+## Multiple environments in the same Quarto project 
+In your blog post, you may want to use specific python packages, which may conflict with packages used in other post. To avoid this problem, you need to use a virtual environment. For simplicity please name your environment `.venv`. 
+
+1. **Creating the virtual environment:** 
+  Go to your post folder (e.g `blog/posts/my_post`) and run :
+   ```sh
+   python -m venv .venv
+   ```
+  The folder `.venv` was created and contains the environment.
+
+2. **Installing packages:** 
+  First activate the environment,
+   ```sh
+   source .venv/bin/activate
+   ```
+  and then install the packages you need:
+   ```sh
+   pip install package1_name package2_name
+   ```
+  To run code in Quarto, you need at least the package `jupyter`. Deactivate the environment with `deactivate`.
+
+3. **Using environment in VS Code:** 
+  Link the virtual environment to VS Code using the command palette, with the command `Python : Select Interpreter` and entering the path to your interpreter ending with `.venv/bin/python`.
+
+4. **Export your package requirements** 
+  If you are installed non standard package, other that `jupyter`, ` numpy`, `matplotlib`, `pandas`, `plotly` for example, you can export your package requirements, so that other can reproduce your environment. First go to your post directory and activate your environment. Then run: 
+   ```sh
+   pip freeze > requirements.txt
+   ```
+

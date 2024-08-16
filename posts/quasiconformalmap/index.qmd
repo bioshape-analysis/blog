@@ -1,5 +1,5 @@
 ---
-title: "Quasiconformal mapping in 1D"
+title: "Quasiconformal mapping for shape representation"
 date: "August 9 2024"
 author:
   - name: "Clément Soubrier" 

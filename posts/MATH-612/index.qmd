@@ -1,7 +1,7 @@
 ---
 title: "Welcome to MATH 612"
 subtitle: "Instructions and tips for MATH 612 students"
-date: "September 1 2024"
+date: "today"
 categories: [MATH 612]
 ---
 

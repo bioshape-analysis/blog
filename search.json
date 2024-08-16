@@ -9,28 +9,28 @@
   {
     "objectID": "posts/AFM-data/index.html",
     "href": "posts/AFM-data/index.html",
-    "title": "Extracting cell geometry from AFM",
+    "title": "Extracting cell geometry from Atomic Force Microscopy",
     "section": "",
     "text": "We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature."
   },
   {
     "objectID": "posts/AFM-data/index.html#biological-context",
     "href": "posts/AFM-data/index.html#biological-context",
-    "title": "Extracting cell geometry from AFM",
+    "title": "Extracting cell geometry from Atomic Force Microscopy",
     "section": "Biological context",
     "text": "Biological context\nMycobacterium smegmatis is Grahm-positive rod shape bacterium. It is 3 to 5 \\(\\mu m\\) long and around 500 \\(nm\\) wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as M.tuberculosis (responsible for the tubercuosis) or M.abscessus, with which it shares the same cell wall structure(Tyagi and Sharma 2002) . In particular M.smegmatis has a fast growth (3-4 hours doubling time compared to 24h for M. tuberculosis), allowing for faster experimental protocols.\nHere are some know properties of M.smegmatis bacteria :\n\nThey present variation of cell diameter along their longitudinal axis (Eskandarian et al. 2017). The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this proile.\n\n\n\n\n3D image of M.smegmatis. The orange line represents the height profile.\n\n\n\nThey grow following a biphasic and asymetrical polar dynamics(Hannebelle et al. 2020). The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).\n\n\n\n\nGrowth dynamics."
   },
   {
     "objectID": "posts/AFM-data/index.html#raw-image-pre-processing",
     "href": "posts/AFM-data/index.html#raw-image-pre-processing",
-    "title": "Extracting cell geometry from AFM",
+    "title": "Extracting cell geometry from Atomic Force Microscopy",
     "section": "Raw image pre-processing",
     "text": "Raw image pre-processing\n\nData\nSeveral data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc."
   },
   {
     "objectID": "posts/AFM-data/index.html#segmentation",
     "href": "posts/AFM-data/index.html#segmentation",
-    "title": "Extracting cell geometry from AFM",
+    "title": "Extracting cell geometry from Atomic Force Microscopy",
     "section": "Segmentation",
     "text": "Segmentation"
   },
@@ -109,7 +109,7 @@
     "href": "index.html",
     "title": "Biological shape analysis (under construction)",
     "section": "",
-    "text": "Welcome to MATH 612\n\n\nInstructions and tips for MATH 612 students\n\n\n\nMATH 612\n\n\n\n\n\n\n\n\n\nSep 1, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nSimulation of tomograms of membrane-embedded spike proteins\n\n\n\n\n\n\ncryo-ET\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nQiyu Wang\n\n\n\n\n\n\n\n\n\n\n\n\nMulti Dimensional Scaling of ribosome exit tunnel shapes\n\n\nAnalyze and compare the geometry of the ribosome exit tunnel\n\n\n\ncryo-EM\n\n\nribosome\n\n\nMDS\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nShiqi Yu, Artem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAnalysis of Eye Tracking Data\n\n\n\n\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nLisa\n\n\n\n\n\n\n\n\n\n\n\n\nShape Analysis of Cancer Cells\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nWanxin Li\n\n\n\n\n\n\n\n\n\n\n\n\nRiemannian elastic metric for curves\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nWanxin Li\n\n\n\n\n\n\n\n\n\n\n\n\nAlpha Shapes in 2D and 3D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 14, 2024\n\n\nWenjun Zhao\n\n\n\n\n\n\n\n\n\n\n\n\nQuasiconformal mapping for shape representation\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nClément Soubrier\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities (new)\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nexample\n\n\ncryo-EM\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nExtracting cell geometry from AFM\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
+    "text": "Welcome to MATH 612\n\n\nInstructions and tips for MATH 612 students\n\n\n\nMATH 612\n\n\n\n\n\n\n\n\n\nSep 1, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nSimulation of tomograms of membrane-embedded spike proteins\n\n\n\n\n\n\ncryo-ET\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nQiyu Wang\n\n\n\n\n\n\n\n\n\n\n\n\nMulti Dimensional Scaling of ribosome exit tunnel shapes\n\n\nAnalyze and compare the geometry of the ribosome exit tunnel\n\n\n\ncryo-EM\n\n\nribosome\n\n\nMDS\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nShiqi Yu, Artem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAnalysis of Eye Tracking Data\n\n\n\n\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nLisa\n\n\n\n\n\n\n\n\n\n\n\n\nShape Analysis of Cancer Cells\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nWanxin Li\n\n\n\n\n\n\n\n\n\n\n\n\nRiemannian elastic metric for curves\n\n\n\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nAug 15, 2024\n\n\nWanxin Li\n\n\n\n\n\n\n\n\n\n\n\n\nAlpha Shapes in 2D and 3D\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 14, 2024\n\n\nWenjun Zhao\n\n\n\n\n\n\n\n\n\n\n\n\nQuasiconformal mapping for shape representation\n\n\n\n\n\n\ntheory\n\n\n\n\n\n\n\n\n\nAug 9, 2024\n\n\nClément Soubrier\n\n\n\n\n\n\n\n\n\n\n\n\n3D tessellation of biomolecular cavities (new)\n\n\nProtocol for analyzing the ribosome exit tunnel\n\n\n\nexample\n\n\ncryo-EM\n\n\n\n\n\n\n\n\n\nAug 4, 2024\n\n\nArtem Kushner, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nExtracting cell geometry from Atomic Force Microscopy\n\n\nPart 1: Static analysis\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 31, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nAlignment of 3D volumes with Optimal Transport\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 29, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\n\n\n\n\n\n\nPoint cloud representation of 3D volumes\n\n\nApplication to cryoEM density maps\n\n\n\nbiology\n\n\nbioinformatics\n\n\n\n\n\n\n\n\n\nJul 28, 2024\n\n\nClément Soubrier, Khanh Dao Duc\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",

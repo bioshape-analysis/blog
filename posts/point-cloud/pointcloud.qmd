@@ -29,272 +29,240 @@ In the context of cryo-EM, many computationaly exhaustive methods rely on simple
 
 This problem can be formulated in a much more general sense rather than cryo-EM. In this sense we are given a probability distribution over $\mathbb{R}^3$ and we want to generate a set of 3D points that represent this distribution. The naive approach to find such a point cloud is to just sample points from the distribution. Although this approach is guaranteed to find a good representation, it needs lots of points to cover the distribution evenly. Since methods used in this field can be computationally intensive with cubic or higher time complexity, generating a point cloud that covers the give distribution with a smaller point cloud could lead to a significant improvement in their runtime.
 
-In this approach, we present two methods for generating a point cloud from a cryo-EM density map or a distribution in general. The first one is based on the Topological Representing Network (TRN) [@martinetz1994topology] and the second one combines the usage the Optimal Transport (OT) theory and and some computational geometry object named Centroidal Vornoi Tessellation (CVT).
+In this approach, we present two methods for generating a point cloud from a cryo-EM density map or a distribution in general. The first one is based on the Topological Representing Network (TRN) [@martinetz1994topology] and the second one combines the usage the Optimal Transport (OT) [@peyre2019computational] theory and and some computational geometry object named Centroidal Vornoi Tessellation (CVT).
 
 
 ## Data
-In this post we use a map of Escherichia coli ribosome (EMDB-1717). To download visit [Electron Microscopy Data Bank](https://www.ebi.ac.uk/emdb/EMD-1717) and selecet "3D volume" option under the "Download" dropdown. Then unzip the downloaded file and put it beside your code. In practice, before using either of these two methods we might threshold the density map to reduce the noice that affects the quality of point clouds.
-
-# Topology Representing Networks (TRN)
-## Summary
-This method is an iterative method relies on randomly sampling an initial point cloud $r_m(0)_{i=1,\dots,n}$ from the given probability distribution $p$. At each step $t$, we sample a new point ($r_t$) from $p$, and compute the distnace from points in $r_m(t)$ to $r_t$ and rank them from zero to $n-1$. Then we update the position of points based on:
-$$r_m(t+1) = r_m(t) + \epsilon(t)exp(-k_m/\lambda(t))(r_t - r_m(t)),$$
+For the sake of simplicity in this post we assume we are given a primal distribution over $\mathbb{R}^2$. As an example we will work on multivariate gaussian distribution that it's domain is limited to $[0, 1]^2$. The following code prepares and illustrates the pdf of the example distribution.
 
 ```{python}
 import numpy as np
+import scipy as scp
+import matplotlib
+import matplotlib.pyplot as plt
 
-def coords_n_by_d(coords_1d=None,N=None,d=3):
-    if N is None: 
-        assert coords_1d is not None
-    elif coords_1d is None:
-        assert N is not None
-        coords_1d = np.arange(-N//2,N//2)
+plt.rcParams["figure.figsize"] = (20,20)
 
-    if d==2:
-        X = np.meshgrid(coords_1d,coords_1d)
-    elif d==3:
-        X = np.meshgrid(coords_1d,coords_1d,coords_1d)
-    coords = np.zeros((X[0].size,d))
-    for di in range(d):
-        coords[:,di] = X[di].flatten()
-    # make compatible with flatten
-    if d == 3: coords[:,[0,1]] = coords[:,[1,0]]
-    elif d == 2: coords[:,[0,1]] = coords[:,[1,0]]
 
-    return(coords)
 
-def EA_to_R3(phi, theta, psi=None):
-    
-    """
-    Makes a rotation matrix from Z-Y-Z Euler angles.
-    maps image coordinates (x,y,0) view coordinates
-    See Z_1 Y_2 Z_3 entry in the table "Proper Euler angles" at https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
-    http://www.gregslabaugh.net/publications/euler.pdf
-    """
-    R_z  = np.array([[ np.cos(phi), -np.sin(phi),  0],
-                     [ np.sin(phi),  np.cos(phi),  0],
-                     [          0,           0,  1]])
-    R_y  = np.array([[ np.cos(theta),  0,  np.sin(theta)],
-                     [0,              1,             0],
-                     [-np.sin(theta),  0,  np.cos(theta)]])
-    R = np.dot(R_z, R_y)
-    if psi is not None and psi != 0:
-        R_in = np.array([[ np.cos(psi), -np.sin(psi),  0],
-                         [ np.sin(psi),  np.cos(psi),  0],
-                         [          0,           0,  1]])
-        R = np.dot(R, R_in);
+mean = np.array([0,0])
+cov = np.array([[0.5, 0.25], [0.25, 0.5]])
+distr = scp.stats.multivariate_normal(cov = cov, mean = mean, seed = 1)
 
-    return R
 
-def deg_to_rad(deg): return(deg*np.pi/180)
+fig, ax = plt.subplots(figsize=(8,8))
+im = ax.imshow([[distr.pdf([i/100,j/100]) for i in range(100,-100,-1)] for j in range(-100,100)], extent=[-1, 1, -1, 1])
+cbar = ax.figure.colorbar(im, ax=ax)
+plt.title("The pdf of our primal distribution")
+plt.show()
+```
 
-def get_random_quat(num_pts,method = 'sphere'):
+Both of the methods that we are going to cover are iterative methods. For generating a point cloud of size $n$, they begin by randomly sampling $n$ points and refining it over iterations. To make the illustration interesting we used a uniform point cloud for initial samples. We use $n=200$ in our examples.
 
-    u = np.random.rand(3, num_pts)
+```{python}
+def sampler(rvs):
+    while True:
+        sample = rvs(1)
+        if abs(sample[0]) > 1 or abs(sample[1]) > 1:
+            continue
+        return sample
 
-    u1, u2, u3 = [u[x] for x in range(3)]
+# The commented code will begin with initial samples drawn from the primal distribution instead of uniform
 
-    quat = np.zeros((4, num_pts))
-    if method == 'hemisphere':
-        angle = np.pi / 2
-        
-    elif method == 'sphere':
-        angle = 2 * np.pi
-    else:
-        assert False, 'use hemisphere or sphere'
+# initial_samples = []
+# while len(initial_samples) < 200:
+#     sample = sampler(distr.rvs)
+#     initial_samples.append(list(sample))
+# initial_samples = np.array(initial_samples)
+initial_samples = np.random.uniform(-1,1,(200,2))
 
-    quat[0] = np.sqrt(1 - u1) * np.sin(np.pi * u2 / 2)
-    quat[1] = np.sqrt(1 - u1) * np.cos(np.pi * u2 / 2)
-    quat[2] = np.sqrt(u1) * np.sin(np.pi * u3 / 2)
-    quat[3] = np.sqrt(u1) * np.cos(np.pi * u3 / 2)
+l = list(zip(*initial_samples))
+x = list(l[0])
+y = list(l[1])
 
-    return np.transpose(quat)
+fig, ax = plt.subplots(figsize=(8,8))
+ax.scatter(x, y)
+ax.plot((-1,-1), (-1,1), 'k-')
+ax.plot((-1,1), (-1,-1), 'k-')
+ax.plot((1,1), (1,-1), 'k-')
+ax.plot((-1,1), (1,1), 'k-')
+plt.ylim(-1.1,1.1)
+plt.xlim(-1.1,1.1)
+plt.show()
+```
 
-def quaternion_to_R(q):
-    a,b,c,d = q[0], q[1], q[2], q[3]
-    R = np.array([
-        [a**2+b**2-c**2-d**2 , 2*b*c-2*a*d , 2*b*d+2*a*c],
-        [2*b*c+2*a*d , a**2-b**2+c**2-d**2 , 2*c*d-2*a*b],
-        [2*b*d-2*a*c , 2*c*d+2*a*b , a**2-b**2-c**2+d**2]
-    ])
-    return(R)
+# Topology Representing Networks (TRN)
+This method is an iterative method relies on randomly sampling an initial point cloud $r_m(0)_{i=1,\dots,n}$ from the given probability distribution $p$. At each step $t$, we sample a new point ($r_t$) from $p$, and compute the distnace from points in $r_m(t)$ to $r_t$ and rank them from zero (closest) to $n-1$ (called $k_m$). Then we update the position of points based on:
+$$r_m(t+1) = r_m(t) + \epsilon(t)exp(-k_m/\lambda(t))(r_t - r_m(t)),$$
+$$\epsilon(t) = \epsilon_0(\frac{\epsilon_f}{\epsilon_0})^{t/t_f},$$
+$$\lambda(t) = \lambda_0(\frac{\lambda_f}{\lambda_0})^{t/t_f}$$
+These fomulas are designed in a way that makes the movement of points slower as the number of iteration increases.
+
+```{python}
+e0=2
+ef=0.5
+l0=3
+lf=0.25
+tf=10000
 ```
 
 ```{python}
+#| scrolled: false
+fig, axs = plt.subplots(2, 2, figsize=(10,10))
 
-def trn_rm0(map_3d,M,random_seed=None):
-    """
-    Parameters
-    ----------
-        map_3d : numpy.ndarray, shape (N,N,N)
-            3d map
-        M : int
-            number of pseudo atoms
-            random_seed : int
-
-    Returns
-    ------- 
-        rm0 : numpy.ndarray, shape (M,3)
-            initial sample of M points from map_3d. probability proportional to density
-        map_3d_flat : numpy.ndarray, shape (N**3,)
-            flattened map_3d, normalized to sum to 1
-        map_3d_idx : numpy.ndarray, shape (N**3,)
-            array of integers from 0 to N**3-1
-        xyz : numpy.ndarray, shape (M,3)
-            coordinates of voxels in map_3d
-
-    """
-    cube_length = max(map_3d.shape)
-    cube_length += cube_length%2
-    print(map_3d.shape)
-    print(map_3d)
-    print(map_3d.sum())
-    print(cube_length)
-    map_3d = np.pad(map_3d, ((0, cube_length - map_3d.shape[0]), (0, cube_length - map_3d.shape[1]), (0, cube_length - map_3d.shape[2])), 'minimum')
-    #print(map_3d.shape)
-    assert np.unique(map_3d.shape).size == 1, 'map must be cube, not non-cubic rectangular parallelepiped'
-    N = map_3d.shape[0]
-    assert N%2 == 0, 'N must be even'
-    print(map_3d.sum())
-    print(map_3d)
-    map_3d /= map_3d.sum() # 3d map to probability density
-    print(map_3d.sum())
-    print(np.where(np.isnan(map_3d)==True))
-    print(map_3d)
-    map_3d_flat = map_3d.flatten()
-    map_3d_idx = np.arange(map_3d_flat.shape[0])
-    if random_seed is not None: np.random.seed(seed=random_seed)
-
-    # this scales with M (the number of chosen items), not map_3d_idx (the possibilities to choose from)
-    samples_idx = np.random.choice(map_3d_idx,size=M,replace=True,p=map_3d_flat) # chosen voxel indeces
-    coords_1d = np.arange(-N//2,N//2)
-    xyz = coords.coords_n_by_d(coords_1d,d=3)
-    rm0 = xyz[samples_idx] # pick out coordinates that where chosen. note that this assumes map_3d_idx matches with rows of xyz
-    return rm0,map_3d_flat,map_3d_idx,xyz,coords_1d
-
-def trn_iterate(rm0,
-    map_3d_flat,
-    map_3d_idx,
-    xyz,
-    n_save=10,
-    e0=0.3,
-    ef=0.05,
-    l0=None,
-    lf=0.5,
-    tf=None,
-    do_log=True,
-    log_n=10,
-):
-    """
-    topology representing network
-    diffuses pseudo atoms to cover probability distribution uniformly
-    evolves by equation rm[t+1] = rm[t] + e exp[-km/l] * (r - rm[t]), where
-        m indexes the pseudo atoms
-        rm is the 3D cartesian location of the mth pseudo atom
-        t is time
-        r is a randomly sampled point from the initial 3d density (independent of t and therefore can be precomputed)
-        e is a time depedent step size and evolves as e0(ef/e0)**(t/tf)
-        km is the rank of the rm to r. how close rm is to r, compared with the other rm's, expressed as a rank
-        l is a time depedent scaling of km size and evolves as l0(lf/l0)**(t/tf)
-        tf is the total time steps
-    see ref 
-        Zhang, Y., Krieger, J., Mikulska-Ruminska, K., Kaynak, B., Sorzano, C. O. S., Carazo, J. M., … Bahar, I. (2021). 
-        State-dependent sequential allostery exhibited by chaperonin TRiC/CCT revealed by network analysis of Cryo-EM maps. 
-        Progress in Biophysics and Molecular Biology, 160, 104–120. 
-        http://doi.org/10.1016/j.pbiomolbio.2020.08.006
-    and python code in prody 
-        http://prody.csb.pitt.edu/manual/reference/proteins/emdfile.html#TRNET
-        https://github.com/prody/ProDy/blob/697220825ebc7498d64f4e82f53bb7ff6d98027c/prody/proteins/emdfile.py#L466
-
-    Parameters
-    ----------
-        rm0 : numpy.ndarray, shape (M,3)
-            initial sample of M points from map_3d. probability proportional to density
-        map_3d_flat : numpy.ndarray, shape (N**3,)
-            flattened map_3d, normalized to sum to 1
-        map_3d_idx : numpy.ndarray, shape (N**3,)
-            array of integers from 0 to N**3-1
-        xyz : numpy.ndarray, shape (M,3)
-            coordinates of voxels in map_3d
-        n_save : int
-            number of steps to save (evenly spaced out), in addition to initial step 0
-        e0 : float
-            initial step size
-        ef : float
-            final step size
-        l0 : float
-            initial scaling of rank. larger tightens things up (pulls together). smaller spreads things out
-        lf : float
-            initial scaling of rank
-        tf : int
-            total steps
-        do_log : bool
-        log_n : int
-            how many times to output log over the course of time steps
+r = initial_samples
+for t in range(tf):
+    rt = sampler(distr.rvs)
+    dist2 = ((rt - r)**2).sum(1) 
+    order = dist2.argsort()
+    rank = order.argsort().reshape(-1,1)
+    l = l0*(lf/l0)**(t/tf)
+    e = e0*(ef/e0)**(t/tf)
+    r = r + e*np.exp(-rank/l)*(rt-r)
     
-    Returns
-    -------
-    rms : numpy.ndarray, shape (n_save + 1, M, 3)
-        location of pseudo atoms, over (evenly spaced intervals of) iterations. 
-        0th and 1st iteration are right after each other with nothing in between
-    rs : numpy.ndarray, shape (tf+1,3)
-        sampled points
-    ts_save : numpy.ndarray, shape (n_save + 1,3), dtype np.int32
-        time points corresponding to rms
-    """
-    M = rm0.shape[0]
-    d = rm0.shape[1]
-    if l0 is None: 0.067*M
-    if tf is None: tf=200*M
-    rms = np.empty((n_save+1,M,d))
-    rms[0] = rm0
-    rs = np.empty((tf+1,d))
-    ts_save = np.empty((n_save+1)).astype(np.int32)
+    if (t+1)%2500 == 0:
+        l = list(zip(*r))
+        x = list(l[0])
+        y = list(l[1])
 
-    r_idxs = np.random.choice(map_3d_idx,p=map_3d_flat,size=tf) # precompute
-    rm = rm0
-    save_idx=0
-
-    for t in range(tf):
-        #if do_log and (t % (tf//log_n) == 0): print(t)
-        r_idx = r_idxs[t]
-        r = xyz[r_idx]
-        rs[t]=r
-        dist2 = ((r - rm)**2).sum(1) # usually sum over xyz. just need relative rank in one time step, so can use dist2 vs dist
-        order = dist2.argsort()
-        rank = order.argsort().reshape(-1,1)
-        l = l0*(lf/l0)**(t/tf)
-        e = e0*(ef/e0)**(t/tf)
-        rm = rm + e*np.exp(-rank/l)*(r-rm)
-        if do_log and ((t % (tf//n_save) == 0) or (t == tf-1)): 
-            rms[save_idx] = rm
-            ts_save[save_idx] = t
-            save_idx+=1
-    return rms,rs,ts_save
-
-def trn_wrapper(map_3d,
-                                threshold,
-                                M=1000,
-                                random_seed=None,
-                                n_save=10,
-                                e0=0.3,
-                                ef=0.05,
-                                l0_factor=0.005,
-                                lf=0.5,
-                                tf_factor=8, # typically M*8
-                                do_log=True,
-                                log_n=10
-                                ):
-    map_th = map_3d.copy()
-    map_th[map_th < threshold] = 0
-    rm0,map_3d_flat,map_3d_idx,xyz,coords_1d = trn_rm0(map_th,M=M,random_seed=random_seed)
-    rms,rs,ts_save = trn_iterate(rm0,map_3d_flat,map_3d_idx,xyz,n_save=n_save,e0=e0,ef=ef,l0=M*l0_factor,lf=lf,tf=M*tf_factor,do_log=do_log,log_n=log_n)
-    map_3d_th_norm = map_3d_flat.reshape(map_3d.shape)
-    return rm0,map_3d_th_norm,map_3d_idx,xyz,coords_1d,rms,rs,ts_save
+        index = t//2500
+        axs[index//2][index%2].scatter(x, y, s=10)
+        axs[index//2][index%2].title.set_text('Position of points after t=%d iterations'%(t+1,))
+        axs[index//2][index%2].plot((-1,-1), (-1,1), 'k-')
+        axs[index//2][index%2].plot((-1,1), (-1,-1), 'k-')
+        axs[index//2][index%2].plot((1,1), (1,-1), 'k-')
+        axs[index//2][index%2].plot((-1,1), (1,1), 'k-')
+        plt.ylim(-1.1,1.1)
+        plt.xlim(-1.1,1.1)
+plt.show()
 ```
 
 # Centroidal Vornoi Tessellation (CVT)
+Although TRN is intuitive it doesn't minimize any specific objective function. Among the mtrics that can be to determine the distance between a point cloud and a continuous distribution the semidiscrete Wasserstein distance (based on the Optimal Transport theory [@peyre2019computational]) is of our interest. In other words we want a point cloud that minimizes the semidicrete Wasserestein distance to a given primal distribution. One can prove that such a point cloud forms a geometrical object named Centroidal Voronoi Tessellation (CVT) over the distribution. A CVT is a the Voronoi diagram generated by a point cloud such that each point is centroid and generator of it's Voronoi cell. Such a tessellation can be computed using Lloyd's iterations by alteranating between computing centroids and Voronoi cells. Unlike TRN this method generated a wighted point cloud.
 
-# Visualization
+```{python}
+def in_box(robots, bounding_box):
+    return np.logical_and(np.logical_and(bounding_box[0] <= robots[:, 0],
+                                         robots[:, 0] <= bounding_box[1]),
+                          np.logical_and(bounding_box[2] <= robots[:, 1],
+                                         robots[:, 1] <= bounding_box[3]))
 
+
+def voronoi(robots, bounding_box):
+    i = in_box(robots, bounding_box)
+    points_center = robots[i, :]
+    points_left = np.copy(points_center)
+    points_left[:, 0] = bounding_box[0] - (points_left[:, 0] - bounding_box[0])
+    points_right = np.copy(points_center)
+    points_right[:, 0] = bounding_box[1] + (bounding_box[1] - points_right[:, 0])
+    points_down = np.copy(points_center)
+    points_down[:, 1] = bounding_box[2] - (points_down[:, 1] - bounding_box[2])
+    points_up = np.copy(points_center)
+    points_up[:, 1] = bounding_box[3] + (bounding_box[3] - points_up[:, 1])
+    points = np.append(points_center,
+                       np.append(np.append(points_left,
+                                           points_right,
+                                           axis=0),
+                                 np.append(points_down,
+                                           points_up,
+                                           axis=0),
+                                 axis=0),
+                       axis=0)
+    # Compute Voronoi
+    vor = scp.spatial.Voronoi(points)
+    # Filter regions and select corresponding points
+    regions = []
+    points_to_filter = [] # we'll need to gather points too
+    ind = np.arange(points.shape[0])
+    ind = np.expand_dims(ind,axis= 1)
+
+    for i,region in enumerate(vor.regions): # enumerate the regions
+        if not region: # nicer to skip the empty region altogether
+            continue
+
+        flag = True
+        for index in region:
+            if index == -1:
+                flag = False
+                break
+            else:
+                x = vor.vertices[index, 0]
+                y = vor.vertices[index, 1]
+                if not(bounding_box[0] - eps <= x and x <= bounding_box[1] + eps and
+                       bounding_box[2] - eps <= y and y <= bounding_box[3] + eps):
+                    flag = False
+                    break
+        if flag:
+            regions.append(region)
+
+            # find the point which lies inside
+            points_to_filter.append(vor.points[vor.point_region == i][0,:])
+
+    vor.filtered_points = np.array(points_to_filter)
+    vor.filtered_regions = regions
+    return vor
+
+def centroid_region(vertices):
+    A = 0
+    C_x = 0
+    C_y = 0
+    for i in range(len(vertices)):
+        p = distr.pdf(vertices[i])
+        A += p
+        C_x += vertices[i,0] * p
+        C_y += vertices[i,1] * p
+        
+    C_x /= A
+    C_y /= A
+    return np.array([[C_x, C_y]]), A
+
+def plot(r,ax):
+    vor = voronoi(r, bounding_box)
+    ax.set_xlim([-1.1, 1.1])
+    ax.set_ylim([-1.1, 1.1])
+    
+    for region in vor.filtered_regions:
+        vertices = vor.vertices[region + [region[0]], :]
+        ax.plot(vertices[:, 0], vertices[:, 1], 'k-')
+        
+    centroids = []
+    weights = []
+    
+    for region in vor.filtered_regions:
+        vertices = vor.vertices[region + [region[0]], :]
+        centroid, w = centroid_region(vertices)
+        centroids.append(list(centroid[0, :]))
+        weights.append(w)
+        
+    
+    ax.scatter(vor.filtered_points[:, 0], vor.filtered_points[:, 1], s=5, c='b', alpha=weights/max(weights))
+        
+    centroids = np.asarray(centroids)
+    return centroids, weights
+```
+
+```{python}
+import sys
+bounding_box = np.array([-1., 1., -1., 1.]) 
+eps = sys.float_info.epsilon
+samples = initial_samples
+fig, axs = plt.subplots(3,3,figsize=(12,12))
+for i in range(9):
+    axs[i//3][i%3].title.set_text('iteration t=%d'%(i + 1,))
+    centroids, weights = plot(samples,axs[i//3][i%3])
+    samples = np.copy(centroids)
+
+plt.show()
+```
+
+# More Examples
+
+ To further examine the effectiveness of these methods, we performed a simulation on a more complex distribution obtained by normalizing the intensities of a sketch of Naqsh-e Jahan Square and $n=10^5$ points. This image show the convergence of methods as well as the primal distribution.
+
+![Image Description](img/example1.png)
+
+# Application on Cryo-EM
+
+Both of these methods ar easily applicable to a 3D density map. A full implementation of both methods in ChimeraX (the standard visualization tool for cryo-EM) [@pettersen2021ucsf] is in thie [GitHub repo](https://github.com/artajmir3/ot_alignment). TRN was first used in the field of cryo-EM by [@zhang2021state], later on we used it in our alignment methods [@riahi2023alignot, @riahi2023empot]. To the best of our knowledge no paper have used CVT on the field of cryo-EM yet.
+                              
 

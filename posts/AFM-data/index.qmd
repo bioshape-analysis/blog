@@ -34,6 +34,10 @@ execute:
 ---
 
 
+```{python}
+import pandas as pd
+print(1)
+```
 
 
 We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature.

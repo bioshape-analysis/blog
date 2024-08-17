@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-08-16">
+<meta name="dcterms.date" content="2024-08-17">
 
 <title>Welcome to MATH 612 – bioshape-analysis</title>
 <style>
@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">August 16, 2024</p>
+        <p class="date">August 17, 2024</p>
       </div>
     </div>
     
@@ -186,6 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#additional-information-for-quarto" id="toc-additional-information-for-quarto" class="nav-link" data-scroll-target="#additional-information-for-quarto">Additional Information for Quarto:</a></li>
   </ul></li>
+  <li><a href="#multiple-environments-in-the-same-quarto-project" id="toc-multiple-environments-in-the-same-quarto-project" class="nav-link" data-scroll-target="#multiple-environments-in-the-same-quarto-project">Multiple environments in the same Quarto project</a></li>
   </ul>
 </nav>
     </div>
@@ -230,7 +231,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><strong>Log into GitHub:</strong> Make sure you have an account and are logged in.</p></li>
 <li><p><strong>Send your account username/email to <a href="mailto:kdd@math.ubc.ca">kdd@math.ubc.ca</a>:</strong> This is needed to be added to the organization.</p></li>
 <li><p><strong>Clone the repository:</strong> After being added to the organization, clone the repository: <code>https://github.com/bioshape-analysis/blog</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/bioshape-analysis/blog<span class="kw">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/bioshape-analysis/blog</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Create a new branch:</strong> To contribute to the blog, create a new branch using:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> <span class="op">&lt;</span>branch_name<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
@@ -269,9 +270,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>This is a citation <span class="co">[</span><span class="ot">@citation_key</span><span class="co">]</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Other Edits:</strong> Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header.</p></li>
 </ul>
-
-
 </section>
+</section>
+<section id="multiple-environments-in-the-same-quarto-project" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-environments-in-the-same-quarto-project">Multiple environments in the same Quarto project</h2>
+<p>In your blog post, you may want to use specific python packages, which may conflict with packages used in other post. To avoid this problem, you need to use a virtual environment. For simplicity please name your environment <code>.venv</code>.</p>
+<ol type="1">
+<li><p><strong>Creating the virtual environment:</strong> Go to your post folder (e.g <code>blog/posts/my_post</code>) and run :</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The folder <code>.venv</code> was created and contains the environment.</p></li>
+<li><p><strong>Installing packages:</strong> First activate the environment,</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>and then install the packages you need:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install package1_name package2_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To run code in Quarto, you need at least the package <code>jupyter</code>. Deactivate the environment with <code>deactivate</code>.</p></li>
+<li><p><strong>Using environment in VS Code:</strong> Link the virtual environment to VS Code using the command palette, with the command <code>Python : Select Interpreter</code> and entering the path to your interpreter ending with <code>.venv/bin/python</code>.</p></li>
+<li><p><strong>Export your package requirements</strong> If you are installed non standard package, other that <code>jupyter</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pandas</code>, <code>plotly</code> for example, you can export your package requirements, so that other can reproduce your environment. First go to your post directory and activate your environment. Then run:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> freeze <span class="op">&gt;</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+
+
 </section>
 
 </main> <!-- /main -->

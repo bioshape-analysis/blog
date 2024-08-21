@@ -11,12 +11,17 @@ categories: [theory]
 
 Alpha shapes are a generalization of the convex hull used in computational geometry. They are particularly useful for understanding the shape of a point cloud in both 2D and 3D spaces. In this document, we will explore alpha shapes in both dimensions using Python.
 
+**What is $\alpha$ shape?** My favorite analogy (reference https://doc.cgal.org/latest/Alpha_shapes_2/index.html): 
+
+Imagine you have a huge mass of ice cream in either 2D or 3D, and the points are "hard" chocolate pieces which we would like to avoid. Using one of these round-shaped ice-cream spoons with radius $1/\alpha$, we carve out all the ice cream without bumping into any of the chocolate pieces. Finally we straighten the round boundaries to obtain the so-called $\alpha$ shape. 
+
+**What is the $\alpha$ parameter**? $1/\alpha$ is the radius of your "carving spoon" and controls the roughness of your boundary. If the radius of spoon is too small ($\alpha\to \infty$), all the ice cream can be carved out except the chocolate chips themselves, so eventually all data points become singletons and no information regarding the shape can be revealed. However, choosing big radius ($\alpha \approx 0$) may not be ideal either because it does not allow carving out anything, so we end up with a convex hull of all data points. 
+
 ## 2D Alpha Shape
 
 To illustrate alpha shapes in 2D, we'll use the `alphashape` library. Let's start by generating a set of random points and compute their alpha shape.
 
-First we create point cloud points:
-
+First we create a point cloud:
 
 ```{python}
 import numpy as np
@@ -56,12 +61,9 @@ plt.scatter(points[:, 0], points[:, 1], s=10, color='blue', label='Points')
 ```
 
 
-Try run this with alpha shape radius 0.1:
+Try run this with  $\alpha=0.1$:
 
 ```{python}
-
-
-
 
 # Create alpha shape
 alpha = 0.1
@@ -107,3 +109,281 @@ for i, alpha in enumerate(alpha_values):
 plt.tight_layout()
 plt.show()
 ```
+
+
+## Application of 2D alpha shapes on reaction-diffusion equation
+
+Now we discuss an application of 2D alpha shape on quantifying the patterns that arise in reaction-diffusion equations modeling morphogenesis. 
+
+Reference: Zhao, Maffa, Sandstede. http://bjornsandstede.com/papers/Data_Driven_Continuation.pdf
+
+As an example, let's consider the Brusselator model in 2D, and below is a simple simulator that generates the snapshot of its solution over the spatial domain. The initial condition is random, and patterns start to arise after we evolve the system forward for a short time. 
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def brusselator_2d_simulation(A, B, Lx=100, Ly=100, Nx=100, Ny=100, dt=0.005, D_u=4, D_v=32, T=20):
+    """
+    Simulate the 2D Brusselator model and return the concentration field u at time T.
+    
+    Parameters:
+    - A: Reaction parameter A
+    - B: Reaction parameter B
+    - Lx: Domain size in x direction
+    - Ly: Domain size in y direction
+    - Nx: Number of grid points in x direction
+    - Ny: Number of grid points in y direction
+    - dt: Time step
+    - D_u: Diffusion coefficient for u
+    - D_v: Diffusion coefficient for v
+    - T: Total simulation time
+    
+    Returns:
+    - u: Concentration field u at time T
+    """
+    
+    # Generate random points
+    np.random.seed(0)  # For reproducibility
+
+    # Initialize variables
+    dx, dy = Lx / Nx, Ly / Ny
+    u = np.random.uniform(size=(Nx, Ny))
+    v = np.zeros((Nx, Ny))
+    
+    
+    # Prepare the grid
+    x = np.linspace(0, Lx, Nx)
+    y = np.linspace(0, Ly, Ny)
+    
+    # Compute Laplacian
+    def laplacian(field):
+        return (np.roll(field, 1, axis=0) + np.roll(field, -1, axis=0) +
+                np.roll(field, 1, axis=1) + np.roll(field, -1, axis=1) -
+                4 * field) / (dx * dy)
+    
+    # Time-stepping loop
+    num_steps = int(T / dt)
+    for _ in range(num_steps):
+        # Compute Laplacian
+        lap_u = laplacian(u)
+        lap_v = laplacian(v)
+        
+        # Brusselator model equations
+        du = D_u * lap_u + A - (B + 1) * u + u**2 * v
+        dv = D_v * lap_v + B * u - u**2 * v
+        
+        # Update fields
+        u += du * dt
+        v += dv * dt
+    
+    return u, x, y
+
+# Example usage
+A = 4.75
+B = 11.0
+u_at_T, x, y = brusselator_2d_simulation(A, B)
+
+# Plot the result
+plt.figure(figsize=(8, 8))
+plt.imshow(u_at_T, cmap='viridis', interpolation='bilinear', origin='lower')
+plt.colorbar(label='Concentration of u')
+plt.title(f'Concentration of u at T=100 with A={A}, B={B}')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.grid(True)
+plt.show()
+```
+
+Now we create point cloud via thresholding the solution:
+
+```{python}
+def get_threshold_points(u, threshold=0.7):
+    """
+    Get grid points where the concentration field u exceeds the specified threshold.
+    
+    Parameters:
+    - u: Concentration field
+    - threshold: The threshold value as a percentage of the maximum value in u
+    
+    Returns:
+    - coords: Array of grid points where u exceeds the threshold
+    """
+    max_u = np.max(u)
+    threshold_value = threshold * max_u
+    coords = np.argwhere(u > threshold_value)
+    return coords
+
+# Get grid points above 70% of the maximum value
+coords = get_threshold_points(u_at_T, threshold=0.7)
+# Highlight points above threshold
+x_coords, y_coords = coords[:, 1], coords[:, 0]
+plt.scatter(x_coords, y_coords, color='red', s=20, marker='o', edgecolor='w')
+```
+
+After we obtain the point cloud, now we can run alpha shape on it. As mentioned before, picking a good alpha can be tricky, so let's try a few alpha values to see which one identifies the boundary in an ideal way. 
+
+```{python}
+
+alpha_values = [.3, 0.35, 0.5, 1.]
+# Plot the flower shape and alpha shapes with varying alpha values
+fig, axes = plt.subplots(2, 2, figsize=(6,6))
+axes = axes.flatten()
+
+for i, alpha in enumerate(alpha_values):
+    # Scatter the plot
+    
+    # Compute alpha shape
+    alpha_shape = alphashape.alphashape(coords, alpha)
+    #print(alpha_shape.type)
+    # Plot the points and the alpha shape
+    plt.subplot(2,2,i+1)
+    #ax = axes[i]
+    
+    if alpha_shape.geom_type == 'GeometryCollection':
+        print(alpha_shape)
+        for geom in list( alpha_shape.geoms ):
+            
+            if geom.type == 'Polygon':
+                x, y = geom.exterior.xy
+                plt.plot(x, y, 'r-')
+    elif alpha_shape.geom_type == 'Polygon':
+                x, y = alpha_shape.exterior.xy
+                plt.plot(x, y, 'r-')
+    elif alpha_shape.geom_type == 'MultiPolygon':
+        
+        alpha_shape = list( alpha_shape.geoms )
+        for polygon in alpha_shape:
+            x, y = polygon.exterior.xy
+            plt.plot(x, y, 'r-')#, label='Alpha Shape')
+    plt.scatter(coords[:, 0], coords[:, 1], color='orange', s=10, label='Point Cloud')
+    
+    
+    
+    plt.title(f'alpha={alpha}')
+    #plt.legend()
+    #plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+
+```
+
+Now we can study different pattern statistics for these clusters! For example, the roundness of clusters are defined as $4\pi Area/Perimeter^2$, which is bounded between zero (stripe) and one (spot). For each cluster, a roundness score value can be computed. The resulting histogram of roundness scores of all clusters will follow a bimodal distribution, with its two peaks correspond to spots and stripes, respectively.
+
+```{python}
+
+alpha_values = [.3, 0.4, 0.6, 1.]
+# Plot the flower shape and alpha shapes with varying alpha values
+fig, axes = plt.subplots(2, 2, figsize=(6,6))
+axes = axes.flatten()
+
+for i, alpha in enumerate(alpha_values):
+    plt.subplot(2,2,i+1)
+    # Compute alpha shape
+    alpha_shape = alphashape.alphashape(coords, alpha)
+    if alpha_shape.geom_type == 'MultiPolygon':
+        # Extract and print the area of each polygon
+        areas = [polygon.area for polygon in list(alpha_shape.geoms)]
+        perimeters = [polygon.length for polygon in list(alpha_shape.geoms)]
+        roundness = [4*np.pi*areas[i]/perimeters[i]**2 for i in range(len(list(alpha_shape.geoms))) ]
+    else:
+        areas = [ alpha_shape.area ]
+        perimeters = [alpha_shape.length]
+        roundness = [areas[0]*4*np.pi/perimeters[0]**2]
+    plt.hist(roundness,density=True, range=[0,1])
+    plt.xlim([0,1])
+    plt.title(f'Roundness with alpha={alpha}')
+    
+
+plt.tight_layout()
+plt.show()
+```
+
+## 3D Alpha shapes
+
+```{python}
+from mpl_toolkits.mplot3d import Axes3D
+
+def plot_torus_with_random_points(R1=1.0, r1=0.3, R2=0.8, r2=0.3, num_points=1000):
+    """
+    Plots a torus with random points filling its volume.
+
+    Parameters:
+    R (float): Major radius of the torus.
+    r (float): Minor radius of the torus.
+    num_points (int): Number of random points to generate inside the torus.
+    """
+    
+    # Generate random points
+    np.random.seed(0)  # For reproducibility
+    theta = np.random.uniform(0, 2 * np.pi, num_points)  # Angle around the major circle
+    phi = np.random.uniform(0, 2 * np.pi, num_points)    # Angle around the minor circle
+    u = np.random.uniform(0, 1, num_points)              # Random uniform distribution for radial distance
+    
+    # Convert uniform distribution to proper volume inside the torus
+    u = np.sqrt(u)  # To spread points more evenly
+
+    # Parametric equations for the double torus
+    # First torus
+    x1 = .5*(R1 + r1 * np.cos(phi)) * np.cos(theta)
+    y1 = (R1 + r1 * np.cos(phi)) * np.sin(theta)
+    z1 = r1 * np.sin(phi)
+    
+    # Second torus
+    x2 = -1 + .5*(R2 + r2 * np.cos(phi)) * np.cos(theta)
+    y2 = (R2 + r2 * np.cos(phi)) * np.sin(theta)
+    z2 = r2 * np.sin(phi)# + 2 * (R2 + r2 * np.cos(phi)) * np.sin(theta)  # Shifted in z-direction for double torus effect
+
+    # Combine points from both tori
+    x = np.concatenate([x1, x2])
+    y = np.concatenate([y1, y2])
+    z = np.concatenate([z1, z2])
+
+      
+
+    # Plot the torus and the random points
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Plot the random points
+    ax.scatter(x, y, z, c='red', s=1, label='Random Points')  # Using a small point size for clarity
+
+
+    # Add titles and labels
+    ax.set_title('Torus with Random Points')
+    ax.set_xlabel('X axis')
+    ax.set_ylabel('Y axis')
+    ax.set_zlabel('Z axis')
+    #ax.set_xlim([-1.5,0.5])
+    #ax.set_ylim([-0.5,1.5])
+    ax.set_zlim([-1.5,1.5])
+    ax.legend()
+    plt.show()
+    return x,y,z
+
+# Example usage
+x, y, z = plot_torus_with_random_points(num_points=2000)
+```
+
+The intuition on picking alpha still holds! Let's first try a big alpha (small radius and refined boundaries) and then a small one (big radius and rough boundaries)
+
+```{python}
+import alphashape
+
+
+alpha_shape = alphashape.alphashape(np.column_stack((x,y,z)), 5.0)
+alpha_shape.show()
+```
+
+```{python}
+
+alpha_shape = alphashape.alphashape(np.column_stack((x,y,z)), 3.0)
+alpha_shape.show()
+
+```
+
+## Application of 3D alpha shape: protein structure
+
+It would be ideal to find some good data and put them here. To be continued.

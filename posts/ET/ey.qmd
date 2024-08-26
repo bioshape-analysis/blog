@@ -1,6 +1,6 @@
 ---
 title: "Analysis of Eye Tracking Data"
-date: "August 15 2024" # Format example: August 9 2024
+date: "July 31 2024" # Format example: August 9 2024
 author:
   - name: "Lisa" 
 categories: [bioinformatics] # [biology, bioinformatics, theory, etc.]

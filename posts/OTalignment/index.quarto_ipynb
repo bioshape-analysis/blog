@@ -1,0 +1,53 @@
+{
+  "cells": [
+    {
+      "cell_type": "raw",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Alignment of 3D volumes with Optimal Transport\"\n",
+        "subtitle: \"Application to cryoEM density maps\"\n",
+        "\n",
+        "engine: \"jupyter\"\n",
+        "author:\n",
+        "  - name: \"Aryan Tajmir Riahi\" \n",
+        "\n",
+        "  - name: \"Khanh Dao Duc\" \n",
+        "    email: \"kdd@math.ubc.ca\"\n",
+        "    affiliations:\n",
+        "      - name: Department of Mathematics, UBC\n",
+        "        url: \"https://www.math.ubc.ca/\"\n",
+        "      - name: Department of Computer Science, UBC\n",
+        "        url: \"https://www.cs.ubc.ca/\"\n",
+        "\n",
+        "date: \"August 3 2024\"\n",
+        "categories: [biology, bioinformatics]    \n",
+        "\n",
+        "callout-icon: false\n",
+        "# format:\n",
+        "#   pdf:\n",
+        "#     include-in-header:\n",
+        "#       text: |\n",
+        "#         \\usepackage{amsmath}\n",
+        "\n",
+        "execute:\n",
+        "  echo: false\n",
+        "  freeze: auto\n",
+        "  pip: [\"pyvista\", \"open3d\", \"scikit-learn\", \"mendeleev\", \"compas\", \"matplotlib\"]\n",
+        "\n",
+        "---"
+      ],
+      "id": "db06a7ff"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/kdd/Library/Python/3.12/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

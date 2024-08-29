@@ -1,5 +1,6 @@
 ---
 title: Shape Analysis of Cancer Cells
+bibliography: refs.bib
 author: Wanxin Li
 date: "August 15, 2024"
 categories: [biology, bioinformatics] 
@@ -11,7 +12,7 @@ This notebook studies *Osteosarcoma* (bone cancer) cells and the impact of drug 
 
 This analysis relies on the *elastic metric between discrete curves* from Geomstats. We will study to which extent this metric can detect how the cell shape is associated with the response to treatment.
 
-This notebook is adapted from Florent Michel's submission to the [ICLR 2021 Computational Geometry and Topology challenge](https://github.com/geomstats/challenge-iclr-2021).
+The full papers analyzing this dataset are available at @li2023using, @li2024unveiling.
 
 <center>
     <img src="figs/illustration/cells_image.png" width=600px />

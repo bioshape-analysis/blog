@@ -42,18 +42,18 @@ As a Riemaniann metric [@mio2007shape; @srivastava2010shape], the elastic metric
 $$
 L^{a,b}[\alpha] = \int_0^1 g^{a,b}_{\alpha(t)} (\alpha'(t),\alpha'(t))^{1/2}dt,
 $${#eq-length}
-and the \emph{geodesic} \emph{distance} between $c_0$ and $c_1$ is
+and the geodesic distance between $c_0$ and $c_1$ is
 $$
 d^{a,b}(c_0,c_1) = \inf_{\alpha:[0,1] \mapsto \mathcal{C} \ | \ \alpha(0)=c_0 \ ; \ \alpha(1)=c_1} L^{a,b}[\alpha]. 
 $${#eq-distance}
 [@fig-elastic-metric].B illustrates the shortest path joining two cell shapes using the elastic metric.
 
 An approximation of the geodesic distance associated with the elastic metric $g^{a,b}$ can be computed as a pull-back of the linear metric: Upon applying a transformation that maps the geodesic associated with $g^{a, b}$ into a straight line, the geodesic distance is equal to the $\mathcal{L}^2$ distance between the two transformed curves [@needham2020simplifying]. 
-While the procedure to construct the mapping can be numerically unstable \cite{bauer2014constructing,needham2020simplifying}, it is simple for the SRV, with the geodesic distance being the $\mathcal{L}^2$ distance obtained upon representing the curve by its speed, renormalized by the square root of its norm as
+While the procedure to construct the mapping can be numerically unstable [@bauer2014constructing; @needham2020simplifying], it is simple for the SRV, with the geodesic distance being the $\mathcal{L}^2$ distance obtained upon representing the curve by its speed, renormalized by the square root of its norm as
 $q(c) = \dot{c}/\sqrt{\lvert \dot{c} \rvert}$ [@bauer2022elastic].
 
 ### Fréchet mean
-With the space of curves equipped with this distance, the so-called Fréchet mean of $n$ curves $(c_1,\ldots,c_n)$ \cite{miolane2020introduction} is defined as
+With the space of curves equipped with this distance, the so-called Fréchet mean of $n$ curves $(c_1,\ldots,c_n)$ [@miolane2020introduction] is defined as
 $$
 \bar{c} =  \underset{c \in \mathcal{C}}{\text{argmin}} \sum_{i=1}^n (d^{a,b}(c,c_i))^2. 
 $${#eq-mean}

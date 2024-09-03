@@ -1,5 +1,5 @@
 /_site
 /.quarto/
 **/.DS_Store
-
+.venv/
 .vscode

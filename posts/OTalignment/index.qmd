@@ -1,14 +1,8 @@
 ---
 title: "Alignment of 3D volumes with Optimal Transport"
 subtitle: "Application to cryoEM density maps"
-
-engine: "jupyter"
 author:
-  - name: "Clément Soubrier" 
-    email: "c.soubrier @math.ubc.ca"
-    affiliations:
-      - name: KDD Group
-        url: "https://rtviii.xyz/"
+  - name: "Aryan Tajmir Riahi" 
 
   - name: "Khanh Dao Duc" 
     email: "kdd@math.ubc.ca"
@@ -18,19 +12,6 @@ author:
       - name: Department of Computer Science, UBC
         url: "https://www.cs.ubc.ca/"
 
-date: "July 29 2024"
-categories: [biology, bioinformatics]    
-
-callout-icon: false
-# format:
-#   pdf:
-#     include-in-header:
-#       text: |
-#         \usepackage{amsmath}
-
-execute:
-  echo: false
-  freeze: auto
-  pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
-
+date: "August 4 2024"
+categories: [example, cryo-EM]    
 ---

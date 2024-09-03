@@ -6,9 +6,9 @@ date: "August 15, 2024"
 categories: [biology, bioinformatics] 
 ---
 
-This notebook is adapted from [this notebook](https://github.com/geomstats/geomstats/blob/main/notebooks/11_real_world_applications__cell_shapes_analysis.ipynb) (Lead author: Nina Miolane). 
+This notebook is adapted from [a Geomstats tutorial](https://github.com/geomstats/geomstats/blob/main/notebooks/11_real_world_applications__cell_shapes_analysis.ipynb). 
 
-This notebook studies *Osteosarcoma* (bone cancer) cells and the impact of drug treatment on their *morphological shapes*, by analyzing cell images obtained from fluorescence microscopy. 
+We study *Osteosarcoma* (bone cancer) cells and the impact of drug treatment on their *morphological shapes*, by analyzing cell images obtained from fluorescence microscopy. 
 
 This analysis relies on the *elastic metric between discrete curves* from Geomstats. We will study to which extent this metric can detect how the cell shape is associated with the response to treatment.
 

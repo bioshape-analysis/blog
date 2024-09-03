@@ -1,5 +1,5 @@
 ---
-title: "Elastic metric"
+title: "Riemannian elastic metric for curves"
 bibliography: refs.bib
 # engine: /home/wanxinli/miniconda3/envs/main@92c7a58/bin/python3
 # jupyter: ""
@@ -22,7 +22,7 @@ execute:
   # pip: ["pyvista", "open3d", "scikit-learn", "mendeleev", "compas", "matplotlib"]
 
 ---
-This page introduces basic concepts for elastic metric, including the definition of elastic metric, square root velocity metric, geodesic distance and Fréchet mean. 
+This page introduces basic concepts of elastic metric, square root velocity metric, geodesic distance and Fréchet mean associated with it. 
 
 ### Definition
 The family of elastic metrics, introduced by Mio et al. [@mio2007shape], can be defined over the space $\mathcal{C}$ of smooth parametrized curves $c:[0,1]\mapsto \mathbb{R}^2$ with nowhere-vanishing derivative. With $a,b>0$ denoting the parameters of the family, one associates with every curve $c \in \mathcal{C}$ an inner product $g^{a, b}_c$ over the tangent space $T_c{\mathcal{C}}$, given by @bauer2014constructing; @needham2020simplifying,

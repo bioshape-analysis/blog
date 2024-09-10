@@ -6,9 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-09-10">
+<meta name="author" content="Aryan Tajmir Riahi">
+<meta name="dcterms.date" content="2024-08-26">
 
-<title>Welcome to MATH 612 – bioshape-analysis</title>
+<title>Centroidal Voronoi Tessellation – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,41 +22,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
 }
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
 }
-</style>
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -102,6 +89,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -148,22 +164,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Welcome to MATH 612</h1>
-            <p class="subtitle lead">Instructions and tips for MATH 612 students</p>
+      <h1 class="title">Centroidal Voronoi Tessellation</h1>
+            <p class="subtitle lead">Relations with Semidiscrete Wasserstein distance</p>
                                 <div class="quarto-categories">
-                <div class="quarto-category">MATH 612</div>
+                <div class="quarto-category">theory</div>
               </div>
                   </div>
   </div>
     
-  
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Aryan Tajmir Riahi <a href="mailto:artajmir@cs.ubc.ca" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+    </div>
+    <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              <a href="https://rtviii.xyz/">
+              KDD Group
+              </a>
+            </p>
+        </div>
+    </div>
+
   <div class="quarto-title-meta">
 
-      
+        
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">September 10, 2024</p>
+        <p class="date">August 26, 2024</p>
       </div>
     </div>
     
@@ -179,14 +210,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
-  <li><a href="#tips" id="toc-tips" class="nav-link" data-scroll-target="#tips">Tips</a></li>
-  <li><a href="#using-github" id="toc-using-github" class="nav-link" data-scroll-target="#using-github">Using GitHub</a></li>
-  <li><a href="#using-quarto-to-create-blog-posts" id="toc-using-quarto-to-create-blog-posts" class="nav-link" data-scroll-target="#using-quarto-to-create-blog-posts">Using Quarto to create blog posts</a>
-  <ul class="collapse">
-  <li><a href="#additional-information-for-quarto" id="toc-additional-information-for-quarto" class="nav-link" data-scroll-target="#additional-information-for-quarto">Additional Information for Quarto:</a></li>
-  </ul></li>
-  <li><a href="#multiple-environments-in-the-same-quarto-project" id="toc-multiple-environments-in-the-same-quarto-project" class="nav-link" data-scroll-target="#multiple-environments-in-the-same-quarto-project">Multiple environments in the same Quarto project</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#voronoi-cells-and-centroidal-voronoi-tessellation" id="toc-voronoi-cells-and-centroidal-voronoi-tessellation" class="nav-link" data-scroll-target="#voronoi-cells-and-centroidal-voronoi-tessellation">Voronoi cells and Centroidal Voronoi Tessellation</a></li>
+  <li><a href="#semidiscrete-wasserstein-distance" id="toc-semidiscrete-wasserstein-distance" class="nav-link" data-scroll-target="#semidiscrete-wasserstein-distance">Semidiscrete Wasserstein distance</a></li>
+  <li><a href="#the-relation-of-cvt-and-semidiscrete-wasserstein-distance" id="toc-the-relation-of-cvt-and-semidiscrete-wasserstein-distance" class="nav-link" data-scroll-target="#the-relation-of-cvt-and-semidiscrete-wasserstein-distance">The relation of CVT and Semidiscrete Wasserstein distance</a></li>
   </ul>
 </nav>
     </div>
@@ -197,102 +224,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p><img src="img/math612.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:65.0%"></p>
-<section id="instructions" class="level2">
-<h2 class="anchored" data-anchor-id="instructions">Instructions</h2>
-<ul>
-<li>Follow all guidelines for assignments and projects.</li>
-<li>Submit your work through the designated platforms by the due dates.</li>
-<li>Collaborate with peers but ensure individual work is original.</li>
-</ul>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In <a href="https://bioshape-analysis.github.io/blog/posts/point-cloud/pointcloud.html">this post</a> we briefly explained Centroidal Voronoi Tessellation (CVT) as a point sampling method and how it rises from the Optimal Transport (OT) theory. Here we will explain the theory behing this method and prove the relation between CVT and OT.</p>
 </section>
-<section id="tips" class="level2">
-<h2 class="anchored" data-anchor-id="tips">Tips</h2>
-<ul>
-<li><strong>Jupyter:</strong> Use <a href="https://jupyter.org/">Jupyter Notebooks</a> for interactive coding and documentation. Great for running small code snippets and visualizing data. Learn more in the <a href="https://jupyter-notebook.readthedocs.io/en/stable/">Jupyter Notebook Documentation</a>.</li>
-<li><strong>VS Code:</strong> A powerful IDE for writing and debugging code. Download it <a href="https://code.visualstudio.com/">here</a>, and install relevant extensions for <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a> and <a href="https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop">LaTeX</a>.</li>
-<li><strong>Environments:</strong> Use virtual environments like <a href="https://docs.python.org/3/library/venv.html">venv</a> or <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</a> to manage dependencies and ensure consistent results across different setups.</li>
-<li><strong>Quarto:</strong> Use <a href="https://quarto.org/">Quarto</a> for creating high-quality documents, reports, and presentations from your code. It supports markdown and integrates seamlessly with Jupyter and VS Code for reproducible analysis and publication. Check out the <a href="https://quarto.org/docs/guide/">Quarto Guide</a> for more information. To get started quickly, you can refer to this <a href="https://github.com/riddhibattu/introduction-to-quarto">GitHub Repository</a>.</li>
-</ul>
+<section id="voronoi-cells-and-centroidal-voronoi-tessellation" class="level1">
+<h1>Voronoi cells and Centroidal Voronoi Tessellation</h1>
+<p>Assume <span class="math inline">\((X,d)\)</span> is a metric space. Given a set of <span class="math inline">\(n\)</span> points <span class="math inline">\(a_1,\dots,a_n \in X\)</span>, the Voronoi diagram <span class="citation" data-cites="aurenhammer1991voronoi">(<a href="#ref-aurenhammer1991voronoi" role="doc-biblioref">Aurenhammer 1991</a>)</span> is formed by <span class="math inline">\(n\)</span> <em>cells</em> <span class="math inline">\(V_1,\dots,V_n \subset X\)</span> where <span class="math inline">\(V_i\)</span> is defined as <span class="math display">\[V_i = \{x \in X | d(x, a_j) \ge d(x,a_i) \quad \forall 1  \le j \le n \},\]</span> and <span class="math inline">\(a_i\)</span> is called the <em>generator</em> of <span class="math inline">\(V_i\)</span>. In addition, for all <span class="math inline">\(x \in X\)</span>, let <span class="math inline">\(i(x)\)</span> denote the index such that <span class="math inline">\(x \in V_{i(x)}\)</span>. Bellow is an example of Voronoi diagrams formed by 20 points in <span class="math inline">\([0, 1]^2\)</span> with <span class="math inline">\(l_2\)</span> (right) and <span class="math inline">\(l_1\)</span> (left) norm.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/voronoi.png" class="img-fluid figure-img"></p>
+<figcaption>An example of Voronoi diagram formed by <span class="math inline">\(l_1\)</span> (right) and <span class="math inline">\(l_2\)</span> (left) norms.</figcaption>
+</figure>
+</div>
+<p>For the rest of this post we assume <span class="math inline">\(X\)</span> is <span class="math inline">\(\mathbb{R}^2\)</span> or <span class="math inline">\(\mathbb{R}^3\)</span> and <span class="math inline">\(d\)</span> is the eclidean distance. For a given probability distribution <span class="math inline">\(\mathbf{p}\)</span> over <span class="math inline">\(X\)</span>, we say <span class="math inline">\(a_1,\dots,a_n \in X\)</span> form a <em>Centroidal Voronoi Tessellation</em> if considering the Voronoi cells <span class="math inline">\(V_1,\dots,V_n\)</span> generated by them, we have <span class="math display">\[a_i = \int_{V_i}x\mathbf{p}(x)dx (\forall 1 \le i \le n),\]</span> i.e., <span class="math inline">\(a_i\)</span> is both the generator and the centroid of <span class="math inline">\(V_i\)</span>. Below an example of such a tessellation over a square with uniform distribution is illustrated.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cvt.png" class="img-fluid figure-img"></p>
+<figcaption>An example of Centroidal Voronoi Tessellation formed by 5 points on a square with uniform distribution.</figcaption>
+</figure>
+</div>
 </section>
-<section id="using-github" class="level2">
-<h2 class="anchored" data-anchor-id="using-github">Using GitHub</h2>
-<ul>
-<li><strong>Create a GitHub Account:</strong> Sign up at <a href="https://github.com">GitHub.com</a>.</li>
-<li><strong>Repositories:</strong> Start by creating a repository to host your project files. Learn how in <a href="https://docs.github.com/en/get-started/quickstart/create-a-repo">GitHub’s guide to repositories</a>. Use a <a href="https://git-scm.com/docs/gitignore"><code>.gitignore</code></a> file to exclude unnecessary files.</li>
-<li><strong>Branches:</strong> Work on separate branches (<code>main</code>, <code>dev</code>, feature branches) to manage different versions of your project. More details in <a href="https://guides.github.com/introduction/flow/">GitHub’s guide on branching</a>.</li>
-<li><strong>Merges:</strong> Merge changes into the <code>main</code> branch only after thorough review and testing. Learn about <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">merging branches</a>.</li>
-<li><strong>Commit Messages:</strong> Write clear, descriptive commit messages to document changes effectively. Follow the <a href="https://cbea.ms/git-commit/">best practices for commit messages</a>.</li>
-</ul>
+<section id="semidiscrete-wasserstein-distance" class="level1">
+<h1>Semidiscrete Wasserstein distance</h1>
+<p>Semidescrete Wasserstein distance is a variant of Optimal Transport problem, specifically designed for comparing a discrete and a continuous probability distribution. Assume <span class="math inline">\((X, d)\)</span> is a metric space, given a set of weighted points <span class="math inline">\(\mathbf{A} = \{a_1,\dots,a_n\}\)</span> and weights <span class="math inline">\(w_1 + \dots + w_n = 1\)</span> we define the distribution <span class="math inline">\(\mathbf{p_A} = \sum_i w_i \delta_{a_i}\)</span>, where <span class="math inline">\(\delta_{a_i}\)</span> is the Dirac delta function located at <span class="math inline">\(a_i\)</span>. Like the previouse section we assume <span class="math inline">\(\mathbf{p}\)</span> is a given distribution over <span class="math inline">\(X\)</span>. With this setting the <em>non-regularized semidiscrete Wasserstein distance</em> between <span class="math inline">\(\mathbf{p_A}\)</span> and <span class="math inline">\(\mathbf{p}\)</span>, denoted <span class="math inline">\(\mathcal{W}(\mathbf{p},\mathbf{p_A})\)</span>, is defined as</p>
+<p><span id="eq-loss"><span class="math display">\[
+\mathcal{W}(\mathbf{p},\mathbf{p_A}) = [\min_{P : X \times [n] \rightarrow \mathbb{R}_+} \quad  \ \int_{X} \sum_{i=1}^n d(x,a_i)P(x,i)dx]^{1/2} \tag{1}\]</span></span> <span class="math display">\[
+\textrm{s.t.} \quad  \int_X P(x,i)dx = w_i, \sum_{i=1}^n P(x,i) = \mathbf{p}(x).
+\]</span> Just like the previouse section we assume <span class="math inline">\(X = \mathbb{R}^2\)</span> or <span class="math inline">\(\mathbb{R}^3\)</span> and <span class="math inline">\(d\)</span> is the equclidean distance for the rest of this post.</p>
 </section>
-<section id="using-quarto-to-create-blog-posts" class="level2">
-<h2 class="anchored" data-anchor-id="using-quarto-to-create-blog-posts">Using Quarto to create blog posts</h2>
-<ol type="1">
-<li><p><strong>Log into GitHub:</strong> Make sure you have an account and are logged in.</p></li>
-<li><p><strong>Send your account username/email to <a href="mailto:kdd@math.ubc.ca">kdd@math.ubc.ca</a>:</strong> This is needed to be added to the organization.</p></li>
-<li><p><strong>Clone the repository:</strong> After being added to the organization, clone the repository: <code>https://github.com/bioshape-analysis/blog</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/bioshape-analysis/blog</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Create a new branch:</strong> To contribute to the blog, create a new branch using:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> <span class="op">&lt;</span>branch_name<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li><p>Verify your branch and repository location: Use the following command to check if you are in the correct branch and repository:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This command will show you the current branch you are on and the status of your working directory, ensuring you are working in the right place</p></li>
-</ul></li>
-<li><p><strong>Navigate to <code>posts</code>:</strong> Go into the <code>posts</code> directory (<a href="https://github.com/bioshape-analysis/blog/tree/main/posts">found here</a>). Create a new folder with a name that represents the content of your blog post.</p></li>
-<li><p><strong>Create or upload your content:</strong></p>
-<ul>
-<li><p>If using Jupyter Notebooks, upload your <code>.ipynb</code> file.</p></li>
-<li><p>If preferred, create a new notebook for your post. Once done, convert it into Quarto using the command:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> convert your_jupyter_notebook.ipynb <span class="at">-o</span> output_file.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-</ul></li>
-<li><p><strong>Edit the YAML in your <code>.qmd</code> file:</strong> Ensure your YAML is consistent with the main template. For example:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Title of your blog post"</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"Date"</span><span class="co"> # Format example: August 9 2024</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Your Name"</span><span class="at"> </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span><span class="co"> # [biology, bioinformatics, theory, etc.]</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> references.bib</span><span class="co"> # If referencing anything</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Feel free to add further formatting, but ensure it remains consistent with the main template.</p></li>
-<li><p><strong>Delete your Jupyter notebook:</strong> After converting it to a <code>.qmd</code> file, delete the original <code>.ipynb</code> file to prevent duplication in the blog post.</p></li>
-<li><p><strong>Commit and push your changes:</strong> After completing your <code>.qmd</code> file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.</p></li>
-</ol>
-<section id="additional-information-for-quarto" class="level3">
-<h3 class="anchored" data-anchor-id="additional-information-for-quarto">Additional Information for Quarto:</h3>
-<ul>
-<li><p><strong>Add Images:</strong> You can add images to your Quarto document using markdown syntax:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="al">![Image Description](path/to/image.png)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To add images from a URL:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="al">![Image Description](https://example.com/image.png)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Add References:</strong> Manage references by creating a <code>bibliography.bib</code> file with your references in BibTeX format. Link the bibliography file in your Quarto document header (YAML). Cite references in your text using the following syntax:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>This is a citation <span class="co">[</span><span class="ot">@citation_key</span><span class="co">]</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Other Edits:</strong> Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header.</p></li>
-</ul>
-</section>
-</section>
-<section id="multiple-environments-in-the-same-quarto-project" class="level2">
-<h2 class="anchored" data-anchor-id="multiple-environments-in-the-same-quarto-project">Multiple environments in the same Quarto project</h2>
-<p>In your blog post, you may want to use specific python packages, which may conflict with packages used in other post. To avoid this problem, you need to use a virtual environment. For simplicity please name your environment <code>.venv</code>.</p>
-<ol type="1">
-<li><p><strong>Creating the virtual environment:</strong> Go to your post folder (e.g <code>blog/posts/my_post</code>) and run :</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The folder <code>.venv</code> was created and contains the environment.</p></li>
-<li><p><strong>Installing packages:</strong> First activate the environment,</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>and then install the packages you need:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install package1_name package2_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To run code in Quarto, you need at least the package <code>jupyter</code>. Deactivate the environment with <code>deactivate</code>.</p></li>
-<li><p><strong>Using environment in VS Code:</strong> Link the virtual environment to VS Code using the command palette, with the command <code>Python : Select Interpreter</code> and entering the path to your interpreter ending with <code>.venv/bin/python</code>.</p></li>
-<li><p><strong>Export your package requirements</strong> If you are installed non standard package, other that <code>jupyter</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pandas</code>, <code>plotly</code> for example, you can export your package requirements, so that other can reproduce your environment. First go to your post directory and activate your environment. Then run:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> freeze <span class="op">&gt;</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-</ol>
+<section id="the-relation-of-cvt-and-semidiscrete-wasserstein-distance" class="level1">
+<h1>The relation of CVT and Semidiscrete Wasserstein distance</h1>
+<p>Assume we are given <span class="math inline">\(\mathbf{p}\)</span> and we want to find a weighted point set <span class="math inline">\(\mathbf{A}\)</span> that minimizes <span id="eq-obj"><span class="math display">\[\min_{w_i \in \mathbb{R}, \mathbf{A} \subset \mathbb{R}^3} \mathcal{W}(\mathbf{p}, \mathbf{p_A}). \tag{2}\]</span></span> To solve this optimization problem we will prove the following theorem.</p>
+<p><strong>Theorem 1.</strong> An optimal solution of <a href="#eq-obj" class="quarto-xref">Equation&nbsp;2</a> is a set of points <span class="math inline">\(\mathbf{A} = \{a_1,\dots, a_n\}\)</span> that forms a CVT over <span class="math inline">\(\mathbf{p}\)</span>, and <span class="math inline">\(w_i = \int_{V_i} \mathbf{p}(x)dx\)</span>.</p>
+<p>We will prove this theorem by splitting it into two lemmas.</p>
+<p><strong>Lemma 1.</strong> Given a probability distribution <span class="math inline">\(\mathbf{p}\)</span>, a set of points <span class="math inline">\(\mathbf{A} = \{ a_1,\dots, a_n\} \subset \mathbb{R}^3\)</span> and the Voronoi diagram associated with <span class="math inline">\(\mathbf{A}\)</span>, the weights defined as <span class="math inline">\(w_i = \int_{V_i} \mathbf{p}(x)dx\)</span> and the transport plan <span class="math inline">\(P^*\)</span> defined as <span class="math inline">\(P^*(x,i(x)) = \mathbf{p}(x), P^*(x,j) = 0 \text{ (for any }j\ne i(x)\text{)}\)</span> solve <a href="#eq-loss" class="quarto-xref">Equation&nbsp;1</a> and <a href="#eq-obj" class="quarto-xref">Equation&nbsp;2</a>.</p>
+<p><em>Proof.</em> For a fixed set of points we can combine <a href="#eq-loss" class="quarto-xref">Equation&nbsp;1</a> and <a href="#eq-obj" class="quarto-xref">Equation&nbsp;2</a> and write <span id="eq-loss1"><span class="math display">\[\min_{w_i \in \mathbb{R}, \mathbf{A} \subset \mathbb{R}^3} \mathcal{W}(\mathbf{p}, \mathbf{p_A}) = \min_{P : \mathbb{R}^3 \times [n] \rightarrow \mathbb{R}_+,w_i \in \mathbb{R}, \mathbf{A} \subset \mathbb{R}^3} \quad  \ \int_{\mathbb{R}^3} \sum_{i=1}^n \lVert x - a_i\rVert^2 P(x,i)dx]^{1/2} \tag{3}\]</span></span> <span class="math display">\[\textrm{s.t.} \quad  \int_{\mathbb{R}^3} P(x,i)dx = w_i, \sum_{i=1}^n P(x_0,i) = \mathbf{p}(x_0)\]</span> As <span class="math inline">\(w_1,\dots,w_n\)</span> only appear in the condition and parameters of the optimization problem <a href="#eq-loss1" class="quarto-xref">Equation&nbsp;3</a> we can ignore them and assume <span class="math inline">\(w_i = \int_{\mathbb{R}^3} P(x,i)dx\)</span> by default. This simplifies the problem to <span id="eq-loss2"><span class="math display">\[\min_{w_i \in \mathbb{R}, \mathbf{A} \subset \mathbb{R}^3} \mathcal{W}(\mathbf{p}, \mathbf{p_A}) =
+[\min_{P : \mathbb{R}^3 \times [n] \rightarrow \mathbb{R}_+, \mathbf{A} \subset \mathbb{R}^3} \quad  \ \int_{\mathbb{R}^3} \sum_i \lVert x - a_i\rVert^2 P(x,i)dx]^{1/2} \tag{4}\]</span></span> <span class="math display">\[\textrm{s.t.} \quad  \sum_{i=1}^n P(x_0,i) = \mathbf{p}(x_0)\]</span> <span class="math display">\[ \ge [\min_{\mathbf{A} \subset \mathbb{R}^3} \int_{\mathbb{R}^3}\lVert x - a_{i(x)}\rVert^2\mathbf{p}(x)dx]^{1/2}.\]</span> In the last line, we use the fact that <span class="math inline">\(x\)</span> is in the Voronoi cell of <span class="math inline">\(a_{i(x)}\)</span>, i.e., for all <span class="math inline">\(i \in [n]\)</span> we have <span class="math inline">\(\lVert x-a_i\rVert \ge \lVert x - a_{i(x)}\rVert\)</span>. Take note that the last line is itself expressing the Optimal Transport problem between <span class="math inline">\(\mathbf{p}\)</span> and <span class="math inline">\(\mathbf{p}_\mathbf{A}\)</span> with a specific choice of <span class="math inline">\(P\)</span> that assigns every point <span class="math inline">\(x\)</span> to <span class="math inline">\(i(x)\)</span>. Hence in our optimal solution, <span class="math inline">\(P^*\)</span> assigns all points in <span class="math inline">\(V_i\)</span> to <span class="math inline">\(a_i\)</span> for all <span class="math inline">\(i \in [n]\)</span>, i.e., <span class="math inline">\(P^*(x,i(x)) = \mathbf{p}(x)\)</span> and <span class="math inline">\(P^*(x,j) = 0\)</span> for any <span class="math inline">\(j \ne i(x)\)</span>.</p>
+<p><strong>Lemma 2.</strong> Given a region <span class="math inline">\(V_i\)</span> and a fixed transportation plan <span class="math inline">\(P\)</span> with the property that <span class="math inline">\(P(x,i)\)</span> is equal to $ (x)$ for all <span class="math inline">\(x \in V_i\)</span> and <span class="math inline">\(0\)</span> otherwise, <span class="math inline">\(a_i = \int_{V_i}x\mathbf{p}(x)dx / \int_{V_i}\mathbf{p}(x)dx\)</span> solves <a href="#eq-obj" class="quarto-xref">Equation&nbsp;2</a>.</p>
+<p><em>Proof.</em> Assume we want to minimize the integral <span class="math inline">\(\int_{\mathbb{R}^3}\lVert x-a_i\rVert^2P(x,i)dx\)</span> by choosing <span class="math inline">\(a_i\)</span>. First, using the assumption on <span class="math inline">\(P\)</span> we can simplify it as <span class="math display">\[\int_{\mathbb{R}^3}\lVert x-a_i\rVert^2P(x,i)dx = \int_{V_i}\lVert x-a_i \rVert^2\mathbf{p}(x)dx\]</span> <span class="math display">\[= \int_{V_i}[\lVert x\rVert^2 + \lVert a_i \rVert^2  - 2\langle a_i, x \rangle]\mathbf{p}(x)dx\]</span> <span class="math display">\[= \int_{V_i}\lVert x \rVert^2 \mathbf{p}(x)dx + \lVert a_i\rVert^2\int_{V_i}\mathbf{p}(x)dx\]</span> <span class="math display">\[\quad\quad-2 \langle a_i , \int_{V_i} x\mathbf{p}(x)dx\rangle.\]</span> Also, as this integral is invariant to rigid body transformations, we can assume <span class="math inline">\(\int x\mathbf{p}(x)dx = 0\)</span> (after applying an appropriate translation to <span class="math inline">\(\mathbf{A}\)</span> and <span class="math inline">\(\mathbf{p}\)</span>). This assumption yields <span class="math display">\[\int_{\mathbb{R}^3}\lVert x-a_i \rVert^2P(x,i)dx =\int_{V_i}\lVert x\rVert^2 \mathbf{p}(x)dx + \lVert a_i \rVert^2\int_{V_i}\mathbf{p}(x)dx.\]</span> The minimum of this equation is <span class="math inline">\(a_i = 0\)</span>, so we conclude that the optimal choice for <span class="math inline">\(a_i\)</span> is the centroid of <span class="math inline">\(V_i\)</span>. In other words, <span class="math inline">\(a_i = \int_{V_i}x\mathbf{p}(x)dx / \int_{V_i}\mathbf{p}(x)dx\)</span>.</p>
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-aurenhammer1991voronoi" class="csl-entry" role="listitem">
+Aurenhammer, Franz. 1991. <span>“Voronoi Diagrams—a Survey of a Fundamental Geometric Data Structure.”</span> <em>ACM Computing Surveys (CSUR)</em> 23 (3): 345–405.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

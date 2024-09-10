@@ -281,13 +281,13 @@ window.Quarto = {
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>In the context of cryo-EM, many computationaly exhaustive methods rely on simpler representations of cryo-EM density maps to overcome their scalability challenges. There are many choices to the form of the simpler representation, such as vectors <span class="citation" data-cites="han2021vesper">(<a href="#ref-han2021vesper" role="doc-biblioref">Han et al. 2021</a>)</span> or mixture of gussians <span class="citation" data-cites="kawabata2008multiple">(<a href="#ref-kawabata2008multiple" role="doc-biblioref">Kawabata 2008</a>)</span>. In this post we discuss a format which is probably the simplest and that is using a set of points (called point cloud).</p>
-<p>This problem can be formulated in a much more general sense rather than cryo-EM. In this sense we are given a probability distribution over <span class="math inline">\(\mathbb{R}^3\)</span> and we want to generate a set of 3D points that represent this distribution. The naive approach to find such a point cloud is to just sample points from the distribution. Although this approach is guaranteed to find a good representation, it needs lots of points to cover the distribution evenly. Since methods used in this field can be computationally intensive with cubic or higher time complexity, generating a point cloud that covers the give distribution with a smaller point cloud could lead to a significant improvement in their runtime.</p>
-<p>In this approach, we present two methods for generating a point cloud from a cryo-EM density map or a distribution in general. The first one is based on the Topological Representing Network (TRN) <span class="citation" data-cites="martinetz1994topology">(<a href="#ref-martinetz1994topology" role="doc-biblioref">Martinetz and Schulten 1994</a>)</span> and the second one combines the usage the Optimal Transport (OT) <span class="citation" data-cites="peyre2019computational">(<a href="#ref-peyre2019computational" role="doc-biblioref">Peyré, Cuturi, et al. 2019</a>)</span> theory and and some computational geometry object named Centroidal Vornoi Tessellation (CVT).</p>
+<p>In the context of cryo-EM, many computationally exhaustive methods rely on simpler representations of cryo-EM density maps to overcome their scalability challenges. There are many choices for the form of the simpler representation, such as vectors <span class="citation" data-cites="han2021vesper">(<a href="#ref-han2021vesper" role="doc-biblioref">Han et al. 2021</a>)</span> or a mixture of Gaussians <span class="citation" data-cites="kawabata2008multiple">(<a href="#ref-kawabata2008multiple" role="doc-biblioref">Kawabata 2008</a>)</span>. In this post, we discuss a format that is probably the simplest and uses a set of points (called a point cloud).</p>
+<p>This problem can be formulated in a much more general sense rather than cryo-EM. In this sense, we are given a probability distribution over <span class="math inline">\(\mathbb{R}^3\)</span> and we want to generate a set of 3D points that represent this distribution. The naive approach for finding such a point cloud is to just sample points from the distribution. Although this approach is guaranteed to find a good representation, it needs many points to cover the distribution evenly. Since methods used in this field can be computationally intensive with cubic or higher time complexity, generating a point cloud that covers the given distribution with a smaller point-cloud size leads to a significant improvement in their runtime.</p>
+<p>In this approach, we present two methods for generating a point cloud from a cryo-EM density map or a distribution in general. The first one is based on the Topological Representing Network (TRN) <span class="citation" data-cites="martinetz1994topology">(<a href="#ref-martinetz1994topology" role="doc-biblioref">Martinetz and Schulten 1994</a>)</span> and the second one combines the usage of the Optimal Transport (OT) <span class="citation" data-cites="peyre2019computational">(<a href="#ref-peyre2019computational" role="doc-biblioref">Peyré, Cuturi, et al. 2019</a>)</span> theory and a computational geometry object named Centroidal Voronoi Tessellation (CVT).</p>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
-<p>For the sake of simplicity in this post we assume we are given a primal distribution over <span class="math inline">\(\mathbb{R}^2\)</span>. As an example we will work on multivariate gaussian distribution that it’s domain is limited to <span class="math inline">\([0, 1]^2\)</span>. The following code prepares and illustrates the pdf of the example distribution.</p>
-<div id="f2a11886" class="cell" data-execution_count="1">
+<p>For the sake of simplicity in this post, we assume we are given a primal distribution over <span class="math inline">\(\mathbb{R}^2\)</span>. As an example, we will work on a multivariate Gaussian distribution that it’s domain is limited to <span class="math inline">\([0, 1]^2\)</span>. The following code prepares and illustrates the pdf of the example distribution.</p>
+<div id="840f6e5a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy <span class="im">as</span> scp</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
@@ -315,8 +315,8 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Both of the methods that we are going to cover are iterative methods. For generating a point cloud of size <span class="math inline">\(n\)</span>, they begin by randomly sampling <span class="math inline">\(n\)</span> points and refining it over iterations. To make the illustration interesting we used a uniform point cloud for initial samples. We use <span class="math inline">\(n=200\)</span> in our examples.</p>
-<div id="1148ce26" class="cell" data-execution_count="2">
+<p>Both of the methods that we are going to cover are iterative methods relying on an initial sample of points. For generating a point cloud with size <span class="math inline">\(n\)</span>, they begin by randomly sampling <span class="math inline">\(n\)</span> points and refining it over iterations. We use <span class="math inline">\(n=200\)</span> in our examples.</p>
+<div id="40de2bb8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sampler(rvs):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        sample <span class="op">=</span> rvs(<span class="dv">1</span>)</span>
@@ -324,32 +324,31 @@ window.Quarto = {
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sample</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The commented code will begin with initial samples drawn from the primal distribution instead of uniform</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># initial_samples = []</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># while len(initial_samples) &lt; 200:</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#     sample = sampler(distr.rvs)</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#     initial_samples.append(list(sample))</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># initial_samples = np.array(initial_samples)</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>initial_samples <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,(<span class="dv">200</span>,<span class="dv">2</span>))</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>l <span class="op">=</span> <span class="bu">list</span>(<span class="bu">zip</span>(<span class="op">*</span>initial_samples))</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="bu">list</span>(l[<span class="dv">0</span>])</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="bu">list</span>(l[<span class="dv">1</span>])</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">8</span>))</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.scatter(x, y)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), (<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), <span class="st">'k-'</span>)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), (<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), <span class="st">'k-'</span>)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="dv">1</span>,<span class="dv">1</span>), (<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), <span class="st">'k-'</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), (<span class="dv">1</span>,<span class="dv">1</span>), <span class="st">'k-'</span>)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="op">-</span><span class="fl">1.1</span>,<span class="fl">1.1</span>)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="op">-</span><span class="fl">1.1</span>,<span class="fl">1.1</span>)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>initial_samples <span class="op">=</span> []</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="bu">len</span>(initial_samples) <span class="op">&lt;</span> <span class="dv">200</span>:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    sample <span class="op">=</span> sampler(distr.rvs)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    initial_samples.append(<span class="bu">list</span>(sample))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>initial_samples <span class="op">=</span> np.array(initial_samples)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>l <span class="op">=</span> <span class="bu">list</span>(<span class="bu">zip</span>(<span class="op">*</span>initial_samples))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="bu">list</span>(l[<span class="dv">0</span>])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="bu">list</span>(l[<span class="dv">1</span>])</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">8</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ax.scatter(x, y)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), (<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), <span class="st">'k-'</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), (<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), <span class="st">'k-'</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="dv">1</span>,<span class="dv">1</span>), (<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), <span class="st">'k-'</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ax.plot((<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), (<span class="dv">1</span>,<span class="dv">1</span>), <span class="st">'k-'</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="op">-</span><span class="fl">1.1</span>,<span class="fl">1.1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="op">-</span><span class="fl">1.1</span>,<span class="fl">1.1</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>plt.xticks([])</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>plt.yticks([])</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="pointcloud_files/figure-html/cell-3-output-1.png" width="665" height="633" class="figure-img"></p>
+<p><img src="pointcloud_files/figure-html/cell-3-output-1.png" width="614" height="611" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -358,16 +357,16 @@ window.Quarto = {
 </section>
 <section id="topology-representing-networks-trn" class="level1">
 <h1>Topology Representing Networks (TRN)</h1>
-<p>This method is an iterative method relies on randomly sampling an initial point cloud <span class="math inline">\(r_m(0)_{i=1,\dots,n}\)</span> from the given probability distribution <span class="math inline">\(p\)</span>. At each step <span class="math inline">\(t\)</span>, we sample a new point (<span class="math inline">\(r_t\)</span>) from <span class="math inline">\(p\)</span>, and compute the distnace from points in <span class="math inline">\(r_m(t)\)</span> to <span class="math inline">\(r_t\)</span> and rank them from zero (closest) to <span class="math inline">\(n-1\)</span> (called <span class="math inline">\(k_m\)</span>). Then we update the position of points based on: <span class="math display">\[r_m(t+1) = r_m(t) + \epsilon(t)exp(-k_m/\lambda(t))(r_t - r_m(t)),\]</span> <span class="math display">\[\epsilon(t) = \epsilon_0(\frac{\epsilon_f}{\epsilon_0})^{t/t_f},\]</span> <span class="math display">\[\lambda(t) = \lambda_0(\frac{\lambda_f}{\lambda_0})^{t/t_f}\]</span> These fomulas are designed in a way that makes the movement of points slower as the number of iteration increases.</p>
-<div id="14104fea" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>e0<span class="op">=</span><span class="dv">2</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ef<span class="op">=</span><span class="fl">0.5</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>l0<span class="op">=</span><span class="dv">3</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>lf<span class="op">=</span><span class="fl">0.25</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>tf<span class="op">=</span><span class="dv">10000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>TRN is an iterative method that relies on randomly sampling an initial point cloud <span class="math inline">\(r_m(0)_{i=1,\dots,n}\)</span> from the given probability distribution <span class="math inline">\(p\)</span>. At each step <span class="math inline">\(t\)</span>, they sample a new point (<span class="math inline">\(r_t\)</span>) from <span class="math inline">\(p\)</span> and compute the distance from points in <span class="math inline">\(r_m(t)\)</span> to <span class="math inline">\(r_t\)</span> and rank them from zero (closest) to <span class="math inline">\(n-1\)</span> (called <span class="math inline">\(k_m\)</span>). Then they update the position of points based on: <span class="math display">\[r_m(t+1) = r_m(t) + \epsilon(t)exp(-k_m/\lambda(t))(r_t - r_m(t)),\]</span> <span class="math display">\[\epsilon(t) = \epsilon_0(\frac{\epsilon_f}{\epsilon_0})^{t/t_f},\]</span> <span class="math display">\[\lambda(t) = \lambda_0(\frac{\lambda_f}{\lambda_0})^{t/t_f}\]</span> These equations are designed in a way that moves points slower as the number of iterations increases.</p>
+<div id="fdadd9a5" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>e0<span class="op">=</span><span class="fl">0.5</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ef<span class="op">=</span><span class="fl">0.05</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>l0<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>lf<span class="op">=</span><span class="fl">0.5</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>tf<span class="op">=</span><span class="dv">2000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="a3df4ad6" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
+<div id="acf5c064" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="fl">9.5</span>,<span class="fl">9.5</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> initial_samples</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(tf):</span>
@@ -379,12 +378,12 @@ window.Quarto = {
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    e <span class="op">=</span> e0<span class="op">*</span>(ef<span class="op">/</span>e0)<span class="op">**</span>(t<span class="op">/</span>tf)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> r <span class="op">+</span> e<span class="op">*</span>np.exp(<span class="op">-</span>rank<span class="op">/</span>l)<span class="op">*</span>(rt<span class="op">-</span>r)</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span><span class="dv">2500</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span><span class="dv">500</span> <span class="op">==</span> <span class="dv">0</span>:</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        l <span class="op">=</span> <span class="bu">list</span>(<span class="bu">zip</span>(<span class="op">*</span>r))</span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="bu">list</span>(l[<span class="dv">0</span>])</span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> <span class="bu">list</span>(l[<span class="dv">1</span>])</span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> t<span class="op">//</span><span class="dv">2500</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> t<span class="op">//</span><span class="dv">500</span></span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        axs[index<span class="op">//</span><span class="dv">2</span>][index<span class="op">%</span><span class="dv">2</span>].scatter(x, y, s<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        axs[index<span class="op">//</span><span class="dv">2</span>][index<span class="op">%</span><span class="dv">2</span>].title.set_text(<span class="st">'Position of points after t=</span><span class="sc">%d</span><span class="st"> iterations'</span><span class="op">%</span>(t<span class="op">+</span><span class="dv">1</span>,))</span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        axs[index<span class="op">//</span><span class="dv">2</span>][index<span class="op">%</span><span class="dv">2</span>].plot((<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>), (<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), <span class="st">'k-'</span>)</span>
@@ -393,11 +392,13 @@ window.Quarto = {
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        axs[index<span class="op">//</span><span class="dv">2</span>][index<span class="op">%</span><span class="dv">2</span>].plot((<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>), (<span class="dv">1</span>,<span class="dv">1</span>), <span class="st">'k-'</span>)</span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        plt.ylim(<span class="op">-</span><span class="fl">1.1</span>,<span class="fl">1.1</span>)</span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        plt.xlim(<span class="op">-</span><span class="fl">1.1</span>,<span class="fl">1.1</span>)</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        axs[index<span class="op">//</span><span class="dv">2</span>][index<span class="op">%</span><span class="dv">2</span>].set_xticks([])</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        axs[index<span class="op">//</span><span class="dv">2</span>][index<span class="op">%</span><span class="dv">2</span>].set_yticks([])</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="pointcloud_files/figure-html/cell-5-output-1.png" width="813" height="801" class="figure-img"></p>
+<p><img src="pointcloud_files/figure-html/cell-5-output-1.png" width="731" height="741" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -405,8 +406,8 @@ window.Quarto = {
 </section>
 <section id="centroidal-vornoi-tessellation-cvt" class="level1">
 <h1>Centroidal Vornoi Tessellation (CVT)</h1>
-<p>Although TRN is intuitive it doesn’t minimize any specific objective function. Among the mtrics that can be to determine the distance between a point cloud and a continuous distribution the semidiscrete Wasserstein distance (based on the Optimal Transport theory <span class="citation" data-cites="peyre2019computational">(<a href="#ref-peyre2019computational" role="doc-biblioref">Peyré, Cuturi, et al. 2019</a>)</span>) is of our interest. In other words we want a point cloud that minimizes the semidicrete Wasserestein distance to a given primal distribution. One can prove that such a point cloud forms a geometrical object named Centroidal Voronoi Tessellation (CVT) over the distribution. A CVT is a the Voronoi diagram generated by a point cloud such that each point is centroid and generator of it’s Voronoi cell. Such a tessellation can be computed using Lloyd’s iterations by alteranating between computing centroids and Voronoi cells. Unlike TRN this method generated a wighted point cloud.</p>
-<div id="f9dec834" class="cell" data-execution_count="5">
+<p>Although TRN is intuitive it doesn’t minimize any specific objective function. Among the metrics that can be for determining the distance between a point cloud and a continuous distribution the semidiscrete Wasserstein distance (based on the Optimal Transport theory <span class="citation" data-cites="peyre2019computational">(<a href="#ref-peyre2019computational" role="doc-biblioref">Peyré, Cuturi, et al. 2019</a>)</span>) is of our interest. In other words, we want a point cloud that minimizes the semidiscrete Wasserstein distance to a given primal distribution. One can prove that such a point cloud forms a geometrical object named Centroidal Voronoi Tessellation (CVT) over the distribution. A CVT is a Voronoi diagram generated by a point cloud such that each point is centroid and generator of it’s Voronoi cell. More details about this object will be covered in future posts. Such a tessellation can be computed using Lloyd’s iterations by alternating between computing centroids and Voronoi cells. Unlike TRN this method generated a weighted point cloud.</p>
+<div id="f58688b1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> in_box(robots, bounding_box):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.logical_and(np.logical_and(bounding_box[<span class="dv">0</span>] <span class="op">&lt;=</span> robots[:, <span class="dv">0</span>],</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                                         robots[:, <span class="dv">0</span>] <span class="op">&lt;=</span> bounding_box[<span class="dv">1</span>]),</span>
@@ -503,15 +504,18 @@ window.Quarto = {
 <span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>    ax.scatter(vor.filtered_points[:, <span class="dv">0</span>], vor.filtered_points[:, <span class="dv">1</span>], s<span class="op">=</span><span class="dv">5</span>, c<span class="op">=</span><span class="st">'b'</span>, alpha<span class="op">=</span>weights<span class="op">/</span><span class="bu">max</span>(weights))</span>
 <span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>    centroids <span class="op">=</span> np.asarray(centroids)</span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> centroids, weights</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks([])</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>    ax.set_yticks([])</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>    centroids <span class="op">=</span> np.asarray(centroids)</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> centroids, weights</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="0ace950f" class="cell" data-execution_count="6">
+<div id="8ad84d5f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bounding_box <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.</span>, <span class="fl">1.</span>, <span class="op">-</span><span class="fl">1.</span>, <span class="fl">1.</span>]) </span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> sys.float_info.epsilon</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> initial_samples</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">3</span>,<span class="dv">3</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">12</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">3</span>,<span class="dv">3</span>,figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">9</span>))</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>):</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    axs[i<span class="op">//</span><span class="dv">3</span>][i<span class="op">%</span><span class="dv">3</span>].title.set_text(<span class="st">'iteration t=</span><span class="sc">%d</span><span class="st">'</span><span class="op">%</span>(i <span class="op">+</span> <span class="dv">1</span>,))</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    centroids, weights <span class="op">=</span> plot(samples,axs[i<span class="op">//</span><span class="dv">3</span>][i<span class="op">%</span><span class="dv">3</span>])</span>
@@ -521,7 +525,7 @@ window.Quarto = {
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="pointcloud_files/figure-html/cell-7-output-1.png" width="962" height="949" class="figure-img"></p>
+<p><img src="pointcloud_files/figure-html/cell-7-output-1.png" width="689" height="704" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -529,17 +533,23 @@ window.Quarto = {
 </section>
 <section id="more-examples" class="level1">
 <h1>More Examples</h1>
-<p>To further examine the effectiveness of these methods, we performed a simulation on a more complex distribution obtained by normalizing the intensities of a sketch of Naqsh-e Jahan Square. This image show the convergence of methods as well as the primal distribution.</p>
+<p>To further examine the effectiveness of these methods, we performed a simulation on a more complex distribution obtained by normalizing the intensities of a sketch of Naqsh-e Jahan Square and <span class="math inline">\(n=10^5\)</span> points. This image shows the convergence of methods as well as the primal distribution.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="img/example1.png" class="img-fluid figure-img"></p>
-<figcaption>Image Description</figcaption>
+<figcaption>Covering a more complex distribution with point clouds generated by TRN and CVT.</figcaption>
 </figure>
 </div>
 </section>
 <section id="application-on-cryo-em" class="level1">
 <h1>Application on Cryo-EM</h1>
-<p>Both of these methods ar easily applicable to a 3D density map. A full implementation of both methods in ChimeraX (the standard visualization tool for cryo-EM) <span class="citation" data-cites="pettersen2021ucsf">(<a href="#ref-pettersen2021ucsf" role="doc-biblioref">Pettersen et al. 2021</a>)</span> is in thie <a href="https://github.com/artajmir3/ot_alignment">GitHub repo</a>. TRN was first used in the field of cryo-EM by <span class="citation" data-cites="zhang2021state">(<a href="#ref-zhang2021state" role="doc-biblioref">Zhang et al. 2021</a>)</span>, later on we used it in our alignment methods <span class="citation" data-cites="riahi2023alignot">Riahi, Zhang, et al. (<a href="#ref-riahi2023empot" role="doc-biblioref">2023</a>)</span>. To the best of our knowledge no paper have used CVT on the field of cryo-EM yet.</p>
+<p>Both of these methods are easily applicable to a 3D density map. A full implementation of both methods in ChimeraX (the standard visualization tool for cryo-EM) <span class="citation" data-cites="pettersen2021ucsf">(<a href="#ref-pettersen2021ucsf" role="doc-biblioref">Pettersen et al. 2021</a>)</span> is in this <a href="https://github.com/artajmir3/ot_alignment">GitHub repo</a>. TRN was first used in the field of cryo-EM by <span class="citation" data-cites="zhang2021state">(<a href="#ref-zhang2021state" role="doc-biblioref">Zhang et al. 2021</a>)</span>, later on, we used it in our alignment methods <span class="citation" data-cites="riahi2023alignot">Riahi, Zhang, et al. (<a href="#ref-riahi2023empot" role="doc-biblioref">2023</a>)</span>. An example of its performance on cryo-EM density map <a href="https://www.ebi.ac.uk/emdb/EMD-1717">EMDB:1717</a> is illustrated below. To the best of our knowledge, no paper has used CVT in the field of cryo-EM yet.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/example-cryoem.png" class="img-fluid figure-img"></p>
+<figcaption>An example of covering EMDB:1717 with 200 points using TRN.</figcaption>
+</figure>
+</div>
 
 
 

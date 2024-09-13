@@ -16,7 +16,7 @@ The main advantage of cryo-ET is that it allows the cells and macromolecules to 
 In order to reconstruct macromolecules, tomographic slices need to be processed through a pipeline. A typical cryo-ET data processing pipeline includes: tilt series alignment, CTF estimation, tomogram reconstruction, particle picking, iterative subtomogram alignment and averaging, and heterogeneity analysis. Unlike cryo-EM, many algorithms for cryo-ET processing are still under development. Therefore, a large database of cryo-ET to test and tune algorithms is important. Unfortunately, collecting cryo-ET data is both time and money-consuming, and the current database of cryo-ET is not large enough, especially for deep learning training which requires a large amount of data. Therefore, simulation becomes a substitute to generate a large amount of data in a short time and at low expense. In this post, we will focus on the simimulation of membrane-embedded proteins.
 
 ## Workflow
-We will use the Membrane Embedded Proteins Simulator (MEPSi), a tool incorporated in PyCoAn to simulate SARS-CoV-2 spike protein [@mepsi2022]. Before doing so, I will briefly go through the workflow of MEPSi.
+We will use the Membrane Embedded Proteins Simulator (MEPSi), a tool incorporated in PyCoAn to simulate SARS-CoV-2 spike protein [@mepsi2022]. Here, I will briefly go through the workflow of MEPSi.
 
 ### 1. Density modeling
 In the density modeling, atom coordinate lists of macromolecules of interest are given, and a "ground-truth" volume representation is simulated by placing the given macromolecules on the membrane with specified geometry. The algorithm uses a 3D Archimedean spiral to place the molecules at approximately equidistant points along the membrane. Random translations with sa bounding box defined by the equidistance and the maximum XY radius of the molecules will then be applied. This ensures there is no overlap between macromolecules on the surface. The volume is generated using direct generation of membrane density and Gaussian convolution of the atom positions. 
@@ -40,5 +40,15 @@ The noise model is expressed as a mixture of Gaussian and Laplacian, in contrast
 Finally tomograms are simulated from the perturbed basis tilt series with user-specified tilt range and increment.
 
 ## Results
+In order to fully demonstrate the capacity of MEPSi, tomograms were simulated from a sample containing three different conformations of SARS-Cov2 spike protein: 6VXX, 6VYB and 6X2B, with ratio 1:1:2. Protein coordinate files in .pdb format were obtained from RCSB PDB, and preprocessed in ChimeraX to align with z-axies in order to be modeled in orrect direction in density simulation.
+
+![Three conformations of the prefusion trimer of SARS-Cov2 spike protein: all RBDs in the closed position (left, 6VXX); one RBD in the open position (center, 6VYB); two RBDs in the open position (right, 6X2B)](img/protein_structure.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+Solvent and CTF were added. A SNR of 0.5 was used. Finally we generated tomograms every
+$1^\circ$ from $-60^\circ$ to $+60^\circ$. Below were four tomograms with different tilt angles simulated.
+
+![](img/simulated_tilt.png){ width=100% style="display: block; margin-left: auto; margin-right: auto;" }
+
+
 ## References
 

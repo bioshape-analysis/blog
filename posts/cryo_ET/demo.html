@@ -209,6 +209,7 @@ window.Quarto = {
   <li><a href="#noise" id="toc-noise" class="nav-link" data-scroll-target="#noise">4. Noise</a></li>
   <li><a href="#tomogram-generation" id="toc-tomogram-generation" class="nav-link" data-scroll-target="#tomogram-generation">5. Tomogram generation</a></li>
   </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -230,26 +231,50 @@ window.Quarto = {
 <figcaption>Tomographic slices of SARS-CoV-2 virions, with spike proteins embedded in the membrane<span class="citation" data-cites="Shi2023">(<a href="#ref-Shi2023" role="doc-biblioref">Shi et al. 2023</a>)</span></figcaption>
 </figure>
 </div>
-<p>In order to reconstruct macromolecules, tomographic slices need to be processed through a pipeline. A typical cryo-ET data processing pipeline includes: tilt series alignment, CTF estimation, tomogram reconstruction, particle picking, iterative subtomogram alignment and averaging, and heterogeneity analysis. Unlike cryo-EM, many algorithms for cryo-ET processing are still under development. Therefore, a large database of cryo-ET to test and tune algorithms is important. Unfortunately, collecting cryo-ET data is both time and money-consuming, and the current database of cryo-ET is not large enough, especially for deep learning training which requires a large amount of data. Therefore, simulation becomes a substitute to generate a large amount of data in a short time and at low expense.</p>
+<p>In order to reconstruct macromolecules, tomographic slices need to be processed through a pipeline. A typical cryo-ET data processing pipeline includes: tilt series alignment, CTF estimation, tomogram reconstruction, particle picking, iterative subtomogram alignment and averaging, and heterogeneity analysis. Unlike cryo-EM, many algorithms for cryo-ET processing are still under development. Therefore, a large database of cryo-ET to test and tune algorithms is important. Unfortunately, collecting cryo-ET data is both time and money-consuming, and the current database of cryo-ET is not large enough, especially for deep learning training which requires a large amount of data. Therefore, simulation becomes a substitute to generate a large amount of data in a short time and at low expense. In this post, we will focus on the simimulation of membrane-embedded proteins.</p>
 </section>
 <section id="workflow" class="level2">
 <h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
-<p>We will use the Membrane Embedded Proteins Simulator (MEPSi), a tool incorporated in PyCoAn to simulate SARS-CoV-2 spike protein. Before doing so, I will briefly go through the workflow of MEPSi.</p>
+<p>We will use the Membrane Embedded Proteins Simulator (MEPSi), a tool incorporated in PyCoAn to simulate SARS-CoV-2 spike protein <span class="citation" data-cites="mepsi2022">(<a href="#ref-mepsi2022" role="doc-biblioref">Rodríguez de Francisco et al. 2022</a>)</span>. Here, I will briefly go through the workflow of MEPSi.</p>
 <section id="density-modeling" class="level3">
 <h3 class="anchored" data-anchor-id="density-modeling">1. Density modeling</h3>
+<p>In the density modeling, atom coordinate lists of macromolecules of interest are given, and a “ground-truth” volume representation is simulated by placing the given macromolecules on the membrane with specified geometry. The algorithm uses a 3D Archimedean spiral to place the molecules at approximately equidistant points along the membrane. Random translations with sa bounding box defined by the equidistance and the maximum XY radius of the molecules will then be applied. This ensures there is no overlap between macromolecules on the surface. The volume is generated using direct generation of membrane density and Gaussian convolution of the atom positions.</p>
+<p>Optionally, a solvent model can be generated and added to the density. In order to keep the computational cost low, a continuum solvent model with an adjustable contrast tuning parameter is used. A 3D version of Lapacian pyramid blending is used to account for displacements of one object from another to mitigate edge effects and emulates the existence of a hydration layer around the molecules.</p>
 </section>
 <section id="basis-tilt-series-generation" class="level3">
 <h3 class="anchored" data-anchor-id="basis-tilt-series-generation">2. Basis tilt series generation</h3>
+<p>In this step, an unperturbed basis tilt series is generated from the simulated volume. The individual tilt images are obtained by rotating the volume around the Y axis and projecting the density along Z axis. The reason that a basis tilt series is generated before final tomogram simulation is to reduce computational cost. It can speed up the process quite a lot if a perturbation-free basis tilt series is first generated to allow the user explore perturbation parameters (e.g.&nbsp;contrast transfer function and noise) before generating final tomograms from perturbed basis tilt series.</p>
 </section>
 <section id="ctf" class="level3">
 <h3 class="anchored" data-anchor-id="ctf">3. CTF</h3>
+<p>One possible perturbation we can add to the basis tilt series is the contrast transfer function (CTF), which models the effect of the microscope optics. One major determinant of the CTF is the defocus value at the scattering event, which changes while the electrons traverse the specimen. In order to simplify the problem, we assume that the simulated specimen as an infinitely thin slice so only focus changes caused by tilting need to be considered. Projected tilted specimen images are subjected to a CTF model in strips parallel to the tilt axis with the defocus value modulated according to the position of the strip center.</p>
 </section>
 <section id="noise" class="level3">
 <h3 class="anchored" data-anchor-id="noise">4. Noise</h3>
+<p>The noise model is expressed as a mixture of Gaussian and Laplacian, in contrast of white additive Gaussian usually used in many other simulation applications. The noise in the low-dose images contrivuting to a tilt series tends to have statistically significant non-zero skewness, which cannot be modeled by Gaussian error model alone.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/noise_model.png" class="img-fluid figure-img" style="width:45.0%"></p>
+<figcaption>Overlay of an experimental intensity histogram (blue) with noise modeling by Gaussian only (red) vs.&nbsp;with a mix of Gaussian and Laplacian noise (green)</figcaption>
+</figure>
+</div>
 </section>
 <section id="tomogram-generation" class="level3">
 <h3 class="anchored" data-anchor-id="tomogram-generation">5. Tomogram generation</h3>
+<p>Finally tomograms are simulated from the perturbed basis tilt series with user-specified tilt range and increment.</p>
 </section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>In order to fully demonstrate the capacity of MEPSi, tomograms were simulated from a sample containing three different conformations of SARS-Cov2 spike protein: 6VXX, 6VYB and 6X2B, with ratio 1:1:2. Protein coordinate files in .pdb format were obtained from RCSB PDB, and preprocessed in ChimeraX to align with z-axies in order to be modeled in orrect direction in density simulation.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/protein_structure.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>Three conformations of the prefusion trimer of SARS-Cov2 spike protein: all RBDs in the closed position (left, 6VXX); one RBD in the open position (center, 6VYB); two RBDs in the open position (right, 6X2B)</figcaption>
+</figure>
+</div>
+<p>Solvent and CTF were added. A SNR of 0.5 was used. Finally we generated tomograms every <span class="math inline">\(1^\circ\)</span> from <span class="math inline">\(-60^\circ\)</span> to <span class="math inline">\(+60^\circ\)</span>. Below were four tomograms with different tilt angles simulated.</p>
+<p><img src="img/simulated_tilt.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:100.0%"></p>
 </section>
 <section id="references" class="level2">
 
@@ -259,6 +284,9 @@ window.Quarto = {
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-mepsi2022" class="csl-entry" role="listitem">
+Rodríguez de Francisco, Borja, Armel Bezault, Xiao-Ping Xu, Dorit Hanein, and Niels Volkmann. 2022. <span>“MEPSi: A Tool for Simulating Tomograms of Membrane-Embedded Proteins.”</span> <em>Journal of Structural Biology</em> 214 (4): 107921. https://doi.org/<a href="https://doi.org/10.1016/j.jsb.2022.107921">https://doi.org/10.1016/j.jsb.2022.107921</a>.
+</div>
 <div id="ref-Shi2023" class="csl-entry" role="listitem">
 Shi, Wei, Yongfei Cai, Haisun Zhu, Hanqin Peng, Jewel Voyer, Sophia Rits-Volloch, Hong Cao, et al. 2023. <span>“Cryo-EM Structure of SARS-CoV-2 Postfusion Spike in Membrane.”</span> <em>Nature</em> 619 (7969): 403–9. <a href="https://doi.org/10.1038/s41586-023-06273-4">https://doi.org/10.1038/s41586-023-06273-4</a>.
 </div>

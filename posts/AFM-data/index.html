@@ -23,6 +23,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 /* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
@@ -231,6 +265,7 @@ window.Quarto = {
   <li><a href="#raw-image-pre-processing" id="toc-raw-image-pre-processing" class="nav-link" data-scroll-target="#raw-image-pre-processing">Raw image pre-processing</a></li>
   <li><a href="#segmentation" id="toc-segmentation" class="nav-link" data-scroll-target="#segmentation">Segmentation</a></li>
   <li><a href="#centerline" id="toc-centerline" class="nav-link" data-scroll-target="#centerline">Centerline</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -241,18 +276,13 @@ window.Quarto = {
 
 
 
-<div id="44521d56" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-stdout">
-<pre><code>1</code></pre>
-</div>
-</div>
 <p>We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature.</p>
 <section id="biological-context" class="level2">
 <h2 class="anchored" data-anchor-id="biological-context">Biological context</h2>
-<p><em>Mycobacterium smegmatis</em> is Grahm-positive rod shape bacterium. It is 3 to 5 <span class="math inline">\(\mu m\)</span> long and around 500 <span class="math inline">\(nm\)</span> wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as <em>M.tuberculosis</em> (responsible for the tubercuosis) or <em>M.abscessus</em>, with which it shares the same cell wall structure<span class="citation" data-cites="tyagi2002mycobacterium">(<a href="#ref-tyagi2002mycobacterium" role="doc-biblioref">Tyagi and Sharma 2002</a>)</span> . In particular <em>M.smegmatis</em> has a fast growth (3-4 hours doubling time compared to 24h for <em>M. tuberculosis</em>), allowing for faster experimental protocols.</p>
+<p><em>Mycobacterium smegmatis</em> is Grahm-positive rod shape bacterium. It is 3 to 5 <span class="math inline">\(\mu m\)</span> long and around 500 <span class="math inline">\(nm\)</span> wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as <em>M.tuberculosis</em> (responsible for the tubercuosis) or <em>M.abscessus</em>, with which it shares the same cell wall structure <span class="citation" data-cites="tyagi2002mycobacterium">(<a href="#ref-tyagi2002mycobacterium" role="doc-biblioref">Tyagi and Sharma 2002</a>)</span>. In particular <em>M.smegmatis</em> has a fast growth (3-4 hours doubling time compared to 24h for <em>M. tuberculosis</em>), allowing for faster experimental protocols.</p>
 <p>Here are some know properties of <em>M.smegmatis</em> bacteria :</p>
 <ul>
-<li>They present variation of cell diameter along their longitudinal axis <span class="citation" data-cites="eskandarian2017division">(<a href="#ref-eskandarian2017division" role="doc-biblioref">Eskandarian et al. 2017</a>)</span>. The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this proile.</li>
+<li>They present variation of cell diameter along their longitudinal axis <span class="citation" data-cites="eskandarian2017division">(<a href="#ref-eskandarian2017division" role="doc-biblioref">Eskandarian et al. 2017</a>)</span>. The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this profile.</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -261,7 +291,7 @@ window.Quarto = {
 </figure>
 </div>
 <ul>
-<li>They grow following a biphasic and asymetrical polar dynamics<span class="citation" data-cites="hannebelle2020biphasic">(<a href="#ref-hannebelle2020biphasic" role="doc-biblioref">Hannebelle et al. 2020</a>)</span>. The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).</li>
+<li>They grow following a biphasic and asymetrical polar dynamics <span class="citation" data-cites="hannebelle2020biphasic">(<a href="#ref-hannebelle2020biphasic" role="doc-biblioref">Hannebelle et al. 2020</a>)</span>. The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -274,28 +304,187 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="raw-image-pre-processing">Raw image pre-processing</h2>
 <section id="data" class="level4">
 <h4 class="anchored" data-anchor-id="data">Data</h4>
-<p>Several data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc.</p>
+<p>Several data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc. After extraction of the data, forward and backward cells are aligned, artefacts such as image scars are detected and corrected.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Figure_1_quarto.png" class="img-fluid figure-img"></p>
+<figcaption>At each time step, images representing different physical variables are produced by the AFM</figcaption>
+</figure>
+</div>
 </section>
 </section>
 <section id="segmentation" class="level2">
 <h2 class="anchored" data-anchor-id="segmentation">Segmentation</h2>
+<p>At each time steps, images are segmented to detect each cells using the cellpose package <span class="citation" data-cites="stringer2021cellpose">(<a href="#ref-stringer2021cellpose" role="doc-biblioref">Stringer et al. 2021</a>)</span>. If available, different physical channels are combined to improve the segmentation. Forward and backward images are also combined.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Figure_2_quarto.png" class="img-fluid figure-img"></p>
+<figcaption>Images are combined to improve the segmentation</figcaption>
+</figure>
+</div>
+<p>Here is an example on how to use cellpose on an image. Different models are available (with the <code>seg_mod</code> variable), depending on the training datasets. With cellpose 3, different denoising models are also available (with the <code>denoise_mod</code> variable).</p>
+<div id="2ca55a5e" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> cellpose <span class="im">import</span> io, denoise, plot</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">'''</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">Parameters</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">'''</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'raw_img.png'</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>path_to_save <span class="op">=</span> <span class="st">'segmented_img'</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Segmentation model type</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>seg_mod <span class="op">=</span> <span class="st">'cyto'</span>   </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Denoizing model</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>denoise_mod <span class="op">=</span> <span class="st">"denoise_cyto3"</span>  </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected cell diameter (pixels)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>dia <span class="op">=</span> <span class="dv">40</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Type of segmentation (with / without nuclei, different color channels or not)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>chan <span class="op">=</span> [<span class="dv">0</span>,<span class="dv">0</span>] </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Segmentation sensibility parameters</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>thres <span class="op">=</span> <span class="fl">0.8</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>celp <span class="op">=</span> <span class="fl">0.4</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">'''</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">Computing segmentation</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">'''</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Opening image to segment</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>img<span class="op">=</span>np.array(Image.<span class="bu">open</span>(image_path))[:,:,<span class="dv">1</span>]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Chosing a model type :</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> denoise.CellposeDenoiseModel(gpu<span class="op">=</span><span class="va">False</span>, model_type<span class="op">=</span>seg_mod, restore_type<span class="op">=</span>denoise_mod)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Computing segmentaion</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>masks, flows, st, diams <span class="op">=</span> model.<span class="bu">eval</span>(img, diameter <span class="op">=</span> dia, channels<span class="op">=</span>chan, flow_threshold <span class="op">=</span> thres, cellprob_threshold<span class="op">=</span>celp)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the results into a numpy file</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>io.masks_flows_to_seg(img, masks, flows, path_to_save, channels<span class="op">=</span>chan, diams<span class="op">=</span>diams)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We plot the final results :</p>
+<div id="23f7d201" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>plt.imshow(img,cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-3-output-1.png" width="575" height="307" class="figure-img"></p>
+<figcaption>Raw image</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div id="b441ded7" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mask_RGB <span class="op">=</span> plot.mask_overlay(img,masks)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.imshow(mask_RGB)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-4-output-1.png" width="575" height="307" class="figure-img"></p>
+<figcaption>Image with segmented masks overlaid</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="centerline" class="level2">
+<h2 class="anchored" data-anchor-id="centerline">Centerline</h2>
+<p>Since we are interested in studying the variations of the cell diameter, we define height profile as the value of the cell height along the cell centerline. The cell centerline are computed using a skeletonization algorithm <span class="citation" data-cites="zhang1984fast">Lee, Kashyap, and Chu (<a href="#ref-lee1994building" role="doc-biblioref">1994</a>)</span>. Here is an example of skeletonization</p>
+<div id="fcc052f8" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.morphology <span class="im">import</span> skeletonize</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting first mask</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>first_mask <span class="op">=</span>  masks <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>skel_img <span class="op">=</span> skeletonize(first_mask, method<span class="op">=</span><span class="st">'lee'</span>)  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>skel <span class="op">=</span> np.argwhere(skel_img)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(first_mask, cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.scatter(skel[:,<span class="dv">1</span>], skel[:,<span class="dv">0</span>], <span class="fl">0.5</span><span class="op">*</span>np.ones(np.shape(skel[:,<span class="dv">0</span>])), color<span class="op">=</span><span class="st">'r'</span>, marker<span class="op">=</span><span class="st">'.'</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-5-output-1.png" width="575" height="307" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Depending on the masks shapes, centerlines may have branches :</p>
+<div id="1eb253d9" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.morphology <span class="im">import</span> skeletonize</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting first mask</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>first_mask <span class="op">=</span>  masks <span class="op">==</span> <span class="dv">3</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>skel_img <span class="op">=</span> skeletonize(first_mask)  <span class="co">#, method='lee'</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>skel <span class="op">=</span> np.argwhere(skel_img)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(first_mask, cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.scatter(skel[:,<span class="dv">1</span>], skel[:,<span class="dv">0</span>], <span class="fl">0.5</span><span class="op">*</span>np.ones(np.shape(skel[:,<span class="dv">0</span>])), color<span class="op">=</span><span class="st">'r'</span>, marker<span class="op">=</span><span class="st">'.'</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.png" width="575" height="307" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In practice, centerlines are pruned and extended to the cell poles, in order to capture the cell length. Other geometrical properties such as masks centroids or outlines are computed as well.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Figure_3_quarto.png" class="img-fluid figure-img"></p>
+<figcaption>Final static processing results in real life data. White masks are excluded from the cell tracking algorithm (see part 2). Black dots are cell centroids. The yellow boxes represent artefacts cleaning.</figcaption>
+</figure>
+</div>
+</section>
+<section id="references" class="level1">
 
 
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">Centerline</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-eskandarian2017division" class="csl-entry" role="listitem">
 Eskandarian, Haig A, Pascal D Odermatt, Joëlle XY Ven, Melanie Hannebelle, Adrian P Nievergelt, Neeraj Dhar, John D McKinney, and Georg E Fantner. 2017. <span>“Division Site Selection Linked to Inherited Cell Surface Wave Troughs in Mycobacteria.”</span> <em>Nature Microbiology</em> 2 (9): 1–6.
 </div>
 <div id="ref-hannebelle2020biphasic" class="csl-entry" role="listitem">
 Hannebelle, Mélanie, Joëlle XY Ven, Chiara Toniolo, Haig A Eskandarian, Gaëlle Vuaridel-Thurre, John D McKinney, and Georg E Fantner. 2020. <span>“A Biphasic Growth Model for Cell Pole Elongation in Mycobacteria.”</span> <em>Nature Communications</em> 11 (1): 1–10.
 </div>
+<div id="ref-lee1994building" class="csl-entry" role="listitem">
+Lee, Ta-Chih, Rangasami L Kashyap, and Chong-Nam Chu. 1994. <span>“Building Skeleton Models via 3-d Medial Surface Axis Thinning Algorithms.”</span> <em>CVGIP: Graphical Models and Image Processing</em> 56 (6): 462–78.
+</div>
+<div id="ref-stringer2021cellpose" class="csl-entry" role="listitem">
+Stringer, Carsen, Tim Wang, Michalis Michaelos, and Marius Pachitariu. 2021. <span>“Cellpose: A Generalist Algorithm for Cellular Segmentation.”</span> <em>Nature Methods</em> 18 (1): 100–106.
+</div>
 <div id="ref-tyagi2002mycobacterium" class="csl-entry" role="listitem">
 Tyagi, Jaya Sivaswami, and Deepak Sharma. 2002. <span>“Mycobacterium Smegmatis and Tuberculosis.”</span> <em>Trends in Microbiology</em> 10 (2): 68–69.
+</div>
+<div id="ref-zhang1984fast" class="csl-entry" role="listitem">
+Zhang, Tongjie Y, and Ching Y. Suen. 1984. <span>“A Fast Parallel Algorithm for Thinning Digital Patterns.”</span> <em>Communications of the ACM</em> 27 (3): 236–39.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

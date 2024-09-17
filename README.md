@@ -10,15 +10,6 @@ For the blog itself, visit [the blog page here](https://bioshape-analysis.github
 
 ## Getting Started
 
-### Prerequisites
-
-To get started, you'll need the following tools:
-
-- **Git**: Install from [Git's official website](https://git-scm.com/).
-- **Python 3.x**: Download it from [python.org](https://www.python.org/downloads/).
-- **Jupyter Notebook**: An open-source web application for interactive data science and scientific computing.
-- **Quarto**: A publishing system to create dynamic documents and blogs.
-
 ### Cloning the Repository
 
 To contribute or explore the content:

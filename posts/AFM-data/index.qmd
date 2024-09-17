@@ -30,6 +30,7 @@ bibliography: bibliography.bib
 execute:
   echo: true
   freeze: auto
+  warning: false
 
 ---
 
@@ -44,7 +45,7 @@ We present here the protocole to process biological images such as bacteria atom
 
 Here are some know properties of *M.smegmatis* bacteria :
 
-* They present variation of cell diameter along their longitudinal axis [@eskandarian2017division]. The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this proile.
+* They present variation of cell diameter along their longitudinal axis [@eskandarian2017division]. The cell diameter is represented as a height profile along the cell centerline. We respectively name peaks and troughs the local maxima and minima of this profile.
 
 ![3D image of *M.smegmatis*. The orange line represents the height profile.](3D_cell.png)
 
@@ -75,7 +76,7 @@ Here is an example on how to use cellpose on an image. Different models are avai
 
 import numpy as np
 import matplotlib.pyplot as plt
-from cellpose import utils, io, models, denoise, plot
+from cellpose import io, denoise, plot
 from PIL import Image
 
 
@@ -124,8 +125,6 @@ We plot the final results :
 ```{python}
 #| fig-cap: "Raw image"
 
-
-
 plt.imshow(img,cmap='gray')
 plt.show()
 
@@ -135,7 +134,6 @@ plt.show()
 
 #| fig-cap: "Image with segmented masks overlaid"
 
-
 mask_RGB = plot.mask_overlay(img,masks)
 plt.imshow(mask_RGB)
 plt.show()
@@ -143,6 +141,40 @@ plt.show()
 ```
 
 ## Centerline
-Since we are interested in studying the variations of the cell diameter, we define height profile as the value of the cell height along the cell centerline. The cell centerline are computed using a skeletonization algorithm [@lee1994building]. 
+Since we are interested in studying the variations of the cell diameter, we define height profile as the value of the cell height along the cell centerline. The cell centerline are computed using a skeletonization algorithm [@zhang1984fast,@lee1994building]. Here is an example of skeletonization 
+
+```{python}
+from skimage.morphology import skeletonize
+
+# Selecting first mask
+first_mask =  masks == 1
+
+skel_img = skeletonize(first_mask, method='lee')  
+skel = np.argwhere(skel_img)
+plt.imshow(first_mask, cmap='gray')
+
+plt.scatter(skel[:,1], skel[:,0], 0.5*np.ones(np.shape(skel[:,0])), color='r', marker='.')
+plt.show()
+```
+
+Depending on the masks shapes, centerlines may have branches :
+
+```{python}
+from skimage.morphology import skeletonize
+
+# Selecting first mask
+first_mask =  masks == 3
+
+skel_img = skeletonize(first_mask)  #, method='lee'
+skel = np.argwhere(skel_img)
+plt.imshow(first_mask, cmap='gray')
+
+plt.scatter(skel[:,1], skel[:,0], 0.5*np.ones(np.shape(skel[:,0])), color='r', marker='.')
+plt.show()
+```
+
+In practice, centerlines are pruned and extended to the cell poles, in order to capture the cell length. Other geometrical properties such as masks centroids or outlines are computed as well.
+
+![Final static processing results in real life data. White masks are excluded from the cell tracking algorithm (see part 2). Black dots are cell centroids. The yellow boxes represent artefacts cleaning.](Figure_3_quarto.png)
 
 # References

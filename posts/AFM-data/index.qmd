@@ -1,7 +1,7 @@
 ---
 title: "Extracting cell geometry from Atomic Force Microscopy"
 subtitle: "Part 1: Static analysis"
-
+jupyter: python3
 
 author:
   - name: "Clément Soubrier" 
@@ -28,22 +28,18 @@ format:
 bibliography: bibliography.bib
 
 execute:
-  echo: false
+  echo: true
   freeze: auto
 
 ---
 
 
-```{python}
-import pandas as pd
-print(1)
-```
 
 
 We present here the protocole to process biological images such as bacteria atomic force miroscopy data. We want to study the bacteria cell shape and extract the main geometrical feature.
 
 ## Biological context
-*Mycobacterium smegmatis* is Grahm-positive rod shape bacterium. It is 3 to 5 $\mu m$ long and around 500 $nm$ wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as *M.tuberculosis* (responsible for the tubercuosis) or *M.abscessus*, with which it shares the same cell wall structure[@tyagi2002mycobacterium] . In particular *M.smegmatis* has a fast growth (3-4 hours doubling time compared to 24h for *M. tuberculosis*), allowing for faster experimental protocols. 
+*Mycobacterium smegmatis* is Grahm-positive rod shape bacterium. It is 3 to 5 $\mu m$ long and around 500 $nm$ wide. This non-pathogenic species is otften used a biological model to study the pathogenic Mycobacteria such as *M.tuberculosis* (responsible for the tubercuosis) or *M.abscessus*, with which it shares the same cell wall structure [@tyagi2002mycobacterium]. In particular *M.smegmatis* has a fast growth (3-4 hours doubling time compared to 24h for *M. tuberculosis*), allowing for faster experimental protocols. 
 
 
 Here are some know properties of *M.smegmatis* bacteria :
@@ -52,7 +48,7 @@ Here are some know properties of *M.smegmatis* bacteria :
 
 ![3D image of *M.smegmatis*. The orange line represents the height profile.](3D_cell.png)
 
-* They grow following a biphasic and asymetrical polar dynamics[@hannebelle2020biphasic]. The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).
+* They grow following a biphasic and asymetrical polar dynamics [@hannebelle2020biphasic]. The cells elongate from the poles, where material is added. After division, the pre-existing pole (OP) elongate at a high rate, whereas the newly created pole (NP) has first a slow growth, and then switches to a fast growth, after the New End Take Off (NETO).
 
 ![Growth dynamics.](Neto.svg)
 
@@ -64,9 +60,89 @@ Here are some know properties of *M.smegmatis* bacteria :
 ## Raw image pre-processing
 #### Data
 
-Several data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc.
+Several data acquisitions were conducted with wild types and different mutant strains. The raw data is composed of AFM log files times series for each experiments. Each log file contain several images, each one representing a physical channel such as height, stiffness, adhesion etc. After extraction of the data, forward and backward cells are aligned, artefacts such as image scars are detected and corrected.
+
+![At each time step, images representing different physical variables are produced by the AFM](Figure_1_quarto.png)
 
 ## Segmentation
+At each time steps, images are segmented to detect each cells using the cellpose package [@stringer2021cellpose]. If available, different physical channels are combined to improve the segmentation. Forward and backward images are also combined.
 
+![Images are combined to improve the segmentation](Figure_2_quarto.png)
+
+Here is an example on how to use cellpose on an image. Different models are available (with the `seg_mod` variable), depending on the training datasets. With cellpose 3, different denoising models are also available (with the `denoise_mod` variable). 
+
+```{python}
+
+import numpy as np
+import matplotlib.pyplot as plt
+from cellpose import utils, io, models, denoise, plot
+from PIL import Image
+
+
+'''
+Parameters
+'''
+
+image_path = 'raw_img.png'
+path_to_save = 'segmented_img'
+# Segmentation model type
+seg_mod = 'cyto'   
+# Denoizing model
+denoise_mod = "denoise_cyto3"  
+# Expected cell diameter (pixels)
+dia = 40
+# Type of segmentation (with / without nuclei, different color channels or not)
+chan = [0,0] 
+# Segmentation sensibility parameters
+thres = 0.8
+celp = 0.4
+
+'''
+Computing segmentation
+'''
+
+
+# Opening image to segment
+img=np.array(Image.open(image_path))[:,:,1]
+
+# Chosing a model type :
+model = denoise.CellposeDenoiseModel(gpu=False, model_type=seg_mod, restore_type=denoise_mod)
+
+# Computing segmentaion
+masks, flows, st, diams = model.eval(img, diameter = dia, channels=chan, flow_threshold = thres, cellprob_threshold=celp)
+
+
+# Saving the results into a numpy file
+io.masks_flows_to_seg(img, masks, flows, path_to_save, channels=chan, diams=diams)
+
+
+
+```
+
+We plot the final results :
+
+```{python}
+#| fig-cap: "Raw image"
+
+
+
+plt.imshow(img,cmap='gray')
+plt.show()
+
+```
+
+```{python}
+
+#| fig-cap: "Image with segmented masks overlaid"
+
+
+mask_RGB = plot.mask_overlay(img,masks)
+plt.imshow(mask_RGB)
+plt.show()
+
+```
 
 ## Centerline
+Since we are interested in studying the variations of the cell diameter, we define height profile as the value of the cell height along the cell centerline. The cell centerline are computed using a skeletonization algorithm [@lee1994building]. 
+
+# References

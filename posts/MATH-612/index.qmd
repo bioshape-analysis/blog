@@ -60,6 +60,9 @@ categories: [MATH 612]
 8. **Delete your Jupyter notebook:** After converting it to a `.qmd` file, delete the original `.ipynb` file to prevent duplication in the blog post.
 9. **Commit and push your changes:** After completing your `.qmd` file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.
 
+Anatomy of a Quarto Document: 
+![](img/quarto_doc_format.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
 ### Additional Information for Quarto:
 
 - **Add Images:**

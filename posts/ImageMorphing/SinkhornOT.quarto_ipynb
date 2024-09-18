@@ -1,0 +1,69 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Extracting cell geometry from Atomic Force Microscopy\"\n",
+        "subtitle: \"Part 1: Static analysis\"\n",
+        "jupyter: python3\n",
+        "\n",
+        "author:\n",
+        "  - name: \"Clément Soubrier\"\n",
+        "    email: \"c.soubrier@math.ubc.ca\"\n",
+        "    affiliations:\n",
+        "      - name: KDD Group\n",
+        "        url: \"https://rtviii.xyz/\"\n",
+        "\n",
+        "  - name: \"Khanh Dao Duc\"\n",
+        "    email: \"kdd@math.ubc.ca\"\n",
+        "    affiliations:\n",
+        "      - name: Department of Mathematics, UBC\n",
+        "        url: \"https://www.math.ubc.ca/\"\n",
+        "      - name: Department of Computer Science, UBC\n",
+        "        url: \"https://www.cs.ubc.ca/\"\n",
+        "\n",
+        "date: \"July 31 2024\"\n",
+        "categories: [biology, bioinformatics]\n",
+        "\n",
+        "callout-icon: false\n",
+        "format:\n",
+        "  html:\n",
+        "    code-fold: true\n",
+        "bibliography: bibliography.bib\n",
+        "\n",
+        "execute:\n",
+        "  echo: true\n",
+        "  freeze: auto\n",
+        "  warning: false\n",
+        "\n",
+        "---\n",
+        "\n",
+        "\n",
+        "#Hi\n",
+        "Hello"
+      ],
+      "id": "3d13cd1e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "print('Hey!')"
+      ],
+      "id": "63829199",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

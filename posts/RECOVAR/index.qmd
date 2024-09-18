@@ -10,11 +10,19 @@ categories: [cryo-EM] # [biology, bioinformatics, theory, etc.]
 ## Background
 Cryogenic electron microscopy (cryo-EM), a cryomicroscopy technique applied on samples embedding in ice, along with recent development of more powerful hardwares and softwares, have achieved huge success in the determination of biomolecular structures at near-atomic level. Cryo-EM takes screenshots of thousands or millions of particles in different poses frozen in the sample, and thus allows the reconstruction of the 3D structure from those 2D projections. 
 
-Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprises of many sub-units, and their compositions may vary within the sample and are of research interest. Spike proteins
+Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprises of many sub-units, and their compositions may vary within the sample and are of research interest. Spike protein is an example of conformational heterogeneity, where the receptor-binding domain (RBD) keeps switching between close and open states in order to bind to receptors and meanwhile resist the binding of antibody. When studying the antigen-antibody complex, both compositional and conformational hetergeneity need to be considered.
+
+![A simple illustration of the conformational heterogeneity of spike protein, where it displays two kinds of conformations: closed RBD and open RBD of one chain (colored in blue) [@Wang2020]. Spike protein is a trimer so in reality all the three chains will move possibly in different ways and the motion of spike protein is much more complex than what's shown here.](img/spike.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM data started from relatively simple 3D classfication, which output discrete classes of different conformations. This is usually done by expectation-maximization (EM) algorithms, where 2D particle stacks were iteratively assigned to classes and used to reconstruct the volume of that class. However, such an approach has two problems: first, the classification decreases the number of images used to reconstruct the volume, and thus lower the resolution we are able to achieve; second, the motion of biomoleule is continuous in reality and discrete classification may not describe the heterogeneity very well, and we may miss some transient states.
+
+Therefore, nowadays people start to focus on methods modeling continuous heterogeneity without any classification step to avoid the above issues. Most methods adopt similar structures, where 2D particle stacks are mapped to latent embeddings, clusters/trajectories are estimated in latent space, and finally volumes are mapped and reconstructed from latent embeddings. Early methods use linear mapping (e.g. 3DVA), but with the applications of deep learning techniques in the field of cryo-EM data processing, people find methods adapted from variational autoencoder (VAE) achieving better performance (e.g. cryoDRGN, 3DFlex). Nevertheless, the latent space obtained from VAE and other deep learning methods is hard to interpret, and do not conserve distances and densities, imposing difficulties in reconstructing motions/trajectories, which are what most structure biologists desire at the end.
+
+Recent developed software RECOVAR, using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. In this blog, I will go through the pipeline of RECOVAR, present heterogeneity analysis results on the Sars-Cov2 spike protein dataset, and discuss some possible improvements we can made to this pipeline.
+
+## Methods
 
 ## Data
-
-## Method
 
 ## Results
 

@@ -1,0 +1,21 @@
+---
+title: "Heterogeneity analysis of Sars-Cov2 spike protein from cryo-EM data using linear subspace methods"
+bibliography: references.bib
+date: "September 18 2024" # Format example: August 9 2024
+author:
+  - name: "Qiyu Wang" 
+categories: [cryo-EM] # [biology, bioinformatics, theory, etc.]
+---
+
+## Background
+Cryogenic electron microscopy (cryo-EM), a cryomicroscopy technique applied on samples embedding in ice, along with recent development of more powerful hardwares and softwares, have achieved huge success in the determination of biomolecular structures at near-atomic level. Cryo-EM takes screenshots of thousands or millions of particles in different poses frozen in the sample, and thus allows the reconstruction of the 3D structure from those 2D projections. 
+
+Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprises of many sub-units, and their compositions may vary within the sample and are of research interest. Spike proteins
+
+## Data
+
+## Method
+
+## Results
+
+## Discussion

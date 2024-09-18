@@ -8,7 +8,6 @@ author:
     email: "c.soubrier@math.ubc.ca"
     affiliations:
       - name: KDD Group
-        url: "https://rtviii.xyz/"
 
   - name: "Khanh Dao Duc" 
     email: "kdd@math.ubc.ca"

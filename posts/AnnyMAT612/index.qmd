@@ -1,0 +1,6 @@
+title: "Farm shape Analysis"
+date: "Septmeber 18 2024"
+author:
+  - name: "Mo Wang" 
+categories: [bioinformation] # [biology, bioinformatics, theory, etc.]
+bibliography: references.bib # If referencing anything

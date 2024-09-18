@@ -1,0 +1,12 @@
+---
+title: "Random fields on shapes"
+date: "September 18 2024" # Format example: August 9 2024
+author:
+  - name: "Sharvaj Kubal" 
+categories: [] # [biology, bioinformatics, theory, etc.]
+bibliography: references.bib # If referencing anything
+---
+
+# Random fields on shapes
+
+Given a subset $M \subseteq \mathbb{R}^s$, a random field $(X_q)_{q \in M}$ is a vector-valued random process taking values in $\mathbb{R}^d$.

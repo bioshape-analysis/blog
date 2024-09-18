@@ -1,0 +1,17 @@
+---
+title: "Title of your blog post"
+date: "Date" # Format example: August 9 2024
+author:
+  - name: "Your Name" 
+categories: [] # [biology, bioinformatics, theory, etc.]
+---
+
+#
+```{r}
+variable <- 2
+print(variable)
+```
+
+##
+
+###

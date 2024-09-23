@@ -41,24 +41,32 @@ where $\lVert A\rVert_F^2=\sum_{i,j}A_{i,j}^2$ and $\lVert A\rVert_R^2=\sum_{i,j
 Our goal at this step is to compute principal components (PCs) from $\hat{\mu}$ and $\hat{\Sigma}$. Nevertheless, computing the entire matrix of $\hat{\Sigma}$ is impossible considering that we have to compute $N^6$ entries. Fortunately, for low-rank variance matrix only a subset of the columns is required to estimate the entire matrix and its leading eigenvectors, which are just PCs. $d$ PCs can be computed in $O(d(N^3+nN^2))$, much faster than $O(N^6)$ required to compute the entire covariance matrix.
 
 ### Latent space embedding
-With PCs computed from last step, denoted by $U\in\mathbb{C}^{N^3\times d}$, we can map $x_i$ to lower-dimensional latent space by $z_i = U^*(x_i-\hat{\mu})\in\mathbb{R}^d$. Assuming $z_i\sim N(0,\Gamma)$, the MAP estimation of $P(z_i|y_i)$ can be obtained by solving: 
+With PCs computed from last step, denoted by $U\in\mathbb{C}^{N^3\times d}$, we can map $x_i$ to lower-dimensional latent space by $z_i = U^*(x_i-\hat{\mu})\in\mathbb{R}^d$. Assuming $z_i\sim N(0,\Gamma)$, where the diagonal of $\Gamma$ is the eigenvalues obtained during PC computation, the MAP estimation of $P(z_i|y_i)$ can be obtained by solving: 
 
 $$\hat{a}_i, \hat{z}_i = \underset{a_i\in\mathbb{R}^+, z_i\in\mathbb{R}^d}{\mathrm{argmin}}\lVert a_iP_i(Uz_i+\hat{\mu})-y_i\rVert_{\Lambda_i^{-1}}^2+\lVert z_i\rVert_{\Gamma^{-1}}^2$$
 
 where $a_i$ is a scaling factor used to capture the effect of display variations in contrast.
 
 ### Conformation reconstruction
-After computing the latent embeddings, the next question would naturally be how to reconstruct conformations from embeddings. The most intuitive way is to do reprojection *i.e*. $\hat{x}\leftarrow Uz+\hat{\mu}$. Nevertheless, reprojection only works well when all the relevant PCs can be computed, which is almosy impossible considering the low signal-to-noise ratio (SNR) in practice. Therefore, an alternative scheme based on adaptive kernel regression is used here. Given a fixed latent position $z^*$ and the frequency $\xi^\in\mathbb{R}^3$ in the 3D Fourier space of the volume whose value we would like to estimate, the kernel regression estimates of this form are computed:
+After computing the latent embeddings, the next question would naturally be how to reconstruct conformations from embeddings. The most intuitive way is to do reprojection *i.e*. $\hat{x}\leftarrow Uz+\hat{\mu}$. Nevertheless, reprojection only works well when all the relevant PCs can be computed, which is almosy impossible considering the low signal-to-noise ratio (SNR) in practice. Therefore, an alternative scheme based on adaptive kernel regression is used here. Given a fixed latent position $z^*$ and the frequency $\xi^k\in\mathbb{R}^3$ in the 3D Fourier space of the volume whose value we would like to estimate, the kernel regression estimates of this form are computed:
 
 $$x(h;\xi^k) = \underset{x_k}{\mathrm{argmin}}\sum_{i,j}\frac{1}{\sigma_{i,j}^2}|C_{i,j}x_k-y_{i,j}|^2K(\xi^k,\xi_{i,j})K_i^h(z^*,z_i)$$
 
 where $h$ is bandwitdth; $\sigma_{i,j}$ is the variance of $\epsilon_{i,j}$, which is the noise of frequency $j$ of the $i$-th observation; $y_{i,j}$ is the value of frequency $j$ of the $i$-th observation; $\xi_{i,j}$ is the frequency $j$ of the $i$-th observation in 3D adjusted by $\phi_i$. We have two kernel functions in this formulation. $K(\xi^k,\xi_{i,j})$
 is the triangular kernel, measuring the distance in frequencies. $K_i^h(z^*, z_i)=E(\frac{1}{h}\lVert z^* - z_i\rVert_{\Sigma_{z_i}^{-1}})$ where $\Sigma_{z_i}$ is the covariance matrix of $z_i$ which can be computed from the formulation for latent embedding, and $E$ is a piecewise constant approxination of the Epanechnikov kernel. $K_i^h(z^*, z_i)$ measures the distance between latent embeddings.
 
+However, here comes a trade-off at the heart of every heterogeneous reconstruction algorithm: averaging images is necessary to overcome noise, but it also degrades heterogeneity since the images averaged may come from different conformations. Hence, we have to choose $h$ carefully. Here a cross-validation strategy is applied to find the optimal $h$ for each frequency shell of each subvolume. For a given $z^*$, the dataset is split into two: from one halfset, the 50 estimates $\hat{x}(h_1), ..., \hat{x}(h_{50})$ with varying $h$ are computed, and from the other subset a single low-bias, high-variance template $\hat{x}_{CV}$ by using a small number of images which are closest to $z^*$. Each of the 50 kernel estimate is then subdivided into small subvolumes by real-space masking, and each subvolume is again decomposed into frequency shells after a Fourier transform. We use the following cross-validation metric for subvolume $v$ and frequency shell $s$:
+
+$$d_{s,v}(h) = \lVert S_sV^{-1/2}(M_v(\hat{x}_{CV}-\hat{x}(h)))\rVert_2^2$$
+
+where $S_s$ is a matrix that extracts shell $s$; $M_v$ is a matrix extracting subvolume $v$; and $V$ is a diagonal matrix containing the variance of the template. For each $s$ and $v$, the minimizer over $h$ of the cross-validarion score is selected, and the final volume is obtained by first recombining frequency shells for each subvolume and then recombining all the subvolumes.
+
+![Volumes are reconstructed from the embedding by adaptive kernel regression.](img/3D_reconstruct.png){ width=100% style="display: block; margin-left: auto; margin-right: auto;" }
+
 ### Estimation of state density
 Since motion is what structure biologists finally want, we have to figure out a method to sample from latent space to form a trajectory representing the motion of the molecule. According to Boltzmann statistics, the density of a particular state is a measure of the free energy of that state, which means a path which maximizes conformational density is equivalent to the path minimizing the free energy. Taking the advantage of linear mapping, we can easily relate embedding density to conformational density. The embedding density estimator is given by:
 
-$$\hat{E(z)} = \frac{1}{n}\sum_{i=1}^nK_G(\hat{z_i}, \Sigma_s;z)$$
+$$\hat{E}(z) = \frac{1}{n}\sum_{i=1}^nK_G(\hat{z_i}, \Sigma_s;z)$$
 
 where $K_G(\mu, \Sigma;z)$ is the probability density function of the multivariant Gaussian with mean $\mu$ and covariance $\Sigma$, evaluated at $z$, and $\Sigma_s$ is set using the Silverman rule. The conformational density can be related as following:
 
@@ -67,7 +75,7 @@ where $K_G(\mu, \Sigma;z)$ is the probability density function of the multivaria
  where $\overline{E}(z)$ is the expectation of the embedding density $\hat{E}(z)$; $\overline{G}(z)$ is the expectation of $\hat{G}(z)=\frac{1}{n}\sum_{i=1}^nK_G(0,\Sigma_{z_i}+\Sigma_s;z)$, which is named as embedding uncertainty; $d(z)$ is the conformational density corresponding to $z$; $*$ is the convolution operation.
 
 ### Motion recovery
-Given the conformational density estimated from last step, denoted by $\hat{d}(z)$, start state $z_{st}$ and end state $z_{end}$, we can find trajectory $Z(t):\mathbb{Z}^+\rightarrow\mathbb{R}^d$ in latent space by computing the value function:
+Given the conformational density estimated from last step, denoted by $\hat{d}(z)$, start state $z_{st}$ and end state $z_{end}$, we can find trajectory $Z(t):\mathbb{R}^+\rightarrow\mathbb{R}^d$ in latent space by computing the value function:
 
 $$v(z):=\underset{Z(t)}{\mathrm{inf}}\int_{t=0}^{t=T_a}\hat{d}(Z(t))^{-1}dt$$
 

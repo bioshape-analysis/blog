@@ -41,7 +41,7 @@ where $\lVert A\rVert_F^2=\sum_{i,j}A_{i,j}^2$ and $\lVert A\rVert_R^2=\sum_{i,j
 Our goal at this step is to compute principal components (PCs) from $\hat{\mu}$ and $\hat{\Sigma}$. Nevertheless, computing the entire matrix of $\hat{\Sigma}$ is impossible considering that we have to compute $N^6$ entries. Fortunately, for low-rank variance matrix only a subset of the columns is required to estimate the entire matrix and its leading eigenvectors, which are just PCs. $d$ PCs can be computed in $O(d(N^3+nN^2))$, much faster than $O(N^6)$ required to compute the entire covariance matrix.
 
 ### Latent space embedding
-With PCs computed from last step, denoted by $U\in\mathbb{C}^{N^3\times d}$, we can map $x_i$ to lower-dimensional latent space by $z_i = U^*(x_i-\hat{\mu})\in\mathbb{R}^d$. Assuming $z_i\sim N(0,\Gamma)$, where the diagonal of $\Gamma$ is the eigenvalues obtained during PC computation, the MAP estimation of $P(z_i|y_i)$ can be obtained by solving: 
+With PCs computed from last step, denoted by $U\in\mathbb{C}^{N^3\times d}$, we can project $x_i$ onto lower-dimensional latent space by $z_i = U^*(x_i-\hat{\mu})\in\mathbb{R}^d$. Assuming $z_i\sim N(0,\Gamma)$, where the diagonal of $\Gamma$ is the eigenvalues obtained during PC computation, the MAP estimation of $P(z_i|y_i)$ can be obtained by solving: 
 
 $$\hat{a}_i, \hat{z}_i = \underset{a_i\in\mathbb{R}^+, z_i\in\mathbb{R}^d}{\mathrm{argmin}}\lVert a_iP_i(Uz_i+\hat{\mu})-y_i\rVert_{\Lambda_i^{-1}}^2+\lVert z_i\rVert_{\Gamma^{-1}}^2$$
 

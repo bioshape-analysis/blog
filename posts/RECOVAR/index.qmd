@@ -1,5 +1,5 @@
 ---
-title: "Heterogeneity analysis of Sars-Cov2 spike protein from cryo-EM data using linear subspace methods"
+title: "Heterogeneity analysis of cryo-EM data of SARS-CoV2 spike protein using linear subspace methods"
 bibliography: references.bib
 date: "September 18 2024" # Format example: August 9 2024
 author:
@@ -18,9 +18,71 @@ The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM d
 
 Therefore, nowadays people start to focus on methods modeling continuous heterogeneity without any classification step to avoid the above issues. Most methods adopt similar structures, where 2D particle stacks are mapped to latent embeddings, clusters/trajectories are estimated in latent space, and finally volumes are mapped and reconstructed from latent embeddings. Early methods use linear mapping (e.g. 3DVA), but with the applications of deep learning techniques in the field of cryo-EM data processing, people find methods adapted from variational autoencoder (VAE) achieving better performance (e.g. cryoDRGN, 3DFlex). Nevertheless, the latent space obtained from VAE and other deep learning methods is hard to interpret, and do not conserve distances and densities, imposing difficulties in reconstructing motions/trajectories, which are what most structure biologists desire at the end.
 
-Recent developed software RECOVAR, using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. In this blog, I will go through the pipeline of RECOVAR, present heterogeneity analysis results on the Sars-Cov2 spike protein dataset, and discuss some possible improvements we can made to this pipeline.
+Recent developed software RECOVAR [@Gilles2023], using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. In this blog, I will go through the pipeline of RECOVAR, present heterogeneity analysis results on the SARS-CoV2 spike protein dataset, and discuss some possible improvements we can made to this pipeline.
 
 ## Methods
+
+### Regularized covariance estimation
+Let $N$ be the dimension of the grid and $n$ be the number of images. We start with formulating the formation process of each cryo-EM image in the Fourier space $y_i\in\mathbb{C}^{N^2}$ from its corresponding conformation $x_i\in\mathbb{C}^{N^3}$ as:
+$$y_i = C_i\hat{P}(\phi_i)X_i + \epsilon_i, \epsilon_i\sim N(0, \Lambda_i) $$
+
+where $\hat{P}(\phi_i)$ is the projetion from 3D to 2D after rigid body motion with pose $\phi_i$, $C_i$ is the contrast transfer function (CTF), and $\epsilon_i$ represents the Gaussian noise. RECOVAR will assume that $C_i$ and $\phi_i$ were given. This can be done via many existing ab-initio methods. Hence in the following analysis, we will simply fix the linear map $P_i:=C_i\hat{P}(\phi_i)$.
+
+When poses are known, the mean $\mu\in\mathbb{C}^{N^3}$ of the distribution of conformations can be estimated by solving:
+
+$$\hat{\mu}:=\underset{\mu}{\mathrm{argmin}}\sum_{i=1}^{n}\lVert y_i-P_i\mu\rVert_{\Lambda^{-1}}^2+\lVert\mu\rVert_w^2$$
+
+where $\lVert v\rVert_{\Lambda^{-1}}^2=v^*\Lambda^{-1}v$ and $\lVert v\rVert_w^2=\sum_i|v_i|^2w_i$. $w\in \mathbb{R}^{N^3}$ is the optional Wiener filter. Similarly, covariance can be estimated as the solution to the linear system corresponding to the following:
+
+$$\hat{\Sigma}:=\underset{\Sigma}{\mathrm{argmin}}\sum_{i=1}^n\lVert(y_i-P_i\hat{\mu})(y_i-P_i\hat{\mu})^*-(P_i\Sigma P_i^*+\Lambda_i)\rVert_F^2+\lVert\Sigma\rVert_R^2$$
+
+where $\lVert A\rVert_F^2=\sum_{i,j}A_{i,j}^2$ and $\lVert A\rVert_R^2=\sum_{i,j}A_{i,j}^2R_{i,j}$. $R$ is the regularization weight.
+
+Our goal at this step is to compute principal components (PCs) from $\hat{\mu}$ and $\hat{\Sigma}$. Nevertheless, computing the entire matrix of $\hat{\Sigma}$ is impossible considering that we have to compute $N^6$ entries. Fortunately, for low-rank variance matrix only a subset of the columns is required to estimate the entire matrix and its leading eigenvectors, which are just PCs. $d$ PCs can be computed in $O(d(N^3+nN^2))$, much faster than $O(N^6)$ required to compute the entire covariance matrix.
+
+### Latent space embedding
+With PCs computed from last step, denoted by $U\in\mathbb{C}^{N^3\times d}$, we can map $x_i$ to lower-dimensional latent space by $z_i = U^*(x_i-\hat{\mu})\in\mathbb{R}^d$. Assuming $z_i\sim N(0,\Gamma)$, the MAP estimation of $P(z_i|y_i)$ can be obtained by solving: 
+
+$$\hat{a}_i, \hat{z}_i = \underset{a_i\in\mathbb{R}^+, z_i\in\mathbb{R}^d}{\mathrm{argmin}}\lVert a_iP_i(Uz_i+\hat{\mu})-y_i\rVert_{\Lambda_i^{-1}}^2+\lVert z_i\rVert_{\Gamma^{-1}}^2$$
+
+where $a_i$ is a scaling factor used to capture the effect of display variations in contrast.
+
+### Conformation reconstruction
+After computing the latent embeddings, the next question would naturally be how to reconstruct conformations from embeddings. The most intuitive way is to do reprojection *i.e*. $\hat{x}\leftarrow Uz+\hat{\mu}$. Nevertheless, reprojection only works well when all the relevant PCs can be computed, which is almosy impossible considering the low signal-to-noise ratio (SNR) in practice. Therefore, an alternative scheme based on adaptive kernel regression is used here. Given a fixed latent position $z^*$ and the frequency $\xi^\in\mathbb{R}^3$ in the 3D Fourier space of the volume whose value we would like to estimate, the kernel regression estimates of this form are computed:
+
+$$x(h;\xi^k) = \underset{x_k}{\mathrm{argmin}}\sum_{i,j}\frac{1}{\sigma_{i,j}^2}|C_{i,j}x_k-y_{i,j}|^2K(\xi^k,\xi_{i,j})K_i^h(z^*,z_i)$$
+
+where $h$ is bandwitdth; $\sigma_{i,j}$ is the variance of $\epsilon_{i,j}$, which is the noise of frequency $j$ of the $i$-th observation; $y_{i,j}$ is the value of frequency $j$ of the $i$-th observation; $\xi_{i,j}$ is the frequency $j$ of the $i$-th observation in 3D adjusted by $\phi_i$. We have two kernel functions in this formulation. $K(\xi^k,\xi_{i,j})$
+is the triangular kernel, measuring the distance in frequencies. $K_i^h(z^*, z_i)=E(\frac{1}{h}\lVert z^* - z_i\rVert_{\Sigma_{z_i}^{-1}})$ where $\Sigma_{z_i}$ is the covariance matrix of $z_i$ which can be computed from the formulation for latent embedding, and $E$ is a piecewise constant approxination of the Epanechnikov kernel. $K_i^h(z^*, z_i)$ measures the distance between latent embeddings.
+
+### Estimation of state density
+Since motion is what structure biologists finally want, we have to figure out a method to sample from latent space to form a trajectory representing the motion of the molecule. According to Boltzmann statistics, the density of a particular state is a measure of the free energy of that state, which means a path which maximizes conformational density is equivalent to the path minimizing the free energy. Taking the advantage of linear mapping, we can easily relate embedding density to conformational density. The embedding density estimator is given by:
+
+$$\hat{E(z)} = \frac{1}{n}\sum_{i=1}^nK_G(\hat{z_i}, \Sigma_s;z)$$
+
+where $K_G(\mu, \Sigma;z)$ is the probability density function of the multivariant Gaussian with mean $\mu$ and covariance $\Sigma$, evaluated at $z$, and $\Sigma_s$ is set using the Silverman rule. The conformational density can be related as following:
+
+ $$\overline{E}(z)=\overline{G}(z)*d(z)$$
+
+ where $\overline{E}(z)$ is the expectation of the embedding density $\hat{E}(z)$; $\overline{G}(z)$ is the expectation of $\hat{G}(z)=\frac{1}{n}\sum_{i=1}^nK_G(0,\Sigma_{z_i}+\Sigma_s;z)$, which is named as embedding uncertainty; $d(z)$ is the conformational density corresponding to $z$; $*$ is the convolution operation.
+
+### Motion recovery
+Given the conformational density estimated from last step, denoted by $\hat{d}(z)$, start state $z_{st}$ and end state $z_{end}$, we can find trajectory $Z(t):\mathbb{Z}^+\rightarrow\mathbb{R}^d$ in latent space by computing the value function:
+
+$$v(z):=\underset{Z(t)}{\mathrm{inf}}\int_{t=0}^{t=T_a}\hat{d}(Z(t))^{-1}dt$$
+
+subject to
+$$Z(0)=z, Z(T_a)=z_{end}, \lVert \frac{d}{dt}Z(t)\rVert=1; T_a = min\{t|Z(t)=z_{end}\}$$
+
+In simple word, $v(z)$ computes the minimum inverse density we can have to reach $z_{end}$ starting from $z$. $v(z)$ is the viscosity solution of the Eikonal equation:
+
+$$\hat{d}(z)|\nabla v(z)|=1, \forall z\in B\setminus \{z_{end}\}; v(z_{end})=0$$
+
+where $B$ is the domain of interest, and $v(z)$ can be solved by solving this partial differential equation. Once $v(z)$ is solved, the optimal trajectory an be obtained by finding the path orthogonal to the level curve of v(z), which can be computed numerically using the steepest gradient descent on $v(z)$ starting from $z_{st}$
+
+![Visulization of the steepest gradient descent on the level curve of v(z)](img/level_curve.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+
 
 ## Data
 

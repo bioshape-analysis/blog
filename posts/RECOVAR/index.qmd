@@ -24,7 +24,7 @@ Recent developed software RECOVAR [@Gilles2023], using a linear mapping like 3DV
 
 ### Regularized covariance estimation
 Let $N$ be the dimension of the grid and $n$ be the number of images. We start with formulating the formation process of each cryo-EM image in the Fourier space $y_i\in\mathbb{C}^{N^2}$ from its corresponding conformation $x_i\in\mathbb{C}^{N^3}$ as:
-$$y_i = C_i\hat{P}(\phi_i)X_i + \epsilon_i, \epsilon_i\sim N(0, \Lambda_i) $$
+$$y_i = C_i\hat{P}(\phi_i)x_i + \epsilon_i, \epsilon_i\sim N(0, \Lambda_i) $$
 
 where $\hat{P}(\phi_i)$ is the projetion from 3D to 2D after rigid body motion with pose $\phi_i$, $C_i$ is the contrast transfer function (CTF), and $\epsilon_i$ represents the Gaussian noise. RECOVAR will assume that $C_i$ and $\phi_i$ were given. This can be done via many existing ab-initio methods. Hence in the following analysis, we will simply fix the linear map $P_i:=C_i\hat{P}(\phi_i)$.
 

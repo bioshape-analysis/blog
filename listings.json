@@ -6,17 +6,17 @@
       "/posts/HDM/index.html",
       "/posts/outlier-detection/DeCOr-MDS.html",
       "/posts/cvt/index.html",
-      "/posts/elastic-metric/elastic_metric.html",
       "/posts/elastic-metric/osteosarcoma_analysis.html",
-      "/posts/point-cloud/pointcloud.html",
-      "/posts/sy mds tunnel/index.html",
+      "/posts/elastic-metric/elastic_metric.html",
       "/posts/cryo_ET/demo.html",
+      "/posts/sy mds tunnel/index.html",
+      "/posts/point-cloud/pointcloud.html",
       "/posts/AlphaShape/index.html",
       "/posts/quasiconformalmap/index.html",
       "/posts/ribosome-tunnel-new/index.html",
       "/posts/OTalignment/index.html",
-      "/posts/ET/ey.html",
-      "/posts/AFM-data/index.html"
+      "/posts/AFM-data/index.html",
+      "/posts/ET/ey.html"
     ]
   }
 ]

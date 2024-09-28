@@ -23,6 +23,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 /* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
@@ -90,6 +124,35 @@ div.csl-indent {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -139,7 +202,6 @@ div.csl-indent {
       <h1 class="title">3D tessellation of biomolecular cavities</h1>
             <p class="subtitle lead">Protocol for analyzing the ribosome exit tunnel</p>
                                 <div class="quarto-categories">
-                <div class="quarto-category">example</div>
                 <div class="quarto-category">cryo-EM</div>
               </div>
                   </div>
@@ -176,10 +238,10 @@ div.csl-indent {
    
   <ul>
   <li><a href="#summary-and-background" id="toc-summary-and-background" class="nav-link active" data-scroll-target="#summary-and-background">Summary and Background</a></li>
-  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">0. Data preparation</a></li>
-  <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">1. Pre-processing</a></li>
-  <li><a href="#voxelization" id="toc-voxelization" class="nav-link" data-scroll-target="#voxelization">2. Voxelization</a></li>
+  <li><a href="#pointcloud-preparation-bounding-box-and-voxelization" id="toc-pointcloud-preparation-bounding-box-and-voxelization" class="nav-link" data-scroll-target="#pointcloud-preparation-bounding-box-and-voxelization">1. Pointcloud Preparation: Bounding Box and Voxelization</a></li>
+  <li><a href="#subcloud-extraction" id="toc-subcloud-extraction" class="nav-link" data-scroll-target="#subcloud-extraction">2. Subcloud Extraction</a></li>
   <li><a href="#tessellation" id="toc-tessellation" class="nav-link" data-scroll-target="#tessellation">3. Tessellation</a></li>
+  <li><a href="#result" id="toc-result" class="nav-link" data-scroll-target="#result">Result</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -194,25 +256,558 @@ div.csl-indent {
 <section id="summary-and-background" class="level2">
 <h2 class="anchored" data-anchor-id="summary-and-background">Summary and Background</h2>
 <p>We present a protocol to extract the surface of a biomolecular cavity for shape analysis and molecular simulations.</p>
-<p>We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel. More details on the tunnel features and biological importance can be found in our previous works<span class="citation" data-cites="dao2018impact dao2019differences"><sup><a href="#ref-dao2018impact" role="doc-biblioref">1</a>,<a href="#ref-dao2019differences" role="doc-biblioref">2</a></sup></span>. The protocol was also design to refine the output obtained from MOLE software<span class="citation" data-cites="sehnal2013mole"><sup><a href="#ref-sehnal2013mole" role="doc-biblioref">3</a></sup></span></p>
+<p>We apply and illustrate the protocol on the ribosome structure, which contains a subcompartment known as the ribosome exit tunnel or “nascent polypeptide exit tunnel” (<strong>NPET</strong>). More details on the tunnel features and biological importance can be found in our previous works<span class="citation" data-cites="dao2018impact dao2019differences"><sup><a href="#ref-dao2018impact" role="doc-biblioref">1</a>,<a href="#ref-dao2019differences" role="doc-biblioref">2</a></sup></span>.</p>
+<p>The protocol was designed to refine the output obtained from MOLE software<span class="citation" data-cites="sehnal2013mole"><sup><a href="#ref-sehnal2013mole" role="doc-biblioref">3</a></sup></span>, but can be applied to reconstruct a mesh on any general point cloud. Hence, we take the point-cloud of atom positions surrounding the tunnel as a point of departure.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="./figures/gkz106fig1.jpeg" class="img-fluid figure-img" style="width:80.0%"></p>
+<p><img src="./data/gkz106fig1.jpeg" class="img-fluid figure-img" style="width:80.0%"></p>
 <figcaption>Illustration of the ribosome exit tunnel (from Dao Duc et al., NAR 2019)</figcaption>
 </figure>
 </div>
+<!-- ::: {layout="[[57,70] ]"}
+![PDB 8OJ0. The structure of human ribosome.](./data/8OJ0.gif){fig-alt=""}
+::: -->
+<!-- ![The locations of the ribosome exit tunnel and the PTC.](./data/ptc_and_tunnel_illustration.png){width=80%;fig-alt=""} -->
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Schematic representation of the protocol
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><img src="./data/visual_protocol.png" class="img-fluid" alt=""></p>
+</div>
+</div>
+</div>
 </section>
-<section id="data-preparation" class="level2">
-<h2 class="anchored" data-anchor-id="data-preparation">0. Data preparation</h2>
+<section id="pointcloud-preparation-bounding-box-and-voxelization" class="level2">
+<h2 class="anchored" data-anchor-id="pointcloud-preparation-bounding-box-and-voxelization">1. Pointcloud Preparation: Bounding Box and Voxelization</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>atompos_to_voxel_sphere</code>: convert a 3D coordinate into a voxelized sphere
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="d6243aef" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> atompos_to_voxelized_sphere(center: np.ndarray, radius: <span class="bu">int</span>):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Make sure radius reflects the size of the underlying voxel grid"""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    x0, y0, z0 <span class="op">=</span> center</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">#!------ Generate indices of a voxel cube of side 2r  around the centerpoint</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    x_range <span class="op">=</span> <span class="bu">slice</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(np.floor(x0 <span class="op">-</span> radius)), </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(np.ceil(x0 <span class="op">+</span> radius)))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    y_range <span class="op">=</span> <span class="bu">slice</span>(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(np.floor(y0 <span class="op">-</span> radius)), </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(np.ceil(y0 <span class="op">+</span> radius)))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    z_range <span class="op">=</span> <span class="bu">slice</span>(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(np.floor(z0 <span class="op">-</span> radius)), </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">int</span>(np.ceil(z0 <span class="op">+</span> radius)))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> np.indices(</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        (</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            x_range.stop <span class="op">-</span> x_range.start,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            y_range.stop <span class="op">-</span> y_range.start,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            z_range.stop <span class="op">-</span> z_range.start,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    indices      <span class="op">+=</span> np.array([x_range.start,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>                              y_range.start,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                              z_range.start])[:, np.newaxis, np.newaxis, np.newaxis ]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    indices       <span class="op">=</span> indices.transpose(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">0</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    indices_list  <span class="op">=</span> <span class="bu">list</span>(<span class="bu">map</span>(<span class="bu">tuple</span>, indices.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>)))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">#!------ Generate indices of a voxel cube of side 2r+2  around the centerpoint</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    sphere_active_ix <span class="op">=</span> []</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ind <span class="kw">in</span> indices_list:</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        x_ <span class="op">=</span> ind[<span class="dv">0</span>]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        y_ <span class="op">=</span> ind[<span class="dv">1</span>]</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        z_ <span class="op">=</span> ind[<span class="dv">2</span>]</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (x_ <span class="op">-</span> x0) <span class="op">**</span> <span class="dv">2</span> <span class="op">+</span> (y_ <span class="op">-</span> y0) <span class="op">**</span> <span class="dv">2</span> <span class="op">+</span> (z_ <span class="op">-</span> z0) <span class="op">**</span> <span class="dv">2</span> <span class="op">&lt;=</span> radius<span class="op">**</span><span class="dv">2</span>:</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            sphere_active_ix.append([x_, y_, z_])</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(sphere_active_ix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>index_grid</code>: populate a voxel grid (with sphered atoms)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="a6121cf0" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index_grid(expanded_sphere_voxels: np.ndarray) :</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> normalize_atom_coordinates(coordinates: np.ndarray)<span class="op">-&gt;</span><span class="bu">tuple</span>[ np.ndarray, np.ndarray ]:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""@param coordinates: numpy array of shape (N,3)"""</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        C      <span class="op">=</span> coordinates</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        mean_x <span class="op">=</span> np.mean(C[:, <span class="dv">0</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        mean_y <span class="op">=</span> np.mean(C[:, <span class="dv">1</span>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        mean_z <span class="op">=</span> np.mean(C[:, <span class="dv">2</span>])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        Cx <span class="op">=</span> C[:, <span class="dv">0</span>] <span class="op">-</span> mean_x</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        Cy <span class="op">=</span> C[:, <span class="dv">1</span>] <span class="op">-</span> mean_y</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        Cz <span class="op">=</span> C[:, <span class="dv">2</span>] <span class="op">-</span> mean_z</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        [dev_x, dev_y, dev_z] <span class="op">=</span> [np.<span class="bu">min</span>(Cx), np.<span class="bu">min</span>(Cy), np.<span class="bu">min</span>(Cz)]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">#! shift to positive quadrant</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        Cx <span class="op">=</span> Cx <span class="op">+</span> <span class="bu">abs</span>(dev_x)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        Cy <span class="op">=</span> Cy <span class="op">+</span> <span class="bu">abs</span>(dev_y)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        Cz <span class="op">=</span> Cz <span class="op">+</span> <span class="bu">abs</span>(dev_z)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        rescaled_coords <span class="op">=</span> np.array(<span class="bu">list</span>(<span class="bu">zip</span>(Cx, Cy, Cz)))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> rescaled_coords, np.array([[mean_x,mean_y,mean_z], [<span class="bu">abs</span>( dev_x ), <span class="bu">abs</span>( dev_y ), <span class="bu">abs</span>( dev_z )]])</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    normalized_sphere_cords, mean_abs_vectors <span class="op">=</span> normalize_atom_coordinates(expanded_sphere_voxels)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    voxel_size <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    sphere_cords_quantized <span class="op">=</span> np.<span class="bu">round</span>(np.array(normalized_sphere_cords <span class="op">/</span> voxel_size) ).astype(<span class="bu">int</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    max_values             <span class="op">=</span> np.<span class="bu">max</span>(sphere_cords_quantized, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    grid_dimensions        <span class="op">=</span> max_values <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    vox_grid               <span class="op">=</span> np.zeros(grid_dimensions)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Dimension of the voxel grid is "</span>, vox_grid.shape)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    vox_grid[</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        sphere_cords_quantized[:, <span class="dv">0</span>],</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        sphere_cords_quantized[:, <span class="dv">1</span>],</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        sphere_cords_quantized[:, <span class="dv">2</span>]  ] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ( vox_grid, grid_dimensions, mean_abs_vectors )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p><strong>Bbox</strong>: There are many ways to extract a point cloud from a larger biological structure – in this case we settle for a bounding box that bounds the space between the PTC and the NPET vestibule.</p>
+<div id="a2d6a007" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># "bounding_box_atoms.npy" is a N,3 array of atom coordinates</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>atom_centers <span class="op">=</span> np.load(<span class="st">"bounding_box_atoms.npy"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Sphering</strong>: To make the representation of atoms slightly more physically-plausible we replace each atom-center coordinate with positions of voxels that fall within a sphere of radius <span class="math inline">\(R\)</span> around the atom’s position. This is meant to represent the atom’s van der Waals radius.</p>
+<p>One could model different types of atoms (<span class="math inline">\(N\)</span>,<span class="math inline">\(C\)</span>,<span class="math inline">\(O\)</span>,<span class="math inline">\(H\)</span> etc.) with separate radii, but taking <span class="math inline">\(R=2\)</span> proves a good enough compromise. The units are Angstrom and correspond to the coordinate system in which the structure of the ribosome is recorded.</p>
+<div id="40b073b0" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>voxel_spheres <span class="op">=</span> np.array([ atompos_to_voxel_sphere(atom, <span class="dv">2</span>) <span class="cf">for</span> atom <span class="kw">in</span> atom_centers ])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Voxelization &amp; Inversion</strong>: Since we are interested in the “empty space” between the atoms, we need a way to capture it. To make this possible we discretize the space by projecting the (sphered) point cloud into a voxel grid and invert the grid.</p>
+<div id="5eb98f44" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the grid is a binary 3D-array </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with 1s where a normalized 3D-coordinate of an atom corresponds to the cell index and 0s elsewhere</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># by "normalized" i mean that the atom coordinates are</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># temporarily moved to the origin to decrease the size of the grid (see `index_grid` method further).</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>initial_grid, grid_dims, _ <span class="op">=</span> index_grid(voxel_spheres)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The grid is inverted by changing 0-&gt;1 and 1-&gt;0</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Now the atom locations are the null voxels and the empty space is active voxels</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>inverted_grid              <span class="op">=</span> np.asarray(np.where(initial_grid <span class="op">!=</span> <span class="dv">1</span>)).T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Compare the following representation (<em>Inverted Point Cloud</em>) to the first point cloud: notice that where there previously was an active voxel is now an empty voxel and vice versa. The tubular constellation of active voxels in the center of the bounding box on this inverted grid is the tunnel “space” we are interested in.</p>
+<div id="fig-cluster" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cluster-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ptcloud" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ptcloud-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0.bbox_atoms.gif" class="img-fluid figure-img" data-ref-parent="fig-cluster">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ptcloud-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Initial bounding-box point cloud
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-inverted" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-inverted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0.inverted_grid.gif" class="img-fluid figure-img" data-ref-parent="fig-cluster">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-inverted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Inverted point cloud
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cluster-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Pointcloud inversion via a voxel grid.
+</figcaption>
+</figure>
+</div>
 </section>
-<section id="pre-processing" class="level2">
-<h2 class="anchored" data-anchor-id="pre-processing">1. Pre-processing</h2>
-</section>
-<section id="voxelization" class="level2">
-<h2 class="anchored" data-anchor-id="voxelization">2. Voxelization</h2>
+<section id="subcloud-extraction" class="level2">
+<h2 class="anchored" data-anchor-id="subcloud-extraction">2. Subcloud Extraction</h2>
+<div id="dbscan_note" class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>DBSCAN_capture</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="35167111" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DBSCAN_capture(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    ptcloud: np.ndarray,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    eps           ,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    min_samples   ,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    metric        : <span class="bu">str</span> <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>): </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    u_EPSILON     <span class="op">=</span> eps</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    u_MIN_SAMPLES <span class="op">=</span> min_samples</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    u_METRIC      <span class="op">=</span> metric</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Running DBSCAN on </span><span class="sc">{}</span><span class="st"> points. eps=</span><span class="sc">{}</span><span class="st">, min_samples=</span><span class="sc">{}</span><span class="st">, distance_metric=</span><span class="sc">{}</span><span class="st">"</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">format</span>( <span class="bu">len</span>(ptcloud), u_EPSILON, u_MIN_SAMPLES, u_METRIC ) ) </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    db     <span class="op">=</span> DBSCAN(eps<span class="op">=</span>eps, min_samples<span class="op">=</span>min_samples, metric<span class="op">=</span>metric).fit(ptcloud) <span class="co"># &lt;-- this is all you need</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> db.labels_</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    CLUSTERS_CONTAINER <span class="op">=</span> {}</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> point, label <span class="kw">in</span> <span class="bu">zip</span>(ptcloud, labels):</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> label <span class="kw">not</span> <span class="kw">in</span> CLUSTERS_CONTAINER:</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>            CLUSTERS_CONTAINER[label] <span class="op">=</span> []</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        CLUSTERS_CONTAINER[label].append(point)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    CLUSTERS_CONTAINER <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">sorted</span>(CLUSTERS_CONTAINER.items()))</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> db, CLUSTERS_CONTAINER</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div id="dbscan_note" class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>DBSCAN_pick_largest_cluster</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="32c6522f" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DBSCAN_pick_largest_cluster(clusters_container:<span class="bu">dict</span>[<span class="bu">int</span>,<span class="bu">list</span>])<span class="op">-&gt;</span>np.ndarray:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    DBSCAN_CLUSTER_ID <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k, v <span class="kw">in</span> clusters_container.items():</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">int</span>(k) <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">len</span>(v) <span class="op">&gt;</span> <span class="bu">len</span>(clusters_container[DBSCAN_CLUSTER_ID]):</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            DBSCAN_CLUSTER_ID <span class="op">=</span> <span class="bu">int</span>(k)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(clusters_container[DBSCAN_CLUSTER_ID])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p><strong>Clustering</strong>: Having obtained a voxelized representation of the interatomic spaces inside and around the NPET our task is now to extract <em>only the space</em> that <em>corresponds to the NPET</em>. We use <a href="https://en.wikipedia.org/wiki/DBSCAN">DBSCAN</a>.</p>
+<p><code>scikit</code>’s implementation of <a href="#dbscan_note"><code>DBSCAN</code></a> conveniently lets us retrieve the points from the largest cluster only, which corresponds to the active voxels of NPET space (if we eyeballed our DBSCAN parameters well).</p>
+<div id="7e832afe" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scikit.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_u_EPSILON, _u_MIN_SAMPLES, _u_METRIC  <span class="op">=</span> <span class="fl">5.5</span>, <span class="dv">600</span>, <span class="st">'euclidian'</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>_, clusters_container   <span class="op">=</span> DBSCAN_capture(inverted_grid, _u_EPSILON, _u_MIN_SAMPLES, _u_METRIC ) </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>largest_cluster         <span class="op">=</span> DBSCAN_pick_largest_cluster(clusters_container)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+DBSCAN Parameters and grid size.
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Our 1Å-side grid just happens to be granular enough to accomodate a “correct” separation of clusters for some empirically established values of <code>min_nbrs</code> and <code>epsilon</code> (DBSCAN parameters), where the largest cluster captures the tunnel space.</p>
+<p>A possible issue here is “extraneous” clusters merging into the cluster of interest and thereby corrupting its shape. In general this occurs when there are clusters of density that are <em>close enough</em> (within <code>epsilon</code> to the main one to warrant a merge) and simultaneously <em>large enough</em> that they fulfill the <code>min_nbrs</code> parameter. Hence it might be challenging to find the combination of <code>min_nbrs</code> and <code>epsilon</code> that is <em>sensitive enough</em> to capture the main cluster completely and yet discriminating enough to not subsume any adjacent clusters.</p>
+<p>In theory, a finer voxel grid (<em>finer</em> – in relationship to the initial coordinates of the general point cloud; sub-angstrom in our case) would make finding the combination of parameters specific to the dataset easier: given that the atom-sphere would be represented by a proprotionally larger number of voxels, the euclidian distance calculation between two voxels would be less sensitive to the change in <code>epsilon</code>.</p>
+<p>Partioning the voxel grid further would come at a cost:</p>
+<ul>
+<li>you would need to rewrite the sphering method for atoms (to account for the the new voxel-size)</li>
+<li>the computational cost will increase dramatically, the dataset could conceivably stop fitting into memory alltogether.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./data/4UG0.dbscan.clusters.gif" class="img-fluid figure-img"></p>
+<figcaption>Clusters identified by DBSCAN on the inverted index grid. The largest cluster corresponds to the tunnel space.</figcaption>
+</figure>
+</div>
+<div id="dbscan_note" class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Subcloud refinement
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I found that this first pass of DBSCAN (<code>eps</code>=<span class="math inline">\(5.5\)</span>, <code>min_nbrs</code>=<span class="math inline">\(600\)</span>) successfully identifies the largest cluster with the tunnel but generally happens to be conservative in the amount of points that are merged into it. That is, there are still redundant points in this cluster that would make the eventual surface reconstruction spatially overlap with the rRNA and protiens. To “sharpen” this cluster we apply DBSCAN only to its sub-pointcloud and push the <code>eps</code> distance down to <span class="math inline">\(3\)</span> and <code>min_nbrs</code> to <span class="math inline">\(123\)</span> (again, “empirically established” values), which happens to be about the lowest parameter values at which any clusters form. This sharpened cluster is what the tesselation (surface reconstruction) will be performed on.</p>
+<div id="fig-cluster" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cluster-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-trimmed" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-trimmed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0.ptcloud_trimmed.gif" class="img-fluid figure-img" data-ref-parent="fig-cluster">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-trimmed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Largest DBSCAN cluster (trimmed from the vestibule side).
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-cluster" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-trimmed-sharpened" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-trimmed-sharpened-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0.ptcloud_trimmed_sharpened.gif" class="img-fluid figure-img" data-ref-parent="fig-cluster">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-trimmed-sharpened-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Cluster refinement: DBSCAN{e=3,mn=123} result (marine blue) on the largest cluster of DBSCAN{e=5.5,mn=600} (gray)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cluster-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Second pass of DBSCAN sharpens the cluster to peel off the outer layer of redundant points.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="tessellation" class="level2">
 <h2 class="anchored" data-anchor-id="tessellation">3. Tessellation</h2>
+<div id="ptcloud_convex_hull_points" class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>ptcloud_convex_hull_points</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Surface points can be extracted by creating an alpha shape over the point cloud and taking only the points that belong to the alpha surface.</p>
+<div id="01c35d4a" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyvista <span class="im">as</span> pv</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> open3d <span class="im">as</span> o3d</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ptcloud_convex_hull_points(pointcloud: np.ndarray, ALPHA:<span class="bu">float</span>, TOLERANCE:<span class="bu">float</span>) <span class="op">-&gt;</span> np.ndarray:</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> pointcloud <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    cloud       <span class="op">=</span> pv.PolyData(pointcloud)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    grid        <span class="op">=</span> cloud.delaunay_3d(alpha<span class="op">=</span>ALPHA, tol<span class="op">=</span>TOLERANCE, offset<span class="op">=</span><span class="dv">2</span>, progress_bar<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    convex_hull <span class="op">=</span> grid.extract_surface().cast_to_pointset()</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> convex_hull.points</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One could content themselves with the alpha shape representation of the NPET geometry and stop here, but it’s easy to notice that the vertice of the polygon (red dots) are distributed unevenly over the surface. This is likely to introduce artifacts and instabilities into further simulations.</p>
+<div id="fig-alpha" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alpha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-alpha" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-alpha-shape" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-alpha-shape-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0.alphashape.gif" class="img-fluid figure-img" data-ref-parent="fig-alpha">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-alpha-shape-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Alpha-shape over the pointcloud
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-alpha" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-surf-pts" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-surf-pts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0.surface_pts.gif" class="img-fluid figure-img" data-ref-parent="fig-alpha">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-surf-pts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Surface points of the point cloud
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alpha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Alpha shape provides a way to identify surface points.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="estimate_normals" class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>estimate_normals</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Normal estimation is done via rolling a tangent plane over the surface points.</p>
+<div id="be397b40" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyvista <span class="im">as</span> pv</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> open3d <span class="im">as</span> o3d</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> estimate_normals(convex_hull_surface_pts: np.ndarray, kdtree_radius<span class="op">=</span><span class="va">None</span>, kdtree_max_nn<span class="op">=</span><span class="va">None</span>, correction_tangent_planes_n<span class="op">=</span><span class="va">None</span>): </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    pcd        <span class="op">=</span> o3d.geometry.PointCloud()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    pcd.points <span class="op">=</span> o3d.utility.Vector3dVector(convex_hull_surface_pts)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    pcd.estimate_normals(search_param<span class="op">=</span>o3d.geometry.KDTreeSearchParamHybrid(radius<span class="op">=</span>kdtree_radius, max_nn<span class="op">=</span>kdtree_max_nn) )</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    pcd.orient_normals_consistent_tangent_plane(k<span class="op">=</span>correction_tangent_planes_n)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pcd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./data/4UG0_normals.gif" class="img-fluid figure-img"></p>
+<figcaption>Normals’ orientations are depicted as vectors(black) on each datapoint.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="apply_poisson_recon" class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>apply_poisson_recon</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The source is available at <a href="https://github.com/mkazhdan/PoissonRecon">https://github.com/mkazhdan/PoissonRecon</a>. For programmability we connect the binary to the pipeline by wrapping it in a python <code>subprocess</code> but one can of course use the binary directly.</p>
+<p>The output of the binary is a binary <code>.ply</code> (Stanford Triangle Format) file. For purposes of distribution we also produce an <code>asciii</code>-encoded version of this <code>.ply</code> file side-by-side: some geometry packages are only able to parse the <code>ascii</code> version.</p>
+<div id="d6df00a6" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_poisson_reconstruction(surf_estimated_ptcloud_path: <span class="bu">str</span>, recon_depth:<span class="bu">int</span><span class="op">=</span><span class="dv">6</span>, recon_pt_weight:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> plyfile</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The documentation can be found at https://www.cs.jhu.edu/~misha/Code/PoissonRecon/Version16.04/ in "PoissonRecon" binary</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    command <span class="op">=</span> [</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        POISSON_RECON_BIN,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"--in"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        surf_estimated_ptcloud_path,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"--out"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        output_path,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"--depth"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">str</span>(recon_depth),</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"--pointWeight"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">str</span>(recon_pt_weight),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"--threads 8"</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    process <span class="op">=</span> subprocess.run(command, capture_output<span class="op">=</span><span class="va">True</span>, text<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> process.returncode <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"&gt;&gt;PoissonRecon executed successfully."</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"&gt;&gt;Wrote </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(output_path))</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Convert the plyfile to asciii</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> plyfile.PlyData.read(output_path)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>        data.text <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        ascii_duplicate <span class="op">=</span>output_path.split(<span class="st">"."</span>)[<span class="dv">0</span>] <span class="op">+</span> <span class="st">"_ascii.ply"</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        data.write(ascii_duplicate)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"&gt;&gt;Wrote </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(ascii_duplicate))</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"&gt;&gt;Error:"</span>, process.stderr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./data/4UG0.reconstruction.gif" class="img-fluid figure-img"></p>
+<figcaption>The final NPET surface reconstruction</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>Now, having refined the largest DBSCAN cluster, we have a pointcloud which faithfully represent the tunnel geometry. To create a watertight mesh from this point cloud we need to prepare the dataset:</p>
+<ul>
+<li>retrieve only the “surface” points from the pointcloud</li>
+<li>estimate <em>normals</em> on the surface points (establish data orientation)</li>
+</ul>
+<div id="a87aeb5a" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>d3d_alpha, d3d_tol     <span class="op">=</span> <span class="dv">2</span>, <span class="dv">1</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>surface_pts <span class="op">=</span> ptcloud_convex_hull_points(coordinates_in_the_original_frame, d3d_alpha,d3d_tol)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>pointcloud  <span class="op">=</span> estimate_normals(surface_pts, kdtree_radius<span class="op">=</span><span class="dv">10</span>, kdtree_max_nn<span class="op">=</span><span class="dv">15</span>, correction_tangent_planes_n<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The dataset is now ready for surface reconstruction. We reach for Poisson surface reconstruction<span class="citation" data-cites="kazhdan2006poisson"><sup><a href="#ref-kazhdan2006poisson" role="doc-biblioref">4</a></sup></span> by <em>Kazhdan</em> and <em>Hoppe</em>, a de facto standard in the field.</p>
+<div id="de2d41c5" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>PR_depth , PR_ptweight <span class="op">=</span> <span class="dv">6</span>, <span class="dv">3</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>apply_poisson_recon(pointcloud, recon_depth<span class="op">=</span>PR_depth, recon_pt_weight<span class="op">=</span>PR_ptweight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="result" class="level2">
+<h2 class="anchored" data-anchor-id="result">Result</h2>
+<p>What you are left with is a smooth polygonal mesh in the <code>.ply</code> format. Below is the illustration of the fidelity of the representation. Folds and depressions can clearly be seen engendered by three proteins surrounding parts of the tunnel (uL22 <em>yellow</em>, uL4 <em>light blue</em> and eL39 <em>magenta</em>). rRNA is not shown.<span class="citation" data-cites="zhou2018open3d"><sup><a href="#ref-sullivan2019pyvista" role="doc-biblioref">6</a></sup></span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./data/tunnel_proteins.gif" class="img-fluid figure-img"></p>
+<figcaption>The NPET mesh surrounded by by three ribosome proteins</figcaption>
+</figure>
+</div>
 </section>
 <section id="references" class="level2">
 
@@ -230,6 +825,15 @@ div.csl-indent {
 </div>
 <div id="ref-sehnal2013mole" class="csl-entry" role="listitem">
 <div class="csl-left-margin">3. </div><div class="csl-right-inline">Sehnal, D. <em>et al.</em> MOLE 2.0: Advanced approach for analysis of biomacromolecular channels. <em>Journal of cheminformatics</em> <strong>5</strong>, 1–13 (2013).</div>
+</div>
+<div id="ref-kazhdan2006poisson" class="csl-entry" role="listitem">
+<div class="csl-left-margin">4. </div><div class="csl-right-inline">Kazhdan, M., Bolitho, M. &amp; Hoppe, H. Poisson surface reconstruction. in <em>Proceedings of the fourth eurographics symposium on geometry processing</em> vol. 7 (2006).</div>
+</div>
+<div id="ref-zhou2018open3d" class="csl-entry" role="listitem">
+<div class="csl-left-margin">5. </div><div class="csl-right-inline">Zhou, Q.-Y., Park, J. &amp; Koltun, V. Open3D: A modern library for 3D data processing. <em>arXiv preprint arXiv:1801.09847</em> (2018).</div>
+</div>
+<div id="ref-sullivan2019pyvista" class="csl-entry" role="listitem">
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">Sullivan, C. &amp; Kaszynski, A. PyVista: 3D plotting and mesh analysis through a streamlined interface for the visualization toolkit (VTK). <em>Journal of Open Source Software</em> <strong>4</strong>, 1450 (2019).</div>
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

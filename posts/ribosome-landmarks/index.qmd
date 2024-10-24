@@ -1,0 +1,52 @@
+---
+title: "Defining landmarks for the ribosome exit tunnel"
+author:
+  - name: "Ella Teasell" 
+
+date: "October 2024"
+categories: [ribosome, cryo-em, bioinformatics]
+jupyter: python3  
+bibliography: references.bib
+csl: nature.csl
+---
+
+## Introduction
+
+The ribosome, the cellular machinery responsible for translation, is present in all domains of life, though exhibits varying conservation across phylogeny. It has been found that, as translation proceeds, the nascent polypeptide chain interacts with the tunnel, and as such, tunnel geometry plays a role in translation dynamics and resulting protein structures [@dao2019differences]. With advances in imaging of ribosomes structure with Cryo-EM, there is ample data to be applied to geometric analysis of the tunnel and therefore a need for more computational tools to do so [@dao2020heterogeneities].
+
+## Background
+
+In order to preform geometric shape analysis on the ribosome, we must first superimpose mathematical definitions onto this biological context. Among others, one way of defining shape mathematically is with a set of landmarks. A landmark is a labelled point on some structure, which, biologically speaking, has some meaning. After removing the effects of translation, scaling, and rotation, sets of landmarks form a shape space, on which statistical analysis may be applied. 
+
+Assigning landmarks to biological shapes is not a new idea; many examples involve defining landmarks as joins between bones or muscles, or as points along observed curves [@dryden]. However, there has been little work in assigning landmarks to biological molecules, and none specifically to the ribosome exit tunnel. The challenge is that any one landmark must have comparable instances across shapes in the shape space, meaning that we cannot arbitrarily pick residues which we know to be near to the tunnel. Such residues must be conserved, and therefore present in each specimen, to be considered useful.
+
+
+## Protocol
+
+Below, I present a preliminary protocol for assigning landmarks to eukaryotic ribosomes. The goal is to eventually extrapolate to bacteria and archaea, as well as produce a combined dataset of landmarks which spans the kingdoms for inter-kingdom comparison. For now, I begin with eukaryota, taking advantage of the high degree of conservation between intra-kingdom ribosomes, as conserved sequences form the basis for this protocol.
+
+As the goal for this dataset is to obtain landmarks that line the ribosome exit tunnel, I begin by selecting proteins and rRNA which interact with the tunnel; uL4, uL22, eL39, and 25/28S rRNA for Eukaryota [@dao2019differences].
+
+
+### 1. Sequence Alignment
+
+In order to assign landmarks which are comparable across ribosome specimens, I consider only the residues which are mostly conserved across our dataset of approximately 400 eukaryotes. To do so, I run Multiple Sequence Alignment (MSA) using MAFFT [@mafft] on the dataset for each of the chosen four polymer types and select residues from the MSA which are at least 90% conserved across samples.
+
+### 2. Selecting landmarks using a prototype
+
+Among the conserved residues on the selected polymers, many will be relatively far from the exit tunnel and not have any influence on tunnel geometry. Thus, the next step in landmark selection is selecting those residues which are close enough to the tunnel. In this protocol, a threshold of $10 \mathring{A}$ is applied.
+
+This process is done by using MOLE 2.0 [@mole], which is a biomolecular channel construction algorithm. The output is a list of points in $\mathbb{R}^3$ which form the centerline of the tunnel, and, for each point on the centerline, a tunnel radius.
+
+I run the MOLE algorithm on a ‘prototype’ specimen. Using the MSA, we locate the coordinates of the conserved residues (see next section for details). For each of the residues on the prototype, find the closest tunnel centerline point in Euclidean space, and compute the distance from the residue to the sphere given by the radius at that centerline point. If this distance on the prototype is less than $10 \mathring{A}$, this conserved residue is close enough to the tunnel to be considered a landmark.
+
+### 3. Locating landmarks
+
+Once the landmarks are filtered by distance to the tunnel on the prototype, I transpose the equivalent landmarks onto the other specimens. This is done by mapping chosen loci from the MSA back to the corresponding loci in the original sequences, and then using PyMol [@PyMOL] to retrieve the atomic coordinates of the residue from the CIF file. To obtain a single landmark per residue, I take the geometric mean of the atomic coordinates for each residue as the landmark.
+
+
+![Landmarks shown in blue on a mesh representation of the 4UG0 tunnel, with proteins shown for reference (uL4 in pink, uL22 in green, and eL39 in yellow).](./data/4UG0_landmarks.gif)
+
+For impormation on the mesh representation of the tunnel used in the figure above, see ['3D tesellation of biomolecular cavities'](https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/).
+
+#### References

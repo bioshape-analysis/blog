@@ -3,7 +3,7 @@ title: "Defining landmarks for the ribosome exit tunnel"
 author:
   - name: "Ella Teasell" 
 
-date: "October 2024"
+date: "October 25, 2024"
 categories: [ribosome, cryo-em, bioinformatics]
 jupyter: env1
 bibliography: references.bib
@@ -12,7 +12,7 @@ csl: nature.csl
 
 ## Introduction
 
-The ribosome, the cellular machinery responsible for translation, is present in all domains of life, though exhibits varying conservation across phylogeny. It has been found that, as translation proceeds, the nascent polypeptide chain interacts with the tunnel, and as such, tunnel geometry plays a role in translation dynamics and resulting protein structures [@dao2019differences]. With advances in imaging of ribosome structure with Cryo-EM, there is ample data on which geometric analysis of the tunnel may be applied and therefore a need for more computational tools to do so [@dao2020heterogeneities].
+The ribosome is present in all domains of life, though exhibits varying conservation across phylogeny. It has been found that, as translation proceeds, the nascent polypeptide chain interacts with the tunnel, and as such, tunnel geometry plays a role in translation dynamics and resulting protein structures [@dao2019differences]. With advances in imaging of ribosome structure with Cryo-EM, there is ample data on which geometric analysis of the tunnel may be applied and therefore a need for more computational tools to do so [@dao2020heterogeneities].
 
 ## Background
 
@@ -29,7 +29,7 @@ As the goal for this dataset is to obtain landmarks that line the ribosome exit 
 
 ![Figure from Dao Duc et al. (2019) showing proteins affecting tunnel shape in E. coli and H. sapiens.](./data/NAR2019-tunnel-proteins.png)
 
-The full protocol is available [here](https://github.com/eteasell/ribosome-exit-tunnel).
+The full protocol is available [here](https://github.com/eteasell/ribosome-exit-tunnel/blob/main/ribosome_exit_tunnel/scripts/main_script.py).
 
 ### 1. Sequence Alignment
 

@@ -2,15 +2,16 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/morphology/proposal.html",
       "/posts/MATH-612/index.html",
       "/posts/HDM/index.html",
       "/posts/outlier-detection/DeCOr-MDS.html",
       "/posts/cvt/index.html",
+      "/posts/cryo_ET/demo.html",
       "/posts/elastic-metric/osteosarcoma_analysis.html",
       "/posts/elastic-metric/elastic_metric.html",
-      "/posts/cryo_ET/demo.html",
-      "/posts/sy mds tunnel/index.html",
       "/posts/point-cloud/pointcloud.html",
+      "/posts/sy mds tunnel/index.html",
       "/posts/AlphaShape/index.html",
       "/posts/quasiconformalmap/index.html",
       "/posts/ribosome-tunnel-new/index.html",

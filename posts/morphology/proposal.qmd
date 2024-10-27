@@ -1,0 +1,100 @@
+---
+title: "Exploring cell shape dynamics dependency on the cell migration"
+bibliography: references.bib
+date: "October 28 2024" # Format example: August 9 2024
+author:
+  - name: "Pavel Bukleomishev" 
+categories: [Cell Morphology, Cell Migration, Differential Geometry] # [biology, bioinformatics, theory, etc.]
+---
+## Background
+Cell morphology is an emerging field of biological research that examines the shape, size, and internal structure of cells to describe their state and the processes occurring within them. Today, more and more scientist across the world are investigating visible cellular transformations to predict cellular phenotypes. This research has significant practical implications: understanding specific cellular features characteristic of certain diseases, such as cancer, could lead to new approaches for early detection and classification.
+
+In this work, we will explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeletal structures [@Mogilner_Oster_1996]. According to current understanding, actin polymerization causes protrusions at the leading edge of a cell, forming specific structures known as lamellipodia and filopodia. Elongation of cells in the direction of movement is also reported. These changes can be observed during experiments.
+
+
+![](img/all_cells.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+## Goals
+Our goal is to perform a differential geometry analysis of cellular shape curves to explore the correlation between shape differences and spatial displacement. Using the Riemann Elastic Metric[@10.1007/978-3-031-38299-4_60]:
+
+$$ 
+g_c^{a, b}(h, k) = a^2 \int_{[0,1]} \langle D_s h, N \rangle \langle D_s k, N \rangle \, ds 
++ b^2 \int_{[0,1]} \langle D_s h, T \rangle \langle D_s k, T \rangle \, ds 
+$$
+
+
+we can estimate the geodesic distance between two cellular boundary curves to mathematically describe how the cell shape changes over time. To implement this algorithm, we will use the Python Geomstats package.
+
+
+## Dataset
+
+This dataset contains real cell contours obtained via fluorescent microscopy in Professor Prasad's lab, segmented by Clément Soubrier. 
+
+- **204 directories**:  
+  Each directory is named `cell_*`, representing an individual cell.  
+
+- **Frames**:  
+  Subdirectories inside each cell are named `frame_*`, capturing different time points for that cell.  
+
+### NumPy Array Objects in Each Frame  
+- **centroid.npy**: Stores the coordinates of the cell's centroid.  
+- **outline.npy**: Contains segmented points as Cartesian coordinates.  
+- **time.npy**: Timestamp of the frame.
+
+### Structure  
+
+```bash
+├── cell_i
+│   ├── frame_j
+│   │   ├── centroid.npy
+│   │   ├── outline.npy
+│   │   └── time.npy
+│   ├── frame_k
+│   │   ├── centroid.npy
+│   │   ├── outline.npy
+│   │   └── time.npy
+│   └── ...
+├── cell_l
+│   ├── frame_m
+│   │   ├── centroid.npy
+│   │   ├── outline.npy
+│   │   └── time.npy
+│   └── ...
+└── ...
+```
+
+## Single cell dynamics
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+
+fig, ax = plt.subplots(figsize=(10, 10), layout='constrained')
+
+N = 15
+
+number_of_frames = sum(os.path.isdir(os.path.join(f"cells/cell_{N}", entry)) for entry in os.listdir(f"cells/cell_{N}"))
+colors = plt.cm.tab20(np.linspace(0, 1, number_of_frames))
+for i in range(1,number_of_frames+1):
+    time = np.load(f'cells/cell_{N}/frame_{i}/time.npy')
+    border = np.load(f'cells/cell_{N}/frame_{i}/outline.npy')
+    centroid = np.load(f'cells/cell_{N}/frame_{i}/centroid.npy')
+
+    
+    color = colors[i - 1]
+
+    ax.plot(border[:, 0], border[:, 1], label=time, color=color)
+    ax.scatter(centroid[0], centroid[1], color=color)
+plt.legend()    
+
+plt.savefig(f"single_cell_{N}.png", dpi=300, bbox_inches='tight')
+
+```
+
+![The cell form in different time moments](img/single_cell_15.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+## References
+
+::: {#refs}
+:::

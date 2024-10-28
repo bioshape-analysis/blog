@@ -1,6 +1,97 @@
-title: "Farm shape Analysis"
-date: "Septmeber 18 2024"
+---
+title: "Farm Shape Analysis: Linking Geometry with Crop Yield and Diversity"
+jupyter: python3
+
 author:
-  - name: "Mo Wang" 
-categories: [bioinformation] # [biology, bioinformatics, theory, etc.]
-bibliography: references.bib # If referencing anything
+  - name: "Mo Wang"
+
+date: "October 24, 2024"
+categories: [landscape-analysis, agriculture]
+
+callout-icon: false
+format:
+  html:
+    mathjax: true
+    code-fold: true
+# bibliography: bibliography.bib
+
+execute:
+  eval: true
+  echo: true
+  freeze: auto
+  warning: false
+---
+## Introduction
+
+In farm management, the geometric characteristics of a field can influence both productivity and biodiversity. This blog will explore the relationship between field polygons and crop yield and crop diversity through three key shape analysis concepts: Shape Index, Convexity/Concavity, and Aspect Ratio. We will also demonstrate the practical application of these metrics using data from Litefarm.
+
+![farm polygon](polygon.png)
+
+## Preliminaries
+
+### 1. **Shape Index**
+The **Shape Index** measures the complexity or irregularity of a polygon compared to a regular shape, like a circle. A Shape Index close to 1 indicates a regular, compact shape, while higher values suggest more irregular shapes.
+
+- **Formula**: 
+$$
+\text{Shape Index} = \frac{P}{2\sqrt{\pi A}}
+$$
+  Where $P$ is the perimeter and $A$ is the area.
+
+### 2. **Convexity/Concavity**
+**Convexity** measures how "convex" or "concave" a polygon is. A polygon is convex if all interior angles are less than 180 degrees, meaning no part of the shape curves inward. Concave shapes, on the other hand, have inward curves and may represent natural formations or inefficient land use.
+
+### 3. **Aspect Ratio**
+The **Aspect Ratio** assesses the proportion between the width and height of a polygon. It offers a perspective on whether the field is more elongated or more compact.
+
+
+
+## **Application of Shape Analysis Using Litefarm Data**
+
+In this section, we will apply the above shape complexity metrics—**Shape Index**, **Convexity/Concavity**, and **Aspect Ratio**—to real-world farm data from **Litefarm**. By doing so, we can analyze how field shapes correlate with crop yield and diversity, and identify potential inefficiencies in farm layout.
+
+### **Calculating Perimeter and Area of a Farm Polygon**
+
+When analyzing the shape of a farm, calculating the **perimeter** and **area** of each field is essential for understanding the geometry of the land. Depending on the longitude and latitude of the farm, these calculations can be done using **geodesic distance** to account for the Earth's curvature.
+```{python}
+import pandas as pd
+
+
+data = pd.read_csv('/Users/app/Desktop/UBC/MAT612/blog/posts/AnnyMAT612/A_and_P.csv')
+
+print(data.head())
+
+```
+
+### **Shape Index Calculation**
+Using the Litefarm data, we calculate the **Shape Index** for each polygon. This will allow us to identify which fields are more regular and which are highly irregular, helping us understand the impact of field shape on crop yield.
+```{python}
+import pandas as pd
+
+
+data = pd.read_csv('/Users/app/Desktop/UBC/landscape-analysis/data/processed/landscape_analysis_shape-index.csv')
+
+print(data.head())
+
+```
+
+- A **low perimeter-area ratio** suggests that the field is compact and well-utilized.
+
+- A **high perimeter-area ratio** might indicate an irregular or elongated shape, potentially affecting farming efficiency and resource use.
+
+  
+- **Application to Crop Diversity**
+
+Irregularly shaped fields may be better suited to growing certain types of crops, while regular fields may support monocropping more effectively.
+
+Concave polygons can support more diverse cropping systems by incorporating natural features such as rivers or hills to create environments suitable for different crops.
+
+
+
+
+
+
+
+
+
+

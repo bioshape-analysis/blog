@@ -1,17 +1,40 @@
 ---
-title: "Title of your blog post"
-date: "Date" # Format example: August 9 2024
+title: "Embryonic cell size asymmetry analysis"
+date: "October 28 2024" # Format example: August 9 2024
 author:
-  - name: "Your Name" 
-categories: [] # [biology, bioinformatics, theory, etc.]
+  - name: "Viktorija Juciute" 
+categories: [biology] # [biology, bioinformatics, theory, etc.]
+bibliography: bibliography.bib
 ---
 
-#
-```{r}
-variable <- 2
-print(variable)
-```
+# Introduction and motivation
 
-##
+Cells propagate via cell division. In multicellular organisms, certain cells divide asymmetrically, which results in generating cell diversity [@jan_asymmetric_1998]. There are several cues for asymmetric cell division, including cell polarity establishment, spindle positioning, division site specification [@li_art_2013], and signals from neighboring cells [@horvitz_mechanisms_1992]. These cues allow multicellular organisms develop correctly, and their misregulation can lead to disorders from developmental defects to cancer. 
 
-###
+In *Caenorhabditis elegans* four cell stage embryos, the endomesodermal precursor (EMS) cell gives rise to mesoderm and endoderm cells. For this asymmetric division, the EMS cell receives signals from a neighboring P2 cell [@rocheleau_wnt_1997]. In response to them, the daughter cell closest to the P2 cell develops into endoderm, and its sister develops into mesoderm [@goldstein_induction_1992] (Figure 1). In situations where the signal is absent, both EMS daughters develop into mesoderm, and the embryo is non-viable. 
+
+![Figure 1: EMS cell division. EMS cell division in a four-cell C. elegans embryo. The EMS cell receives signals from P2 cell to develop into endoderm (gut) and mesoderm (muscle) precursors. Adapted from [@goldstein_induction_1992]](Figure1.png)
+
+In the EMS division, daughter cells appear to adopt different shapes [@caroti_wnt_2021]. Additionally, the shape of daughter cells changes if Wnt signaling is absent. It is possible that these differences are correlated to the fate of the daughter cells. If gradual, these differences could also be used to identify the strength of cell response to external cues, such as Wnt signaling. It is also possible that before the birth of the E and MS cells, the shape of the EMS cell changes in response to external cues. Analysis of the EMS cell shape in different contexts could therefore prove to be a useful tool to understanding differentiation and development. Finally, developing quantitative size and shape analysis tools can reduce human bias and help speed up the experimental procedures in both understanding EMS and its daughters’ fates. 
+
+![Figure 2, E and MS cells adopt different shapes. Top row, EMS (parent) cell in three embryos. Bottom row, purple: MS cell, blue: E cell. Taken from [@caroti_wnt_2021] - Figure 2 E.](Figure2.png) 
+
+There are several different methods to analyze shapes and sizes. Given that different analysis tools yield different results [@dryden_statistical_2016, p.37], it is helpful to consider a few before finding the best tool for subsequent use. 
+
+# Centroid size analysis
+
+Centroid analysis is a tool to measure the size of a shape on Cartesian coordinates and is defined by [@dryden_statistical_2016, p.34]as: 
+
+$$
+S(X) = \sqrt{\sum_{i=1}^{k} \sum_{j=1}^{m}\left( X_{ij} - \bar{X}_j \right)^2}, \quad X \in \mathbb{R}^{k \times m}
+$$
+
+Where $X_{ij}$ is a matrix entry, and $\bar{X}_j$ is a mean of the j’th dimension of the matrix. 
+
+Centroid is a simple tool to estimate size of a shape and could help to easily quantify differences between different cell groups in a sample, for example, EMS or E cell with and without a signal from the P2 cell. 
+
+# Euclidean distance matrix analysis (EDMA)
+
+EDMA is a version of multidimensional scale analysis that accounts for a bias in landmark distribution [@dryden_statistical_2016, p.357-360]. This analysis focuses on distances between landmarks and can handle missed landmarks [@lele_euclidean_1993]. This method corrects for landmark distribution biases and can be used to test for shape differences (EDMA-I and EDMA-II). 
+
+While centroids are useful in estimating size of a shape, EDMA can be helpful in finding differences in shape itself. There are a number of other tools to estimate shape differences, including square root velocity (SRV) function - a landmark-independent tool for analysing differences in shape and curvature [@srivastava_shape_2011]. Independence from landmarks might result in more precise shape comparisons, however, it renders analysis computationally intensive. Analysis of the dividing EMS and E/MS cells can be performed using any of these methods, the easiest being centroid size estimation, which does not account for shape differences. Incorporating more complex analysis tools would allow for more understanding in how the cell shape changes. Additionally, it could be extrapolated to more complex analyses, such as time series or 3D images. These tools could help further understand what affects EMS daughter cells and whether their shape is linked to their fate. 

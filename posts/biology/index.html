@@ -6,9 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Viktorija Juciute">
 <meta name="dcterms.date" content="2024-10-28">
 
-<title>Welcome to MATH 612 – bioshape-analysis</title>
+<title>Embryonic cell size asymmetry analysis – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,41 +22,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
 }
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
 }
-</style>
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -102,6 +89,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -148,10 +164,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Welcome to MATH 612</h1>
-            <p class="subtitle lead">Instructions and tips for MATH 612 students</p>
+      <h1 class="title">Embryonic cell size asymmetry analysis</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">MATH 612</div>
+                <div class="quarto-category">biology</div>
               </div>
                   </div>
   </div>
@@ -159,6 +174,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
   <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Viktorija Juciute </p>
+            </div>
+    </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
@@ -179,13 +200,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preliminaries" id="toc-preliminaries" class="nav-link active" data-scroll-target="#preliminaries">Preliminaries</a></li>
-  <li><a href="#using-github" id="toc-using-github" class="nav-link" data-scroll-target="#using-github">Using GitHub</a></li>
-  <li><a href="#using-quarto-to-create-blog-posts" id="toc-using-quarto-to-create-blog-posts" class="nav-link" data-scroll-target="#using-quarto-to-create-blog-posts">Using Quarto to create blog posts</a>
-  <ul class="collapse">
-  <li><a href="#additional-information-for-quarto" id="toc-additional-information-for-quarto" class="nav-link" data-scroll-target="#additional-information-for-quarto">Additional Information for Quarto:</a></li>
-  </ul></li>
-  <li><a href="#multiple-environments-in-the-same-quarto-project" id="toc-multiple-environments-in-the-same-quarto-project" class="nav-link" data-scroll-target="#multiple-environments-in-the-same-quarto-project">Multiple environments in the same Quarto project</a></li>
+  <li><a href="#introduction-and-motivation" id="toc-introduction-and-motivation" class="nav-link active" data-scroll-target="#introduction-and-motivation">Introduction and motivation</a></li>
+  <li><a href="#centroid-size-analysis" id="toc-centroid-size-analysis" class="nav-link" data-scroll-target="#centroid-size-analysis">Centroid size analysis</a></li>
+  <li><a href="#euclidean-distance-matrix-analysis-edma" id="toc-euclidean-distance-matrix-analysis-edma" class="nav-link" data-scroll-target="#euclidean-distance-matrix-analysis-edma">Euclidean distance matrix analysis (EDMA)</a></li>
   </ul>
 </nav>
     </div>
@@ -196,95 +213,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p><img src="img/math612.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:65.0%"></p>
-<section id="preliminaries" class="level2">
-<h2 class="anchored" data-anchor-id="preliminaries">Preliminaries</h2>
-<ul>
-<li><strong>Jupyter:</strong> Use <a href="https://jupyter.org/">Jupyter Notebooks</a> for interactive coding and documentation. Great for running small code snippets and visualizing data. Learn more in the <a href="https://jupyter-notebook.readthedocs.io/en/stable/">Jupyter Notebook Documentation</a>.</li>
-<li><strong>VS Code:</strong> A powerful IDE for writing and debugging code. Download it <a href="https://code.visualstudio.com/">here</a>, and install relevant extensions for <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a> and <a href="https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop">LaTeX</a>.</li>
-<li><strong>Environments:</strong> Use virtual environments like <a href="https://docs.python.org/3/library/venv.html">venv</a> or <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</a> to manage dependencies and ensure consistent results across different setups.</li>
-<li><strong>Quarto:</strong> Use <a href="https://quarto.org/">Quarto</a> for creating high-quality documents, reports, and presentations from your code. It supports markdown and integrates seamlessly with Jupyter and VS Code for reproducible analysis and publication. Check out the <a href="https://quarto.org/docs/guide/">Quarto Guide</a> for more information. To get started quickly, you can refer to this <a href="https://github.com/riddhibattu/introduction-to-quarto">GitHub Repository</a>.</li>
-</ul>
+<section id="introduction-and-motivation" class="level1">
+<h1>Introduction and motivation</h1>
+<p>Cells propagate via cell division. In multicellular organisms, certain cells divide asymmetrically, which results in generating cell diversity <span class="citation" data-cites="jan_asymmetric_1998">(<a href="#ref-jan_asymmetric_1998" role="doc-biblioref">Jan and Jan 1998</a>)</span>. There are several cues for asymmetric cell division, including cell polarity establishment, spindle positioning, division site specification <span class="citation" data-cites="li_art_2013">(<a href="#ref-li_art_2013" role="doc-biblioref">Li 2013</a>)</span>, and signals from neighboring cells <span class="citation" data-cites="horvitz_mechanisms_1992">(<a href="#ref-horvitz_mechanisms_1992" role="doc-biblioref">Horvitz and Herskowitz 1992</a>)</span>. These cues allow multicellular organisms develop correctly, and their misregulation can lead to disorders from developmental defects to cancer.</p>
+<p>In <em>Caenorhabditis elegans</em> four cell stage embryos, the endomesodermal precursor (EMS) cell gives rise to mesoderm and endoderm cells. For this asymmetric division, the EMS cell receives signals from a neighboring P2 cell <span class="citation" data-cites="rocheleau_wnt_1997">(<a href="#ref-rocheleau_wnt_1997" role="doc-biblioref">Rocheleau et al. 1997</a>)</span>. In response to them, the daughter cell closest to the P2 cell develops into endoderm, and its sister develops into mesoderm <span class="citation" data-cites="goldstein_induction_1992">(<a href="#ref-goldstein_induction_1992" role="doc-biblioref">Goldstein 1992</a>)</span> (Figure 1). In situations where the signal is absent, both EMS daughters develop into mesoderm, and the embryo is non-viable.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Figure1.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 1: EMS cell division. EMS cell division in a four-cell C. elegans embryo. The EMS cell receives signals from P2 cell to develop into endoderm (gut) and mesoderm (muscle) precursors. Adapted from <span class="citation" data-cites="goldstein_induction_1992">(<a href="#ref-goldstein_induction_1992" role="doc-biblioref">Goldstein 1992</a>)</span></figcaption>
+</figure>
+</div>
+<p>In the EMS division, daughter cells appear to adopt different shapes <span class="citation" data-cites="caroti_wnt_2021">(<a href="#ref-caroti_wnt_2021" role="doc-biblioref">Caroti et al. 2021</a>)</span>. Additionally, the shape of daughter cells changes if Wnt signaling is absent. It is possible that these differences are correlated to the fate of the daughter cells. If gradual, these differences could also be used to identify the strength of cell response to external cues, such as Wnt signaling. It is also possible that before the birth of the E and MS cells, the shape of the EMS cell changes in response to external cues. Analysis of the EMS cell shape in different contexts could therefore prove to be a useful tool to understanding differentiation and development. Finally, developing quantitative size and shape analysis tools can reduce human bias and help speed up the experimental procedures in both understanding EMS and its daughters’ fates.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Figure2.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 2, E and MS cells adopt different shapes. Top row, EMS (parent) cell in three embryos. Bottom row, purple: MS cell, blue: E cell. Taken from <span class="citation" data-cites="caroti_wnt_2021">(<a href="#ref-caroti_wnt_2021" role="doc-biblioref">Caroti et al. 2021</a>)</span> - Figure 2 E.</figcaption>
+</figure>
+</div>
+<p>There are several different methods to analyze shapes and sizes. Given that different analysis tools yield different results <span class="citation" data-cites="dryden_statistical_2016">(<a href="#ref-dryden_statistical_2016" role="doc-biblioref">Dryden and Mardia 2016, 37</a>)</span>, it is helpful to consider a few before finding the best tool for subsequent use.</p>
 </section>
-<section id="using-github" class="level2">
-<h2 class="anchored" data-anchor-id="using-github">Using GitHub</h2>
-<ul>
-<li><strong>Create a GitHub Account:</strong> Sign up at <a href="https://github.com">GitHub.com</a>.</li>
-<li><strong>Repositories:</strong> Start by creating a repository to host your project files. Learn how in <a href="https://docs.github.com/en/get-started/quickstart/create-a-repo">GitHub’s guide to repositories</a>. Use a <a href="https://git-scm.com/docs/gitignore"><code>.gitignore</code></a> file to exclude unnecessary files.</li>
-<li><strong>Branches:</strong> Work on separate branches (<code>main</code>, <code>dev</code>, feature branches) to manage different versions of your project. More details in <a href="https://guides.github.com/introduction/flow/">GitHub’s guide on branching</a>.</li>
-<li><strong>Merges:</strong> Merge changes into the <code>main</code> branch only after thorough review and testing. Learn about <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">merging branches</a>.</li>
-<li><strong>Commit Messages:</strong> Write clear, descriptive commit messages to document changes effectively. Follow the <a href="https://cbea.ms/git-commit/">best practices for commit messages</a>.</li>
-</ul>
+<section id="centroid-size-analysis" class="level1">
+<h1>Centroid size analysis</h1>
+<p>Centroid analysis is a tool to measure the size of a shape on Cartesian coordinates and is defined by <span class="citation" data-cites="dryden_statistical_2016">(<a href="#ref-dryden_statistical_2016" role="doc-biblioref">Dryden and Mardia 2016, 34</a>)</span>as:</p>
+<p><span class="math display">\[
+S(X) = \sqrt{\sum_{i=1}^{k} \sum_{j=1}^{m}\left( X_{ij} - \bar{X}_j \right)^2}, \quad X \in \mathbb{R}^{k \times m}
+\]</span></p>
+<p>Where <span class="math inline">\(X_{ij}\)</span> is a matrix entry, and <span class="math inline">\(\bar{X}_j\)</span> is a mean of the j’th dimension of the matrix.</p>
+<p>Centroid is a simple tool to estimate size of a shape and could help to easily quantify differences between different cell groups in a sample, for example, EMS or E cell with and without a signal from the P2 cell.</p>
 </section>
-<section id="using-quarto-to-create-blog-posts" class="level2">
-<h2 class="anchored" data-anchor-id="using-quarto-to-create-blog-posts">Using Quarto to create blog posts</h2>
-<ol type="1">
-<li><p><strong>Log into GitHub:</strong> Make sure you have an account and are logged in.</p></li>
-<li><p><strong>Send your account username/email to <a href="mailto:kdd@math.ubc.ca">kdd@math.ubc.ca</a>:</strong> This is needed to be added to the organization.</p></li>
-<li><p><strong>Clone the repository:</strong> After being added to the organization, clone the repository: <code>https://github.com/bioshape-analysis/blog</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/bioshape-analysis/blog</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Create a new branch:</strong> To contribute to the blog, create a new branch using:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> <span class="op">&lt;</span>branch_name<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li><p>Verify your branch and repository location: Use the following command to check if you are in the correct branch and repository:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This command will show you the current branch you are on and the status of your working directory, ensuring you are working in the right place</p></li>
-</ul></li>
-<li><p><strong>Navigate to <code>posts</code>:</strong> Go into the <code>posts</code> directory (<a href="https://github.com/bioshape-analysis/blog/tree/main/posts">found here</a>). Create a new folder with a name that represents the content of your blog post.</p></li>
-<li><p><strong>Create or upload your content:</strong></p>
-<ul>
-<li><p>If using Jupyter Notebooks, upload your <code>.ipynb</code> file.</p></li>
-<li><p>If preferred, create a new notebook for your post. Once done, convert it into Quarto using the command:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> convert your_jupyter_notebook.ipynb <span class="at">-o</span> output_file.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-</ul></li>
-<li><p><strong>Edit the YAML in your <code>.qmd</code> file:</strong> Ensure your YAML is consistent with the main template. For example:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Title of your blog post"</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"Date"</span><span class="co"> # Format example: August 9 2024</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Your Name"</span><span class="at"> </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span><span class="co"> # [biology, bioinformatics, theory, etc.]</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> references.bib</span><span class="co"> # If referencing anything</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Feel free to add further formatting, but ensure it remains consistent with the main template.</p></li>
-<li><p><strong>Delete your Jupyter notebook:</strong> After converting it to a <code>.qmd</code> file, delete the original <code>.ipynb</code> file to prevent duplication in the blog post.</p></li>
-<li><p><strong>Commit and push your changes:</strong> After completing your <code>.qmd</code> file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.</p></li>
-</ol>
-<p>Anatomy of a Quarto Document: <img src="img/quarto_doc_format.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:65.0%"></p>
-<section id="additional-information-for-quarto" class="level3">
-<h3 class="anchored" data-anchor-id="additional-information-for-quarto">Additional Information for Quarto:</h3>
-<ul>
-<li><p><strong>Add Images:</strong> You can add images to your Quarto document using markdown syntax:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="al">![Image Description](path/to/image.png)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To add images from a URL:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="al">![Image Description](https://example.com/image.png)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Add References:</strong> Manage references by creating a <code>bibliography.bib</code> file with your references in BibTeX format. Link the bibliography file in your Quarto document header (YAML). Cite references in your text using the following syntax:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>This is a citation <span class="co">[</span><span class="ot">@citation_key</span><span class="co">]</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Other Edits:</strong> Add headers, footnotes, and other markdown features as needed. Customize the layout by editing the YAML header.</p></li>
-</ul>
-</section>
-</section>
-<section id="multiple-environments-in-the-same-quarto-project" class="level2">
-<h2 class="anchored" data-anchor-id="multiple-environments-in-the-same-quarto-project">Multiple environments in the same Quarto project</h2>
-<p>In your blog post, you may want to use specific python packages, which may conflict with packages used in other post. To avoid this problem, you need to use a virtual environment. For simplicity please name your environment <code>.venv</code>.</p>
-<ol type="1">
-<li><p><strong>Creating the virtual environment:</strong> Go to your post folder (e.g <code>blog/posts/my_post</code>) and run :</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The folder <code>.venv</code> was created and contains the environment.</p></li>
-<li><p><strong>Installing packages:</strong> First activate the environment,</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>and then install the packages you need:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install package1_name package2_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To run code in Quarto, you need at least the package <code>jupyter</code>. Deactivate the environment with <code>deactivate</code>.</p></li>
-<li><p><strong>Using environment in VS Code:</strong> Link the virtual environment to VS Code using the command palette, with the command <code>Python : Select Interpreter</code> and entering the path to your interpreter ending with <code>.venv/bin/python</code>.</p></li>
-<li><p><strong>Export your package requirements</strong> If you are installed non standard package, other that <code>jupyter</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pandas</code>, <code>plotly</code> for example, you can export your package requirements, so that other can reproduce your environment. First go to your post directory and activate your environment. Then run:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> freeze <span class="op">&gt;</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-</ol>
+<section id="euclidean-distance-matrix-analysis-edma" class="level1">
+<h1>Euclidean distance matrix analysis (EDMA)</h1>
+<p>EDMA is a version of multidimensional scale analysis that accounts for a bias in landmark distribution <span class="citation" data-cites="dryden_statistical_2016">(<a href="#ref-dryden_statistical_2016" role="doc-biblioref">Dryden and Mardia 2016, 357–60</a>)</span>. This analysis focuses on distances between landmarks and can handle missed landmarks <span class="citation" data-cites="lele_euclidean_1993">(<a href="#ref-lele_euclidean_1993" role="doc-biblioref">Lele 1993</a>)</span>. This method corrects for landmark distribution biases and can be used to test for shape differences (EDMA-I and EDMA-II).</p>
+<p>While centroids are useful in estimating size of a shape, EDMA can be helpful in finding differences in shape itself. There are a number of other tools to estimate shape differences, including square root velocity (SRV) function - a landmark-independent tool for analysing differences in shape and curvature <span class="citation" data-cites="srivastava_shape_2011">(<a href="#ref-srivastava_shape_2011" role="doc-biblioref">Srivastava et al. 2011</a>)</span>. Independence from landmarks might result in more precise shape comparisons, however, it renders analysis computationally intensive. Analysis of the dividing EMS and E/MS cells can be performed using any of these methods, the easiest being centroid size estimation, which does not account for shape differences. Incorporating more complex analysis tools would allow for more understanding in how the cell shape changes. Additionally, it could be extrapolated to more complex analyses, such as time series or 3D images. These tools could help further understand what affects EMS daughter cells and whether their shape is linked to their fate.</p>
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-caroti_wnt_2021" class="csl-entry" role="listitem">
+Caroti, Francesca, Wim Thiels, Michiel Vanslambrouck, and Rob Jelier. 2021. <span>“Wnt <span>Signaling</span> <span>Induces</span> <span>Asymmetric</span> <span>Dynamics</span> in the <span>Actomyosin</span> <span>Cortex</span> of the <span>C</span>. Elegans <span>Endomesodermal</span> <span>Precursor</span> <span>Cell</span>.”</span> <em>Front Cell Dev Biol</em> 9 (September): 702741. <a href="https://doi.org/10.3389/fcell.2021.702741">https://doi.org/10.3389/fcell.2021.702741</a>.
+</div>
+<div id="ref-dryden_statistical_2016" class="csl-entry" role="listitem">
+Dryden, Ian L., and Kanti V. Mardia. 2016. <em>Statistical <span>Shape</span> <span>Analysis</span>, with <span>Applications</span> in <span>R</span></em>. 1st ed. Wiley <span>Series</span> in <span>Probability</span> and <span>Statistics</span>. Wiley. <a href="https://doi.org/10.1002/9781119072492">https://doi.org/10.1002/9781119072492</a>.
+</div>
+<div id="ref-goldstein_induction_1992" class="csl-entry" role="listitem">
+Goldstein, Bob. 1992. <span>“Induction of Gut in <span>Caenorhabditis</span> Elegans Embryos.”</span> <em>Nature</em> 357 (6375): 255–57. <a href="https://doi.org/10.1038/357255a0">https://doi.org/10.1038/357255a0</a>.
+</div>
+<div id="ref-horvitz_mechanisms_1992" class="csl-entry" role="listitem">
+Horvitz, H.Robert, and Ira Herskowitz. 1992. <span>“Mechanisms of Asymmetric Cell Division: <span>Two</span> <span>Bs</span> or Not Two <span>Bs</span>, That Is the Question.”</span> <em>Cell</em> 68 (2): 237–55. <a href="https://doi.org/10.1016/0092-8674(92)90468-R">https://doi.org/10.1016/0092-8674(92)90468-R</a>.
+</div>
+<div id="ref-jan_asymmetric_1998" class="csl-entry" role="listitem">
+Jan, Yuh Nung, and Lily Yeh Jan. 1998. <span>“Asymmetric Cell Division.”</span> <em>Nature</em> 392 (6678): 775–78. <a href="https://doi.org/10.1038/33854">https://doi.org/10.1038/33854</a>.
+</div>
+<div id="ref-lele_euclidean_1993" class="csl-entry" role="listitem">
+Lele, Subhash. 1993. <span>“Euclidean <span>Distance</span> <span>Matrix</span> <span>Analysis</span> (<span>EDMA</span>): <span>Estimation</span> of Mean Form and Mean Form Difference.”</span> <em>Math Geol</em> 25 (5): 573–602. <a href="https://doi.org/10.1007/BF00890247">https://doi.org/10.1007/BF00890247</a>.
+</div>
+<div id="ref-li_art_2013" class="csl-entry" role="listitem">
+Li, Rong. 2013. <span>“The <span>Art</span> of <span>Choreographing</span> <span>Asymmetric</span> <span>Cell</span> <span>Division</span>.”</span> <em>Developmental Cell</em> 25 (5): 439–50. <a href="https://doi.org/10.1016/j.devcel.2013.05.003">https://doi.org/10.1016/j.devcel.2013.05.003</a>.
+</div>
+<div id="ref-rocheleau_wnt_1997" class="csl-entry" role="listitem">
+Rocheleau, Christian E, William D Downs, Rueyling Lin, Claudia Wittmann, Yanxia Bei, Yoon-Hee Cha, Mussa Ali, James R Priess, and Craig C Mello. 1997. <span>“Wnt <span>Signaling</span> and an <span>APC</span>-<span>Related</span> <span>Gene</span> <span>Specify</span> <span>Endoderm</span> in <span>Early</span> <span>C</span>. Elegans <span>Embryos</span>.”</span> <em>Cell</em> 90 (4): 707–16. <a href="https://doi.org/10.1016/S0092-8674(00)80531-0">https://doi.org/10.1016/S0092-8674(00)80531-0</a>.
+</div>
+<div id="ref-srivastava_shape_2011" class="csl-entry" role="listitem">
+Srivastava, A, E Klassen, S H Joshi, and I H Jermyn. 2011. <span>“Shape <span>Analysis</span> of <span>Elastic</span> <span>Curves</span> in <span>Euclidean</span> <span>Spaces</span>.”</span> <em>IEEE Trans. Pattern Anal. Mach. Intell.</em> 33 (7): 1415–28. <a href="https://doi.org/10.1109/TPAMI.2010.184">https://doi.org/10.1109/TPAMI.2010.184</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

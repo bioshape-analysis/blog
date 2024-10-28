@@ -217,9 +217,7 @@ window.Quarto = {
     </div>
     <div class="quarto-title-meta-contents">
           <p class="affiliation">
-              <a href="https://rtviii.xyz/">
               KDD Group
-              </a>
             </p>
         </div>
       <div class="quarto-title-meta-contents">
@@ -323,7 +321,7 @@ window.Quarto = {
 </figure>
 </div>
 <p>Here is an example on how to use cellpose on an image. Different models are available (with the <code>seg_mod</code> variable), depending on the training datasets. With cellpose 3, different denoising models are also available (with the <code>denoise_mod</code> variable).</p>
-<div id="2ca55a5e" class="cell" data-execution_count="1">
+<div id="3ab54498" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -370,7 +368,7 @@ window.Quarto = {
 </details>
 </div>
 <p>We plot the final results :</p>
-<div id="23f7d201" class="cell" data-execution_count="2">
+<div id="74cda568" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>plt.imshow(img,cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
@@ -385,7 +383,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="b441ded7" class="cell" data-execution_count="3">
+<div id="179ae32b" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mask_RGB <span class="op">=</span> plot.mask_overlay(img,masks)</span>
@@ -405,7 +403,7 @@ window.Quarto = {
 <section id="centerline" class="level2">
 <h2 class="anchored" data-anchor-id="centerline">Centerline</h2>
 <p>Since we are interested in studying the variations of the cell diameter, we define height profile as the value of the cell height along the cell centerline. The cell centerline are computed using a skeletonization algorithm <span class="citation" data-cites="zhang1984fast">Lee, Kashyap, and Chu (<a href="#ref-lee1994building" role="doc-biblioref">1994</a>)</span>. Here is an example of skeletonization</p>
-<div id="fcc052f8" class="cell" data-execution_count="4">
+<div id="a5fab9ab" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.morphology <span class="im">import</span> skeletonize</span>
@@ -429,7 +427,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Depending on the masks shapes, centerlines may have branches :</p>
-<div id="1eb253d9" class="cell" data-execution_count="5">
+<div id="a3da0255" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.morphology <span class="im">import</span> skeletonize</span>

@@ -9,7 +9,6 @@ categories:
   - biology
   - cell morphology
 bibliography: references.bib
-jupyter: .venv
 ---
 
 # Introduction

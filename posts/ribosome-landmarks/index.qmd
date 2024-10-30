@@ -6,6 +6,8 @@ author:
 date: "October 25, 2024"
 categories: [ribosome, cryo-em, bioinformatics]
 jupyter: env1
+execute:
+    freeze: auto
 bibliography: references.bib
 csl: nature.csl
 ---

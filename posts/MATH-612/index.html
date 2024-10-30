@@ -237,20 +237,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>If preferred, create a new notebook for your post. Once done, convert it into Quarto using the command:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> convert your_jupyter_notebook.ipynb <span class="at">-o</span> output_file.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul></li>
-<li><p><strong>Edit the YAML in your <code>.qmd</code> file:</strong> Ensure your YAML is consistent with the main template. For example:</p>
+<li><p><strong>Edit the YAML in your <code>.qmd</code> file:</strong> Ensure your YAML is consistent with the main template. For example:</p></li>
+</ol>
 <div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Title of your blog post"</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"Date"</span><span class="co"> # Format example: August 9 2024</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Your Name"</span><span class="at"> </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span><span class="co"> # [biology, bioinformatics, theory, etc.]</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> references.bib</span><span class="co"> # If referencing anything</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Feel free to add further formatting, but ensure it remains consistent with the main template.</p></li>
-<li><p><strong>Delete your Jupyter notebook:</strong> After converting it to a <code>.qmd</code> file, delete the original <code>.ipynb</code> file to prevent duplication in the blog post.</p></li>
-<li><p><strong>Commit and push your changes:</strong> After completing your <code>.qmd</code> file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.</p></li>
-</ol>
-<p>Anatomy of a Quarto Document: <img src="img/quarto_doc_format.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:65.0%"></p>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">jupyter</span><span class="kw">:</span><span class="at"> python3</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">categories</span><span class="kw">:</span><span class="at"> </span><span class="kw">[]</span><span class="co"> # [biology, bioinformatics, theory, etc.]</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> references.bib</span><span class="co"> # If referencing anything</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">execute</span><span class="kw">:</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">freeze</span><span class="kw">:</span><span class="at"> auto</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Feel free to add further formatting, but ensure it remains consistent with the main template. 8. <strong>Delete your Jupyter notebook:</strong> After converting it to a <code>.qmd</code> file, delete the original <code>.ipynb</code> file to prevent duplication in the blog post. 9. <strong>Commit and push your changes:</strong> After completing your <code>.qmd</code> file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.</p>
+<p>Anatomy of a Quarto Document: <img src="img/quarto_doc_format.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:65.0%"> If you are running code, please do not forget the <code>execute: freeze: auto</code>, so that the website can be built without re-running your code each time.</p>
 <section id="additional-information-for-quarto" class="level3">
 <h3 class="anchored" data-anchor-id="additional-information-for-quarto">Additional Information for Quarto:</h3>
 <ul>

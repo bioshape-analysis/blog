@@ -21,16 +21,32 @@ execute:
   freeze: auto
   warning: false
 ---
+
 ## Introduction
 
-In farm management, the geometric characteristics of a field can influence both productivity and biodiversity. This blog will explore the relationship between field polygons and crop yield and crop diversity through three key shape analysis concepts: Shape Index, Convexity/Concavity, and Aspect Ratio. We will also demonstrate the practical application of these metrics using data from Litefarm.
+In modern agriculture, geometric features of farmland may affect crop yields and biodiversity. Understanding these characteristics has the potential to help farmers make better decisions, manage resources more efficiently, and promote sustainable agricultural practices. In this blog, we will explore whether field shape metrics (such as shape index, convexity/concavity, and aspect ratio) have an impact on crop yield and biodiversity.
 
-![farm polygon](polygon.png)
+To conduct this research, we used data from [Litefarm](https://www.litefarm.org/), an open-source agri-tech application designed to support sustainable agriculture decision-making. Litefarm provides a wealth of data about farmland, including field shape, crop type and environmental conditions. The aim of this project is to investigate potential links between farmland shape characteristics and agricultural outcomes to understand whether geometric factors can play a role in improving productivity or promoting biodiversity.
 
-## Preliminaries
+![Litefarm Interface](img/Litefarm.png)
+Our research focuses on three main geometric characteristics:
+
+## Motivation
+
+This study aims to achieve two main goals:
+
+1. **Identify Fake Farms**: Using geometric metrics—**Shape Index**, **Convexity**, and **Aspect Ratio**—to filter out unrealistic fields that may indicate data errors.
+
+2. **Analyze Relationships Between Field Geometry and Crop Outcomes**: Investigate how the geometric characteristics of fields relate to **crop yield** and **crop diversity**, aiming to determine whether certain field shapes contribute to better farming efficiency or support greater biodiversity.
+
+By understanding these aspects, we hope to provide insights that can improve farming practices, promote ecological health, and contribute to more sustainable agriculture.
+
+## Geometric Characteristics of Fields
+
+Three main geometric characteristics:
 
 ### 1. **Shape Index**
-The **Shape Index** measures the complexity or irregularity of a polygon compared to a regular shape, like a circle. A Shape Index close to 1 indicates a regular, compact shape, while higher values suggest more irregular shapes.
+The **Shape Index** measures the complexity or irregularity of a polygon. A Shape Index close to 1 indicates a regular, compact shape, while higher values suggest more irregular shapes.
 
 - **Formula**: 
 $$
@@ -39,59 +55,93 @@ $$
   Where $P$ is the perimeter and $A$ is the area.
 
 ### 2. **Convexity/Concavity**
-**Convexity** measures how "convex" or "concave" a polygon is. A polygon is convex if all interior angles are less than 180 degrees, meaning no part of the shape curves inward. Concave shapes, on the other hand, have inward curves and may represent natural formations or inefficient land use.
+
+Assesses whether a field has inward curves or if it is fully convex. Convex fields might support more efficient use of resources.
 
 ### 3. **Aspect Ratio**
-The **Aspect Ratio** assesses the proportion between the width and height of a polygon. It offers a perspective on whether the field is more elongated or more compact.
+
+Measures the proportion between the width and height of a field, offering insights into whether the field is elongated or compact, which could affect farming operations.
+
+By examining these metrics, we hope to uncover any relationship between field geometry and crop outcomes, which will ultimately promote more productive and sustainable farming practices.
 
 
 
-## **Application of Shape Analysis Using Litefarm Data**
+## Dataset Overview
 
-In this section, we will apply the above shape complexity metrics—**Shape Index**, **Convexity/Concavity**, and **Aspect Ratio**—to real-world farm data from **Litefarm**. By doing so, we can analyze how field shapes correlate with crop yield and diversity, and identify potential inefficiencies in farm layout.
+In this section, we describe the dataset from Litefarm and how we represent each farm field as a polygon for analysis.
 
-### **Calculating Perimeter and Area of a Farm Polygon**
+The dataset from Litefarm provides geographic data for each farm field, which Litefarm can automatically use to calculate the perimeter and area of each field. However, these values can be overwritten by the user. To maintain consistency and accuracy in our analysis, we chose to calculate the perimeter and area ourselves.
 
-When analyzing the shape of a farm, calculating the **perimeter** and **area** of each field is essential for understanding the geometry of the land. Depending on the longitude and latitude of the farm, these calculations can be done using **geodesic distance** to account for the Earth's curvature.
-```{python}
-import pandas as pd
+The dataset includes the following fields:
 
+- **FarmID**: Unique identifier for each farm.
+- **Longitude**: Longitude value of the geographic coordinate.
+- **Latitude**: Latitude value of the geographic coordinate.
+- **Field Coordinates**: A list of coordinates representing the boundary of the field.
+- **Calculated Perimeter**: The perimeter of the field, calculated by iterating through each coordinate, pairing each point with the next to form a side, and accumulating the distance for each side.
+- **Calculated Area**: The area of the field, calculated by converting geographic coordinates into UTM coordinates to create a projection suitable for precise measurements.
 
-data = pd.read_csv('/Users/app/Desktop/UBC/MAT612/blog/posts/AnnyMAT612/A_and_P.csv')
+![farm polygon](img/polygon.png)
 
-print(data.head())
+## Filtering and Identifying Fake Fields
 
-```
+To ensure the quality and reliability of the dataset, it is important to filter out fields that are not suitable for our analysis. In this study, we used **shape index**, **convexity**, and **aspect ratio** as the main tools to identify and filter potential false fields, because extreme values ​​in these indices may indicate overly complex or irregular boundaries, which are unlikely to occur in real-world agricultural scenarios.
 
-### **Shape Index Calculation**
-Using the Litefarm data, we calculate the **Shape Index** for each polygon. This will allow us to identify which fields are more regular and which are highly irregular, helping us understand the impact of field shape on crop yield.
-```{python}
-import pandas as pd
+### Filtering Criteria
 
+**Shape Index**: 
 
-data = pd.read_csv('/Users/app/Desktop/UBC/landscape-analysis/data/processed/landscape_analysis_shape-index.csv')
+Fields with a shape Index greater than 1 is inefficient in terms of perimeter relative to area, while values significantly greater than 1 or less than 1 may indicate that the polygon is unrealistic.
 
-print(data.head())
+Shape index is calculated based on the perimeter and area ($\text{Shape Index} = \frac{P}{2\sqrt{\pi A}}$).
 
-```
+   - If a shape index of polygon is significantly greater than 1 may indicate that the polygon is unrealistic or a data entry error.
+   - If a shape Index less than 1 is unusual and often indicates a data error, 
 
-- A **low perimeter-area ratio** suggests that the field is compact and well-utilized.
+**Low Convexity**
 
-- A **high perimeter-area ratio** might indicate an irregular or elongated shape, potentially affecting farming efficiency and resource use.
+Fields with low convexity, characterized by significant inward curves or irregular boundaries, are flagged as potentially unrealistic. These shapes are not typical for well-managed agricultural fields and may indicate data entry errors or geographic anomalies that make the field impractical for farming.
 
-  
-- **Application to Crop Diversity**
+- **Create Polygon Object**: We create a `Polygon` object using `shapely` package and a list of geographic coordinates that represent the boundary of the field.
 
-Irregularly shaped fields may be better suited to growing certain types of crops, while regular fields may support monocropping more effectively.
+- **Calculate Convex Hull**: We calculate the convex hull of the polygon using the `polygon.convex_hull`  attribute of the Polygon object. The convex hull represents the smallest convex shape that contains all the points of the original polygon.
 
-Concave polygons can support more diverse cropping systems by incorporating natural features such as rivers or hills to create environments suitable for different crops.
-
-
-
-
-
-
+- **Calculate Convexity**: Convexity is calculated as the ratio of the area of the original polygon to the area of its convex hull (`convexity = calculated area / convex_hull.area`).
+    - If the value is close to 1, it means the polygon is mostly convex.
+    - If the value is significantly less than 1, it means there are significant inward curves or concavities.
 
 
+**Unusual Low Aspect Ratio**
 
+Fields with extremely high or low aspect ratios, indicating that the field is very elongated or unusually compact, are also flagged for further review. These fields may be difficult to manage effectively due to their shape, making them less likely to be realistic farm plots.
+
+- **Create Polygon Object**: We create a `Polygon` object using `shapely` package and a list of geographic coordinates that represent the boundary of the field.
+
+- **Get Bounding Box**: The bounding box of the polygon is calculated using `polygon.bounds`, which returns four values:
+    - `minx`, `miny`: These are the minimum x and y values, representing the bottom-left corner of the bounding box.
+    - `maxx`, `maxy`: These are the maximum x and y values, representing the top-right corner of the bounding box.
+
+- **Calculate Width and Height**: The width is calculated as the difference between `maxx` and `minx`, while the height is the difference between `maxy` and `miny`.
+
+- **Calculate Aspect Ratio**: The aspect ratio is determined by dividing the width by the height (`width / height`). This measure provides an indication of how elongated the field is:
+    - An aspect ratio close to **1** suggests a more square or compact field.
+    - A very high or low aspect ratio indicates an elongated shape, which could be more challenging for farming operations.
+
+
+Filter out fields with high Shape Index value, Shape Index less than one, low Convexity, or unusual Aspect Ratios, as these fields may indicate unrealistic shapes or data errors. For example, fields with high complexity, highly irregular inward curves, or extremely elongated forms may be impractical for farming, suggesting potential data errors or unrealistic scenarios.
+
+
+## Evaluating Relationships Between Field Geometry and Crop Characteristics
+
+Once the polygons are validated, we aim to analyze the relationship between field geometry and crop characteristics:
+
+### **Crop Yield vs. Field Geometry**
+
+We will link the geometric features of fields, such as Shape Index, Convexity, and Aspect Ratio, with crop yield data to determine if more compact or convex fields tend to be more productive. By comparing yield data with geometric characteristics, we hope to identify patterns that suggest whether fields with certain shapes are more efficient for farming and yield better results.
+
+### **Crop Diversity vs. Field Geometry**
+
+We will also explore the relationship between field shapes and crop diversity. Specifically, we are interested in whether concave or complex field shapes might support greater biodiversity by providing natural features that can accommodate multiple types of crops or diverse ecosystems. Fields with more irregular shapes may have areas that promote diverse cropping systems, leading to improved ecological health and sustainability.
+
+By examining these metrics, we hope to uncover any relationships between field geometry and crop outcomes, which could ultimately contribute to more productive and sustainable agricultural practices. However, the goal is exploratory, as it is uncertain whether these geometric characteristics will significantly influence crop productivity or biodiversity.
 

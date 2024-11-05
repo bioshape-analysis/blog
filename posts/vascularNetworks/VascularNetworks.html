@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ali Fele Paranj">
+<meta name="dcterms.date" content="2024-11-05">
+
+<title>Vascular Networks – bioshape-analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">bioshape-analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Vascular Networks</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">MATH 612</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Ali Fele Paranj </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 5, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#anderson-chaplain-model-of-angiogenesis" id="toc-anderson-chaplain-model-of-angiogenesis" class="nav-link" data-scroll-target="#anderson-chaplain-model-of-angiogenesis">Anderson-Chaplain Model of Angiogenesis</a></li>
+  <li><a href="#branching-annihilating-random-walker" id="toc-branching-annihilating-random-walker" class="nav-link" data-scroll-target="#branching-annihilating-random-walker">Branching-Annihilating Random Walker</a></li>
+  <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing">Data Pre-Processing</a></li>
+  <li><a href="#time-evolution-of-networks" id="toc-time-evolution-of-networks" class="nav-link" data-scroll-target="#time-evolution-of-networks">Time Evolution Of Networks</a></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>I have introduced some basic concepts of micro-circulation and the vascular networks and how they get created (angiogenesis) in health and disease. Then I discuss some angiogenesis models (Anderson-Chaplain as well as BARW) and use the tools of the geomstats to analyze the loopy structure in these networks. I explained the characteristics of the loopy structures in the networks in terms of the parameters of the model. Furthermore, I consider the time evolution of the graphs created by these networks and how the characterization of the loopy structures change through time in these networks.</p>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Vascular network in animals is a complex network of vessels to carry the nutrients to and wastes out from the tissue. Main parts of the blood circulation system is determined during the embryo development (like the location and characterization of the main veins and arteries). However, the exact positioning and hierarchy of the capillary networks is not predetermined genetically, but is an adaptive process. A tissue under hypoxia (experiencing low oxygen) will initiate biochemical signals to recruit new vessels. One of the main signaling molecules is the tumor angiogenic factor (TAF) and as the name suggests it is highly expressed by tumor under oxygen stress (hypoxia). The TAF molecules will diffuse in the interstitial space. Upon interaction with pre-existing vessels, they will digest through the basal membrane of the pre-existing vessels and will activate the endothelial cells (that are lining the inner part lumen of all vessels in the body). The endothelial cells activated by TAF will turn into tip cells which will move up in the gradient of TAF, and they will make branches of vessels which will grow as the tip cells are moving. See figure below for details.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Angiogenesis.png" class="img-fluid figure-img" style="width:60.0%"></p>
+<figcaption>Steps of angiogenesis process. The endothelial cells are “activated” by the TAF molecules and turn into tip cells that move towards the source of TAF (up the gradient) and produce new blood vessel segments along their way. This is called tip-induced angiogenesis. This figure is taken from <span class="citation" data-cites="Atale2020">(<a href="#ref-Atale2020" role="doc-biblioref">Atale and Rani 2020</a>)</span></figcaption>
+</figure>
+</div>
+<p>There are also other factors important in the process of tip cell movement among which is the concentration of fibronectin in the environment. Fibronectin is a protein that acts like a glue and attaches the cells to intracellular matrix, which mediates the cell movement. In the section related to the angiogenesis models we will discuss how this protein is considered in the models.</p>
+</section>
+<section id="anderson-chaplain-model-of-angiogenesis" class="level2">
+<h2 class="anchored" data-anchor-id="anderson-chaplain-model-of-angiogenesis">Anderson-Chaplain Model of Angiogenesis</h2>
+<p>Anderson-Chaplain model of angiogenesis describes the angiogenesis process considering the factors like TAF and fibronectin. This model contains three variables <span class="math inline">\(\newcommand{\R}{\mathbb{R}}\)</span> <span class="math inline">\(\newcommand{\abs}[1]{|#1|}\)</span></p>
+<ul>
+<li><span class="math inline">\(n = n(X,t): \Omega \times \R \to \R\)</span>: the endothelial-cell density (per unit area).</li>
+<li><span class="math inline">\(c = c(X,t): \Omega \times \R \to \R\)</span>: the tumor angiogenic factor (TAF) concentration (nmol per unit area).</li>
+<li><span class="math inline">\(f = f(X,t): \Omega \times \R \to \R\)</span>: the fibronectin concentration (nmol per unit area).</li>
+</ul>
+<p>and the time evolution is governed by the following system of PDEs</p>
+<p><span class="math display">\[\begin{align*}
+        &amp;\frac{\partial n}{\partial t} =  D_n\nabla^2 n  - \nabla\cdot(\chi n\nabla c) - \nabla\cdot(\rho n \nabla f), \\
+        &amp;\frac{\partial c}{\partial t} = -\lambda n c, \\
+        &amp;\frac{\partial f}{\partial t} = \omega n - \mu n f,
+    \end{align*}\]</span></p>
+<p>where <span class="math inline">\(D_n\)</span> is a diffusion constant taking the random movement of tip cells into account, <span class="math inline">\(\chi, \rho\)</span> reflects the strength of the chemotaxis of tip cells due to the gradient of TAF, and fibronectin respectively. Furthermore, <span class="math inline">\(\lambda, \mu\)</span> is the rate at which tip cells consume the TAF and fibronectin respectively, and <span class="math inline">\(\omega\)</span> denotes the production of fibronectin by the tip cells. Note that we assume at the start of the angiogenesis process, we have a steady state distribution of fibronectin and TAF and is not diffusing. This assumption is not entirely true and can be enhanced.</p>
+<p>Here in this report, we will be using the discrete and stochastic variation of this model. For more detail see <span class="citation" data-cites="Anderson1998">(<a href="#ref-Anderson1998" role="doc-biblioref">Anderson and Chaplain 1998</a>)</span>. See figure below for some example outputs of the model.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Anderson.png" class="img-fluid figure-img"></p>
+<figcaption>Some example output of the Anderson-Chaplain model of angiogenesis using the implementation of the model shared by <span class="citation" data-cites="Nardini2021">(<a href="#ref-Nardini2021" role="doc-biblioref">Nardini et al. 2021</a>)</span>. We have assumed the source of TAF molecules is located at the right edge of the domain, while the pre-existing parent vessels is located at the left edge of the domain. The strength of the chemotaxis and haptotactic (due to fibronectin) signaling is set to be <span class="math inline">\(\chi = 0.4\)</span>, and <span class="math inline">\(\rho = 0.4\)</span>.</figcaption>
+</figure>
+</div>
+</section>
+<section id="branching-annihilating-random-walker" class="level2">
+<h2 class="anchored" data-anchor-id="branching-annihilating-random-walker">Branching-Annihilating Random Walker</h2>
+<p>The Anderson-Chaplain model of angiogenesis is not the only formulation of this phenomena. A popular alternative formulation is using the notion of branching annihilating random walkers for the to explain the branching morphogenesis of vascular networks. A very detailed discussion on this formulation can be found in <span class="citation" data-cites="Hannezo2017">Uçar et al. (<a href="#ref-Ucar2021" role="doc-biblioref">2021</a>)</span>. This formulation has been also successful to models a vast variety of tip-driven morphogenesis in mammary-glands, prostate, kidney <span class="citation" data-cites="Hannezo2017">(<a href="#ref-Hannezo2017" role="doc-biblioref">Hannezo et al. 2017</a>)</span>, lymphatic system <span class="citation" data-cites="Ucar2023">(<a href="#ref-Ucar2023" role="doc-biblioref">Uçar et al. 2023</a>)</span>, neural branching <span class="citation" data-cites="Ucar2021">(<a href="#ref-Ucar2021" role="doc-biblioref">Uçar et al. 2021</a>)</span>, and etc.</p>
+<p>The core idea behind this formulation is to assume that the tip cells undergo a branching-annihilating random walk, i.e.&nbsp;they move randomly in the space, turn into pairs randomly (branching), and as they move they produce new cells (stalk) behind their trails, and finally annihilate if they encounter any of the stalk cells. See figure below:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/BARW.png" class="img-fluid figure-img"></p>
+<figcaption>The network generated by branching-annihilating process, where the tip cells (orange circles) are doing random walk (not necessarily unbiased random walk) and each generate two random walkers at random times (branching). The tip cells make the stalk cells (the blue lines) along their way and the tip cells annihilate when encounter any of the stalk cells.</figcaption>
+</figure>
+</div>
+</section>
+<section id="data-pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="data-pre-processing">Data Pre-Processing</h2>
+<p>The data generated by the Anderson-Chaplain model or BARW model are typically matrices (i.e.&nbsp;images) (however, there are certain ways to construct a graph representing the final structure during the simulation). To be able to do any form of computation with the simulated data (like finding the loops, etc) it is convenient to turn the images into a graph.</p>
+<p>For the outputs of the Anderson-Chaplain model , since the vessels are more crowded at some regions, we first did a dilation followed by a erosion (using OpenCV) to enhance the images for further processing. We then applied a connectivity-8 kernel to the enhanced images to find the nodes, and finally used the processes information to turn the vascular network in the image into a graph in python (using NetworkX library). See figure below for more details. We also applied the same processing pipeline on the data generated by the BARW model which is shown in the following figure</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/BARWProc.png" class="img-fluid figure-img"></p>
+<figcaption>The loop detection processing pipeline performed on the data set generated by the BARW formulation of the branching morphogenesis. Right: the initial raw synthetic data, Left: detected loop through the loop detection pipeline.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/AndersonProc.png" class="img-fluid figure-img"></p>
+<figcaption>fig-cap: The pre-processing pipeline the synthetic data by Anderson-Chaplain model. Top left: The synthetic data generated by the model. Top right: A series of dilation and erosion applied on the image to enhance the images for network extraction. Bottom left: Applying a connectivity-8 kernel on the image to get the nodes of the graph and converting the processed information to NetworkX graph data structure. Then we apply the cycle finding algorithm in the NetworkX to detect the cycles. Bottom right: The overlay of the detected cycles on the original image.</figcaption>
+</figure>
+</div>
+<p>The new data structure that we store the synthetic data (i.e.&nbsp;as graphs in NetworkX) gives us a tremendous flexibility in working and analyzing the shape of each individual loops. See the following figure for further details on this. This data structure will also come in handy when we study the time evolution of the graphs.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/loops.png" class="img-fluid figure-img"></p>
+<figcaption>Converting the synthetic data from binary images to graph in NetworkX gives us a great flexibility in working and analyzing (or even evolving) individual loops. For instance, in the figures above, Left and Right sub-figures represent the individual scaled version of the loops of Anderson-Chaplain and BARW models respectively. Note that the shapes that looks more jagged correspond to the larger loops, whereas the loops with dull boundary correspond to the smaller loops.</figcaption>
+</figure>
+</div>
+<p><strong>Study Plan</strong>: In this section we will use the notions of Kendall shape space to study the structure of the loops that appear under different parameters of the model.</p>
+</section>
+<section id="time-evolution-of-networks" class="level2">
+<h2 class="anchored" data-anchor-id="time-evolution-of-networks">Time Evolution Of Networks</h2>
+<p>Vascular networks are not static structure, but rather the evolve in time in response to the changing metabolic demand of the underlying tissue, as well as the metabolic cost of the network itself, and the overall energy required to pump the fluid through the network (See <span class="citation" data-cites="Pries2010">Pries and Secomb (<a href="#ref-Pries2014" role="doc-biblioref">2014</a>)</span> for more discussion). To put this in different words, the role of vascular networks is to deliver nutrients to the tissue and remove the wastes. To do this, it needs to have a space filling configuration with lots of branches. However, due to the Poiseuille law for the flow of fluids in a tube, the power needed to pump the fluid through the tube scales with <span class="math inline">\(r^{-4}\)</span> where <span class="math inline">\(r\)</span> is the radius of the tube. I.e. smaller vessel segments needs a huge power to pump the blood through them. Thus have a massively branched structure is not an optimal solution. On the other hand, the vascular network consists of cells which requires maintenance as well. Thus the optimized vascular network should have a low volume as well. Because of these dynamics in action, in the angiogenesis process first a mesh of new blood vessels form which later evolve to a more ordered and hierarchical structure in a self-organization process.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/remodeling2.png" class="img-fluid figure-img"></p>
+<figcaption>Remodeling of vascular network of chick chorioallantoic membrane. Initially (sub-figure 1) a mesh of vascular networks form. Then (sub-figures 2,3,4), through the remodeling dynamics, a more ordered and hierarchical structure emerges. Images are taken from <span class="citation" data-cites="Richard2018">(<a href="#ref-Richard2018" role="doc-biblioref">Richard et al. 2018</a>)</span>.</figcaption>
+</figure>
+</div>
+<p>To determine the time evolution of the vascular network we first need to formulate the problem in an appropriate way. First, we represent a given vascular network with a multi-weighted graph <span class="math inline">\(G=(\mathcal{V},\mathcal{E})\)</span> where <span class="math inline">\(V\)</span> is the set of vertices and <span class="math inline">\(E\)</span> is the edge set. We define the pressure <span class="math inline">\(\mathbf{P}\)</span> on the nodes, the flow $ $ on the edges, and let <span class="math inline">\(C_{i,j}, L_{i,j}\)</span> denote the conductivity of an edge, and <span class="math inline">\(L_{i,j}\)</span> denote the length of the same edge. Given the source and sink terms on the nodes $ $, the flow in the edges can be determined by <span class="math display">\[\mathcal{L} \mathbf{P} = \mathbf{q},\]</span> where <span class="math inline">\(\mathcal{L}\)</span> is the Laplacian matrix of the graph. For more details on this see . Once we know the pressures on the nodes, we can easily calculate the flow through the edges by <span class="math display">\[\bf{Q} = \bf{C} L^{-1} \bf{\Delta} \bf{P}, \tag{2}\]</span> where <span class="math inline">\(C\)</span> is a diagonal matrix of the conductance of the edges, <span class="math inline">\(L\)</span> is the diagonal matrix of the length of each edge, $ $ is the transpose of the incidence matrix, and $ P $ is the pressure on the nodes. <span class="math inline">\(Q\)</span> is the flow of the edges. Once we know the flow in the edges, we can design evolution law to describe the time evolution of the weights of the edges (which by Poiseuille’s is a function of the radius of the vessel segment). The evolution law can be derived by defining an energy functional and moving down the gradient of the energy functional to minimize it, or we can take an ad-hoc method and write a mechanistic ODE for time evolution of the conductances. For the energy functional one can write <span class="math display">\[ E(\mathbf{C}) = \frac{1}{2} \sum_{e\in \mathcal{E}}(\frac{Q_e^2}{C_e} + \nu C_e^\gamma), \]</span> where $ $ is the edge set of the graph, $ Q_e, C_e $ is the flow and conductance of the edge $ e $, and $ ,$ are parameters. The first term in the sum is of the form ``power=current$ $potential’’ and reflects the power required to pump the flow, and the second term can be shown that reflects the volume of the total network. We can set <span class="math display">\[ \frac{d \mathbf{C}}{dt} = -\nabla E, \]</span> which determines the time evolution of the weights in a direction that reduces the total energy. The steady-state solution of this ODE system is precisely the Euler-Lagrange formulation of the least action principle. Alternatively, one can come up with carefully designed ODEs for the time evolution of the conductances that represents certain biological facts. In particular <span class="math display">\[ \frac{d C_e}{dt} = \alpha |Q_e|^{2\sigma} - b C_e + g \]</span> proposed by , and <span class="math display">\[ \frac{d}{dt} \sqrt{C_e} = F(Q_e) - c\sqrt{C_e}, \]</span> proposed by has been popular choices. See for more details. It is important to note that in the simulations shown here, the initial network is a toy network. This can be improved by using any of the vascular network generated by any of the angiogenesis models discussed before.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/evolution.png" class="img-fluid figure-img"></p>
+<figcaption>Time evolution of optimal transport network. A triangulation of a 2D domain is considered to be the graph over which we optimize the flow. The sink term is represented by green dot, while the sources are represented by yellow dots. Different sub-figures show the flow network at different time steps towards converging to the optimal configuration.</figcaption>
+</figure>
+</div>
+</section>
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">Appendix</h2>
+For a graph, the Laplacian matrix contains the information on the in/out flow of stuff into the nodes.
+<p align="center">
+<img src="images/graph1.png" alt="BARW" width="400" height="300">
+</p>
+<p>Then the Laplacian matrix is given by <span class="math display">\[ D = \begin{pmatrix}
+        2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+        0 &amp; 4 &amp; 0 &amp; 0 &amp; 0 \\
+        0 &amp; 0 &amp; 2 &amp; 0 &amp; 0 \\
+        0 &amp; 0 &amp; 0 &amp; 2 &amp; 0 \\
+        0 &amp; 0 &amp; 0 &amp; 0 &amp; 2
+    \end{pmatrix}, \]</span> and the adjacency matrix is given by <span class="math display">\[ A = \begin{pmatrix}
+        0 &amp; 1 &amp; 1 &amp; 0 &amp; 0 \\
+        1 &amp; 0 &amp; 1 &amp; 1 &amp; 1 \\
+        1 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+        0 &amp; 1 &amp; 0 &amp; 0 &amp; 1 \\
+        0 &amp; 1 &amp; 0 &amp; 1 &amp; 0
+    \end{pmatrix}, \]</span> and the Laplacian matrix is given by <span class="math display">\[ L = D -A =
+    \begin{pmatrix}
+        2 &amp; -1 &amp; -1 &amp; 0 &amp; 0 \\
+        -1 &amp; 4 &amp; -1 &amp; -1 &amp; -1 \\
+        -1 &amp; -1 &amp; 2 &amp; 0 &amp; 0 \\
+        0 &amp; -1 &amp; 0 &amp; 2 &amp; -1 \\
+        0 &amp; -1 &amp; 0 &amp; -1 &amp; 2
+    \end{pmatrix}.
+    \]</span> It is straight forward to generalize the notion of Laplacian matrix to the weighed graphs, where the degree matrix $ D $, the diagonal entries will be the sum of all weights of the edges connected to that node, and for the adjacency matrix, instead of zeros and ones, we will have the weights of the connections..</p>
+<p>There is also another way of finding the Laplacian matrix by using the notion of incidence matrix. To do so, we first need to make our graph to be directed. Any combination of the direction on the edges will do the job and will yield in a correct answer. For instance, consider the following directed graph</p>
+For a graph, the Laplacian matrix contains the information on the in/out flow of stuff into the nodes.
+<p align="center">
+<img src="images/graph2.png" alt="BARW" width="400" height="300">
+</p>
+<p>Its incidence matrix will be <span class="math display">\[
+    M = \begin{pmatrix}
+        -1 &amp; 1  &amp; 0  &amp; 0  &amp; 0  &amp; 0  \\
+        0  &amp; -1 &amp; 1  &amp; -1 &amp; 0  &amp; -1 \\
+        1  &amp; 0  &amp; -1 &amp; 0  &amp; 0  &amp; 0  \\
+        0  &amp; 0  &amp; 0  &amp; 1  &amp; 1  &amp; 0  \\
+        0  &amp; 0  &amp; 0  &amp; 0  &amp; -1 &amp; 1  \\
+    \end{pmatrix}
+    \]</span> The Laplacian matrix can be written as <span class="math display">\[ \mathcal{L} = M M^T. \]</span> Note that in the case of the weighed graphs, we will have <span class="math display">\[ \mathcal{L} = M W M^T \tag{1}\]</span> where $ W $ is a diagonal matrix containing the weights. These computations can be done easily on the NetworkX.</p>
+<p>The incidence matrix is also very useful in calculating the pressure difference between nodes of a particular edge. Let <span class="math inline">\(\Delta = M^T\)</span>. Then given the vector <span class="math inline">\(P\)</span> that contains the pressures on the vertices, then the pressure difference on the edges will be given by <span class="math inline">\(\Delta P\)</span>, where <span class="math inline">\(\Delta\)</span> is the transpose of the incidence matrix. This comes in handy when we want to calculate the flow of the edges which will be given by <span class="math display">\[ \bf{Q} = \bf{C} L^{-1} \bf{\Delta} \bf{P}, \tag{2} \]</span> where $ C $ is a diagonal matrix of the conductance of the edges, <span class="math inline">\(L\)</span> is the diagonal matrix of the ``length’’ of each edge, <span class="math inline">\(\Delta\)</span> is the transpose of the incidence matrix, and <span class="math inline">\(P\)</span> is the pressure on the nodes. <span class="math inline">\(Q\)</span> is the flow of the edges. In this particular example we are assuming that the relation between flow and the pressure difference is <span class="math inline">\(Q_e = C_e (p_i - p_j)/L\)</span>. But we can have many other choices.</p>
+<p>Knowing the sources and sinks on the nodes, the pressure can be determined by the Kirchhoff law <span class="math display">\[ \mathcal{L} \bf{P} = \bf{q}, \]</span> where the vector $ q $ is the sources and the sinks values for each node. This is the same as solving the . This can also be written in terms of the flow, i.e. <span class="math display">\[ \Delta^T \bf{Q} = \bf{q}. \]</span> By $ (2) $ we can write <span class="math display">\[ (\bf{\Delta}^T \bf{C}\bf{L}^{-1}\Delta) \bf{P} = \bf{q}. \]</span> Since $ = M^T $, the expression inside the parentheses is clearly Equation (1).</p>
+<p>Similar to the Poisson equation on the graph which is equivalent Kirchhoff’s law, we can solve other types of heat and wave equations on the graph as well. The Laplacian matrix play a key role. <span class="math display">\[ \frac{\partial p}{\partial t} = - \mathcal{L} p + q,  \]</span> for the heat equation, and <span class="math display">\[ \frac{\partial^2 p}{\partial t^2} = -\mathcal{L}p + q, \]</span> for the wave equation.</p>
+</section>
+<section id="references" class="level2">
+
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Anderson1998" class="csl-entry" role="listitem">
+Anderson, A. R., and M. A. Chaplain. 1998. <span>“Continuous and Discrete Mathematical Models of Tumor-Induced Angiogenesis.”</span> <em>Bulletin of Mathematical Biology</em> 60 (5): 857–99. <a href="https://doi.org/10.1006/bulm.1998.0042">https://doi.org/10.1006/bulm.1998.0042</a>.
+</div>
+<div id="ref-Atale2020" class="csl-entry" role="listitem">
+Atale, Neha, and Vibha Rani. 2020. <span>“Angiogenesis: <span>A</span> <span>Therapeutic</span> <span>Target</span> for <span>Cancer</span>.”</span> In, edited by Hardeep Singh Tuli, 165–83. Singapore: Springer. <a href="https://doi.org/10.1007/978-981-15-7586-0_9">https://doi.org/10.1007/978-981-15-7586-0_9</a>.
+</div>
+<div id="ref-Hannezo2017" class="csl-entry" role="listitem">
+Hannezo, Edouard, Colinda L. G. J. Scheele, Mohammad Moad, Nicholas Drogo, Rakesh Heer, Rosemary V. Sampogna, Jacco van Rheenen, and Benjamin D. Simons. 2017. <span>“A <span>Unifying</span> <span>Theory</span> of <span>Branching</span> <span>Morphogenesis</span>.”</span> <em>Cell</em> 171 (1): 242–255.e27. <a href="https://doi.org/10.1016/j.cell.2017.08.026">https://doi.org/10.1016/j.cell.2017.08.026</a>.
+</div>
+<div id="ref-Nardini2021" class="csl-entry" role="listitem">
+Nardini, John T., Bernadette J. Stolz, Kevin B. Flores, Heather A. Harrington, and Helen M. Byrne. 2021. <span>“Topological Data Analysis Distinguishes Parameter Regimes in the <span>Anderson</span>-<span>Chaplain</span> Model of Angiogenesis.”</span> <em>PLoS Computational Biology</em> 17 (6): e1009094. <a href="https://doi.org/10.1371/journal.pcbi.1009094">https://doi.org/10.1371/journal.pcbi.1009094</a>.
+</div>
+<div id="ref-Pries2010" class="csl-entry" role="listitem">
+Pries, Axel R., Michael Höpfner, Ferdinand le Noble, Mark W. Dewhirst, and Timothy W. Secomb. 2010. <span>“The Shunt Problem: Control of Functional Shunting in Normal and Tumour Vasculature.”</span> <em>Nature Reviews Cancer</em> 10 (8): 587–93. <a href="https://doi.org/10.1038/nrc2895">https://doi.org/10.1038/nrc2895</a>.
+</div>
+<div id="ref-Pries2014" class="csl-entry" role="listitem">
+Pries, Axel R., and Timothy W. Secomb. 2014. <span>“Making <span>Microvascular</span> <span>Networks</span> <span>Work</span>: <span>Angiogenesis</span>, <span>Remodeling</span>, and <span>Pruning</span>.”</span> <em>Physiology</em> 29 (6): 446–55. <a href="https://doi.org/10.1152/physiol.00012.2014">https://doi.org/10.1152/physiol.00012.2014</a>.
+</div>
+<div id="ref-Richard2018" class="csl-entry" role="listitem">
+Richard, Sophie, Amanda Brun, Antonio Tedesco, Benjamin Gallois, Naoual Taghi, Philippe Dantan, Johanne Seguin, and Vincent Fleury. 2018. <span>“Direct Imaging of Capillaries Reveals the Mechanism of Arteriovenous Interlacing in the Chick Chorioallantoic Membrane.”</span> <em>Communications Biology</em> 1 (1): 1–11. <a href="https://doi.org/10.1038/s42003-018-0229-x">https://doi.org/10.1038/s42003-018-0229-x</a>.
+</div>
+<div id="ref-Ucar2023" class="csl-entry" role="listitem">
+Uçar, Mehmet Can, Edouard Hannezo, Emmi Tiilikainen, Inam Liaqat, Emma Jakobsson, Harri Nurmi, and Kari Vaahtomeri. 2023. <span>“Self-Organized and Directed Branching Results in Optimal Coverage in Developing Dermal Lymphatic Networks.”</span> <em>Nature Communications</em> 14 (September): 5878. <a href="https://doi.org/10.1038/s41467-023-41456-7">https://doi.org/10.1038/s41467-023-41456-7</a>.
+</div>
+<div id="ref-Ucar2021" class="csl-entry" role="listitem">
+Uçar, Mehmet Can, Dmitrii Kamenev, Kazunori Sunadome, Dominik Fachet, Francois Lallemend, Igor Adameyko, Saida Hadjab, and Edouard Hannezo. 2021. <span>“Theory of Branching Morphogenesis by Local Interactions and Global Guidance.”</span> <em>Nature Communications</em> 12 (1): 6830. <a href="https://doi.org/10.1038/s41467-021-27135-5">https://doi.org/10.1038/s41467-021-27135-5</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/bioshape-analysis\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

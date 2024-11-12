@@ -13,7 +13,7 @@ execute:
 
 ## Context and motivation
 
-R-loops are three-stranded nucleic acid structures containing a DNA:RNA hybrid and an associated single DNA strand. They are normally created when DNA and RNA interac throughout the lifespan of a cell. Although their existence can be beneficial to a cell, an excessive formation of these objects is commonly associated with instability phenotypes.
+R-loops are three-stranded nucleic acid structures containing a DNA:RNA hybrid and an associated single DNA strand. They are normally created when DNA and RNA interact throughout the lifespan of a cell. Although their existence can be beneficial to a cell, an excessive formation of these objects is commonly associated with instability phenotypes.
 
 The role of R-loop structures on genome stability is still not completely determined. The determining characteristics of harmful R-loops still remain to be defined. Their architecture is not very well-known either, and they are normally classified manually.
 
@@ -142,13 +142,13 @@ plt.show()
 ```
 
 <div style="text-align: center;">
-![Fig.6 White pixels projected onto the preshape space](data/kendall_projected.png)
+![Fig.6 White pixels projected onto the pre-shape space](data/kendall_projected.png)
 </div>
 
 Taking a close look at it will reveal more details about where the points lie in the space.
 
 <div style="text-align: center;">
-![Fig.7 White pixels projected onto the preshape space](data/kendall_projected_2.png)
+![Fig.7 White pixels projected onto the pre-shape space](data/kendall_projected_2.png)
 </div>
 
 The upper part of the curve consist of points that are in the left side of the image while the one below are closer to the middle. We see a reverse relationship between the amount of R-loops and the density of these points. This is an expected result when we consider how the Kendall pre-shape space is defined.

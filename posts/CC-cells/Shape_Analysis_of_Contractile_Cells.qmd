@@ -2,7 +2,7 @@
 title: Shape Analysis of Contractile Cells
 execute:
   freeze: true
-date: October 28th 2024
+date: "October 28 2024"
 author:
   - name: Yuqi Xiao
 categories:

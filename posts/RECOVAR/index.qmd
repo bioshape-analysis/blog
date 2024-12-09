@@ -18,7 +18,7 @@ The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM d
 
 Therefore, nowadays people start to focus on methods modeling continuous heterogeneity without any classification step to avoid the above issues. Most methods adopt similar structures, where 2D particle stacks are mapped to latent embeddings, clusters/trajectories are estimated in latent space, and finally volumes are mapped and reconstructed from latent embeddings. Early methods use linear mapping (e.g. 3DVA), but with the applications of deep learning techniques in the field of cryo-EM data processing, people find methods adapted from variational autoencoder (VAE) achieving better performance (e.g. cryoDRGN, 3DFlex). Nevertheless, the latent space obtained from VAE and other deep learning methods is hard to interpret, and do not conserve distances and densities, imposing difficulties in reconstructing motions/trajectories, which are what most structure biologists desire at the end.
 
-Recent developed software RECOVAR [@Gilles2023], using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. In this blog, I will review the pipeline of RECOVAR, present heterogeneity analysis results from the original paper and our SARS-CoV2 spike protein dataset, and discuss some possible improvements we can make to this pipeline.
+Recent developed software RECOVAR [@Gilles2023], using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. For this project, I will review the pipeline of RECOVAR, discussed improvements and extensions we made to this pipeline, and present heterogeneity analysis results from the original paper and our SARS-CoV2 spike protein dataset.
 
 ## Methods
 
@@ -93,6 +93,28 @@ $$\hat{d}(z)|\nabla v(z)|=1, \forall z\in B\setminus \{z_{end}\}; v(z_{end})=0$$
 where $B$ is the domain of interest, and $v(z)$ can be solved by solving this partial differential equation. Once $v(z)$ is solved, the optimal trajectory an be obtained by finding the path orthogonal to the level curve of $v(z)$, which can be computed numerically using the steepest gradient descent on $v(z)$ starting from $z_{st}$
 
 ![Visulization of the steepest gradient descent on the level curve of v(z)](img/level_curve.png){ width=45% style="display: block; margin-left: auto; margin-right: auto;" }
+
+### Extentions to RECOVAR: MPPC for path discovery
+The density-based path discovery algorithm used by RECOVAR is based on physical considerations that molecules prefer to take the path with lowest free energy, which is the path with highest density in the latent space, and is rebust against outliers. Nevertheless, the time to deconvolve density is exponential of the number of PCs, and deconvolution requires large memory. Our 24GB GPU can deconvolve density at most a dimension of 4, but 4 PCs are usually not enough to capture enough heterogeneity as shown in the figure below, which shows how the eigenvalues change with the number of PCs when applying RECOVAR to the SARS-CoV2 spike dataset. There are still quite large drops in the eigenvalue after 4 PCs.
+
+![Eigenvalues vs. the number PCs of the SARS-CoV2 spike dataset applied with RECOVAR](img/eigenvalue.png){ width=45% style="display: block; margin-left: auto; margin-right: auto;" }
+
+Therefore, we proposed an alternative method to discover path by computing multiple penalized principal curves (MPPC) [slav2017]. The basic idea of MPPC is to find one or multiple curves to fit all the given points as close as possible, with constraints in the number and lengths of the curves. In order to be solved numerically, the curves are usually discretized. Let $y^1 = (y_1, y_2, ..., y_{m_1}), y^2 = (y_{m_1+1}, y_{m_1+2}, ..., y_{m_1+m_2}),...,y^k = (y_{m-m_k+1}, y_{m-m_k+2},...,y_{m_k})$ to be $k$ curves represented by points. Let $s_c = \sum_{j=1}^{c}m_j$ be the indices of the end points of curve $c$. Each point $x_i$ in the data to fit is assigned to the closest point on the curves, and we denote $I_j$ to be the group of indices of data points that are assigned to curve point $y_j$. The goal is to minimize:
+$$\sum_{j=1}^m\sum_{i\in I_j}w_i|x_i-y_j|^2+\lambda_1\sum_{c=0}^{k-1}\sum_{j=1}^{m_c+1}|y_{s_c+j+1}-y_{s_c+j}|+\lambda_1 \lambda_2 (k-1)$$
+
+$\sum_{j=1}^m\sum_{i\in I_j}w_i|x_i-y_j|^2$ penalizes the distance of the curves to data points, $\lambda_1\sum_{c=0}^{k-1}\sum_{j=1}^{m_c+1}|y_{s_c+j+1}-y_{s_c+j}|$ is the total length of all the curves, and $\lambda_1 \lambda_2 (k-1)$ controls the number of curves. Applied to our case, we set $w_i$ to be the inverse of the trace of the covariance matrix of the embedding to make the curves fit better to those embeddings with high confidence.
+
+### Extensions to RECOVAR: atomic model fitting
+When resolving homogenoeous structures of proteins, atomic models are usually the final product instead of density maps as they contain more structural information. Atomic models are fitted into density maps either manually or automatically, but most start from scratch, which is very inefficient to be applied to density map series because the difference between the neighboring maps should be relatively small. We can take advantage of this property by updating coordinates of the fitted model of the previous frame to get the model fitted in the current density map. Hence, we proposed two algorithms to fit atomic model, both are based on gradient descent.
+
+Let $R_{t-1}\in \mathbb{R}^{N_a\times 3}$ be the fitted atomic model of the $t-1$th density map, where $N_a$ is the number of atoms in the protein. We can use deposited protein structure or model predicted from sequence using algorithms like AlphaFold as $R_1$. Let $V_t\in\mathbb{R}^{N\times N\times N}$ be the $t$th density map we want to fit in, where $N$ is the grid size. We cannot directly minimize the "distance" between $R_{t-1}$ and $V_t$, because atomic coordinates cannot be compared with volume maps. A natural way to solve this issue is to map atomic coordinates to density map with a function $f: \mathbb{R}^{N_a\times 3}\rightarrow \mathbb{R}^{N\times N\times N}$, for example, by summing up the gaussian kernels centered at each coordinate i.e.:
+$$V_t({\bf r}=(x,y,z)^T) = \sum_{k=1}^{N_a} \exp -\frac{\|{\bf r} - R_t[k]\|_2^2}{2\sigma_k^2}$$
+
+However, the computational time for one mapping is $O(N^3N_a)$, which is already very slow, even without considering the fact that we have to map coordinates to densities in many update iterations. Hence in practice we used truncated gaussian kernels.
+
+Now we have all the tools needed to have algorithms fit atomic model $R_{t-1}$ into density map $V_t$. Our first algorithm purely based on gradient descent will be:
+
+
 
 
 ## Results

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.39">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -57,10 +91,10 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -232,14 +266,13 @@ window.Quarto = {
   <li><a href="#experimental-setup" id="toc-experimental-setup" class="nav-link" data-scroll-target="#experimental-setup">Experimental Setup</a>
   <ul class="collapse">
   <li><a href="#the-dome-apparatus" id="toc-the-dome-apparatus" class="nav-link" data-scroll-target="#the-dome-apparatus">The Dome Apparatus</a></li>
-  <li><a href="#crux-of-the-problem" id="toc-crux-of-the-problem" class="nav-link" data-scroll-target="#crux-of-the-problem">Crux of the problem</a></li>
+  <li><a href="#description-of-the-problem" id="toc-description-of-the-problem" class="nav-link" data-scroll-target="#description-of-the-problem">Description of the problem</a></li>
   </ul></li>
   <li><a href="#main-goal" id="toc-main-goal" class="nav-link" data-scroll-target="#main-goal">Main Goal</a></li>
   <li><a href="#what-is-cebra" id="toc-what-is-cebra" class="nav-link" data-scroll-target="#what-is-cebra">What is CEBRA?</a>
   <ul class="collapse">
   <li><a href="#the-need-for-cebra" id="toc-the-need-for-cebra" class="nav-link" data-scroll-target="#the-need-for-cebra">The Need for CEBRA</a></li>
   <li><a href="#how-does-cebra-work" id="toc-how-does-cebra-work" class="nav-link" data-scroll-target="#how-does-cebra-work">How Does CEBRA Work?</a></li>
-  <li><a href="#key-features-of-cebra" id="toc-key-features-of-cebra" class="nav-link" data-scroll-target="#key-features-of-cebra">Key Features of CEBRA</a></li>
   <li><a href="#cebra-architecture" id="toc-cebra-architecture" class="nav-link" data-scroll-target="#cebra-architecture">CEBRA Architecture</a></li>
   </ul></li>
   <li><a href="#persistent-homology" id="toc-persistent-homology" class="nav-link" data-scroll-target="#persistent-homology">Persistent Homology</a>
@@ -255,7 +288,14 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#final-step" id="toc-final-step" class="nav-link" data-scroll-target="#final-step">Final Step</a></li>
   </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#point-clouds-and-parametrization" id="toc-point-clouds-and-parametrization" class="nav-link" data-scroll-target="#point-clouds-and-parametrization">Point clouds and parametrization</a></li>
+  <li><a href="#h-values" id="toc-h-values" class="nav-link" data-scroll-target="#h-values">H values</a></li>
+  <li><a href="#results-1" id="toc-results-1" class="nav-link" data-scroll-target="#results-1">Results</a></li>
+  </ul></li>
   <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -268,13 +308,13 @@ window.Quarto = {
 
 <section id="problem-description" class="level2">
 <h2 class="anchored" data-anchor-id="problem-description">Problem Description:</h2>
-<p>Understanding how animals navigate is an important area of research that has applications in early detection of diseases such as Alzheimers and Huntington as well as advancing autonomous robotics and reinforcement learning. One way that the brain encodes spatial information is through a mechanism known as the “Cognitive Map” (<span class="citation" data-cites="behrens2018">Behrens et al. (<a href="#ref-behrens2018" role="doc-biblioref">2018</a>)</span>). Specifically, the hippocampus plays a key role in this process by using path integration to keep track of an animal’s position through the integration various idiothetic cues (self-motion signals), such as optic flow, vestibular inputs, and proprioception.</p>
-<p><strong>The question then arises:</strong> How can we manipulate hippocampal neurons by presenting conflicting visual cues? Basically, by studying what happens when we perturb normal self-motion cues in an animal’s environment and observing the resulting changes in the brain’s navigation system, we can understand better how animals navigate and map their environments. This blog will focus on experiments conducted in “Control and recalibration of path integration in place cells using optic flow” (<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span>).</p>
+<p>Seeing, hearing, touching – every moment, our brain receives numerous sensory inputs. How does it organize this wealth of data and extract relevant information? We know that the brain forms a coherent neural representation of the external world called the cognitive map (<span class="citation" data-cites="tolman1948">Tolman (<a href="#ref-tolman1948" role="doc-biblioref">1948</a>)</span>), formed by the combined firing activity of neurons in the hippocampal formation. For example, place cells are neurons that fire when a rat is at a particular location (<span class="citation" data-cites="moser2008">Moser, Kropff, and Moser (<a href="#ref-moser2008" role="doc-biblioref">2008</a>)</span>). Together, the activity of hundreds of these place cells can be modeled as a continuous surface - a ‘manifold’ - the location on which is analogous to the rat’s location in physical space; the rat is indeed creating a cognitive map. Specifically, the hippocampus plays a key role in this process by using path integration to keep track of an animal’s position through the integration various idiothetic cues (self-motion signals), such as optic flow, vestibular inputs, and proprioception. Manifold learning has emerged as a powerful technique for mapping complex, high-dimensional neural data onto lower-dimensional geometric representations (<span class="citation" data-cites="mitchell-heggs2023">Mitchell-Heggs et al. (<a href="#ref-mitchell-heggs2023" role="doc-biblioref">2023</a>)</span>, <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span>, <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>). To date, it has not been feasible to learn manifolds ‘online’, i.e.&nbsp;while the experiment is in progress. Doing so would allow ‘closed-loop’ experiments, where we can provide feedback to the animal based on its internal representation, and thereby examine how these representations are created and maintained in the brain.</p>
+<p><strong>The question then arises:</strong> Can we decode important navigational behavioural variables during an experiment through manifold learning? And further, can we learn these manifolds online? This blog will focus on experiments conducted in “Control and recalibration of path integration in place cells using optic flow” (<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span>) and “Recalibration of path integration in hippocampal place cells” (<span class="citation" data-cites="jayakumar2019">Jayakumar et al. (<a href="#ref-jayakumar2019" role="doc-biblioref">2019</a>)</span>).</p>
 </section>
 <section id="experimental-setup" class="level2">
 <h2 class="anchored" data-anchor-id="experimental-setup">Experimental Setup</h2>
-<p>In the paper “Control and recalibration of path integration in place cells using optic flow” (<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span>), Dr.&nbsp;Madhav and colleagues designed an experimental setup to investigate how optic flow cues influence hippocampal <strong>place cells</strong> in freely moving rats. <strong>Place cells</strong> are neurons that fire when an animal is in a <strong>specific</strong> location within its environment, effectively encoding spatial information.</p>
-<p>For example, imagine a rat moving along a horizontal linear track. For simplicity let’s say the rat has only <strong>3</strong> place cell neurons. In this case, <strong>Neuron 1</strong> would fire when the rat is at the very left of the track, <strong>Neuron 2</strong> would fire when the rat is in the middle of the track, and <strong>Neuron 3</strong> would fire at the very right of the track. As the rat moves along the track, the specific place cells corresponding to each location become activated, helping the rat to construct an internal <strong>cognitive map</strong> of its environment.</p>
+<p>In (<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span> and <span class="citation" data-cites="jayakumar2019">Jayakumar et al. (<a href="#ref-jayakumar2019" role="doc-biblioref">2019</a>)</span>), Dr.&nbsp;Madhav and colleagues designed an experimental setup to investigate how optic flow cues influence hippocampal place cells in freely moving rats. Place cells are neurons that fire when an animal is in a specific location.</p>
+<p>Let’s take an example to better understand: imagine a rat moving along a horizontal linear track. For simplicity let’s say the rat has only <strong>3</strong> place cell neurons. In this case, <strong>Neuron 1</strong> would fire when the rat is at the very left of the track, <strong>Neuron 2</strong> would fire when the rat is in the middle of the track, and <strong>Neuron 3</strong> would fire at the very right of the track. As the rat moves along the track, the specific place cells corresponding to each location become activated, helping the rat to construct an internal cognitive map of its environment.</p>
 <section id="the-dome-apparatus" class="level3">
 <h3 class="anchored" data-anchor-id="the-dome-apparatus">The Dome Apparatus</h3>
 <p>In the experiment, rats ran on a circular platform surrounded by a hemispherical projection surface called the Dome.</p>
@@ -286,125 +326,137 @@ window.Quarto = {
 </figure>
 </div>
 </div>
-<p>The dome projected moving stripes that provided controlled optic flow cues. The movement of the stripes was tied to the rats’ movement, with the stripe gain (<span class="math inline">\(\mathcal{S}\)</span>) determining the relationship between the rat’s speed and the stripes’ speed.</p>
+<p>The dome projects moving stripes that provided controlled optic flow cues. The movement of the stripes was tied to the rats’ movement, with the stripe gain (<span class="math inline">\(\mathcal{S}\)</span>) determining the relationship between the rat’s speed and the stripes’ speed.</p>
 <ul>
 <li><p><span class="math inline">\(\mathcal{S}\)</span> = 1: Stripes are stationary relative to the lab frame, meaning the rat is not recieving conflicting cues.</p></li>
 <li><p><span class="math inline">\(\mathcal{S}\)</span> &gt; 1: Stripes move opposite to the rat’s direction, causing the rat to percieve itself as moving faster than it is.</p></li>
 <li><p><span class="math inline">\(\mathcal{S}\)</span> &lt; 1: Stripes move in the same direction but slower than the rat, causing the rat to percieve itself as moving slower than it is.</p></li>
 </ul>
-<p>Electrodes were inserted into the <strong>CA1</strong> of the hippocampus of <strong>male evan’s rats</strong> and spike rate neural activity was recorded during the experiment. Dr.&nbsp;Madhav and colleagues introduce a value <span class="math inline">\(\mathcal{H}\)</span>, called the <strong>Hippocampal Gain</strong>. It is defined as the relationship between the rat’s physical movement and the updating of its position on the internal hippocampal map. Specifically,</p>
+<p>Electrodes were inserted into the <strong>CA1</strong> of the hippocampus of <strong>male evan’s rats</strong> and spike rate neural activity was recorded during the experiment. Dr.&nbsp;Madhav and colleagues introduce a value <span class="math inline">\(\mathcal{H}\)</span>, called the Hippocampal Gain. It is defined as the relationship between the rat’s physical movement and the updating of its position on the internal hippocampal map. At a high level, we can think of it as the rate at which the rat “perceives” itself to be moving because of the conflicting visual cues. Specifically,</p>
 <p><span class="math display">\[
   \mathcal{H} = \frac{\text{distance travelled in hippocampal reference frame}}{\text{distance travelled in lab reference frame}}.
 \]</span></p>
-<p>In this equation, <strong>distance travelled in the hippocampal frame</strong> refers to the distance that the rat <strong>“thinks”</strong> it’s moving.</p>
+<p>In this equation, distance travelled in the hippocampal frame refers to the distance that the rat “thinks” it’s moving.</p>
 <ul>
-<li><p><span class="math inline">\(\mathcal{H} = 1\)</span>: The rat perceives itself as moving the “correct” speed</p></li>
+<li><p><span class="math inline">\(\mathcal{H} = 1\)</span>: The rat perceives itself as moving the “correct” speed.</p></li>
 <li><p><span class="math inline">\(\mathcal{H} &gt; 1\)</span>: The rat perceives itself as moving faster than it actually is with respect to the lab frame.</p></li>
 <li><p><span class="math inline">\(\mathcal{H} &lt; 1\)</span>: The rat perceives itself as moving slower than it actually is with respect to the lab frame.</p></li>
 </ul>
-<p><span class="math inline">\(\mathcal{H}\)</span> gives valuable insights into how these visual cues such as the moving stripes affect the rats’ internal <strong>cognitive map</strong> during the task. It gives an understanding of how the rats update their <strong>perceived</strong> position in the environment.</p>
-<p>For example, an <span class="math inline">\(\mathcal{H}\)</span> value of 2, would mean that the rat <strong>perceives</strong> itself as moving twice as fast as it actually is. Consequently each place cell corresponding to a specific <strong>location</strong> in the maze, will fire twice per lap rather than once.</p>
+<p><span class="math inline">\(\mathcal{H}\)</span> gives valuable insights into how these visual cues such as the moving stripes affect the rats’ internal cognitive map during the task. It gives an understanding of how the rats update their perceived position in the environment.</p>
+<p>For example, an <span class="math inline">\(\mathcal{H}\)</span> value of 2, would mean that the rat perceives itself as moving twice as fast as it actually is. Consequently each place cell corresponding to a specific location in the maze will fire twice per lap rather than once.</p>
 </section>
-<section id="crux-of-the-problem" class="level3">
-<h3 class="anchored" data-anchor-id="crux-of-the-problem">Crux of the problem</h3>
-<p><strong>Method of Determining <span class="math inline">\(\mathcal{H}\)</span></strong>: Traditionally, <span class="math inline">\(\mathcal{H}\)</span> is determined by analyzing the spatial periodicity of place cell firing over multiple laps using <strong>Fourier transforms</strong>, as seen in (<span class="citation" data-cites="jayakumar2019">Jayakumar et al. (<a href="#ref-jayakumar2019" role="doc-biblioref">2019</a>)</span>,<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span>). However, this method is cumbersome and lacks temporal precision <strong>within</strong> individual laps. A more precise, <strong>within-lap</strong> decoding of Hippocampal Gain (<span class="math inline">\(\mathcal{H}\)</span>) could provide a deeper understanding of how path integration updates occur with finer <strong>temporal resolution</strong>. This could lead to new insights into how the brain updates its <strong>cognitive map</strong>when receiving conflicting visual cues.</p>
+<section id="description-of-the-problem" class="level3">
+<h3 class="anchored" data-anchor-id="description-of-the-problem">Description of the problem</h3>
+<p><strong>Method of Determining <span class="math inline">\(\mathcal{H}\)</span></strong>: Traditionally, <span class="math inline">\(\mathcal{H}\)</span> is determined by analyzing the spatial periodicity of place cell firing over multiple laps using Fourier transforms, as seen in (<span class="citation" data-cites="jayakumar2019">Jayakumar et al. (<a href="#ref-jayakumar2019" role="doc-biblioref">2019</a>)</span>,<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span>). Below is a figure displaying how the traditional method is used to determine the <span class="math inline">\(\mathcal{H}\)</span> value.</p>
+<p><br></p>
+<div id="spectral_decoding" class="cell figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/spectral_decode.jpeg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Figure 2 - Spectral decoding algorithm. In the dome, as visual landmarks are presented and moved at an experimental gain G, the rat encounters a particular landmark every 1/G laps (the spatial period). If the place fields fire at the same location in the landmark reference frame, the firing rate of the cell exhibits a spatial frequency of G fields per lap. a, Illustration of place-field firing for three values of hippocampal gain, H</figcaption>
+</figure>
+</div>
+</div>
+<p><br></p>
+<p>The frequency of firing for each place cell effectively decodes the <span class="math inline">\(\mathcal{H}\)</span> value for that specific neuron and the mean <span class="math inline">\(\mathcal{H}\)</span> value over all neurons gives the estimated <span class="math inline">\(\mathcal{H}\)</span> value over the neuronal population. This method lacks temporal precision within individual laps since it uses a Fourier Transform over 6 laps.</p>
+<p>A more precise, within-lap decoding of Hippocampal Gain (<span class="math inline">\(\mathcal{H}\)</span>) could provide a deeper understanding of how path integration occurs with finer temporal resolution. This could lead to new insights into how the brain updates its cognitive map when receiving conflicting visual cues.</p>
+<p>Also, note how the decoding of <span class="math inline">\(\mathcal{H}\)</span> is directly tied to the neural data, which makes the traditional method less flexible. It cannot easily be applied to experiments involving two varying neural representations (e.g., a spatial gain <span class="math inline">\(\mathcal{H}\)</span> and an auditory gain <span class="math inline">\(\mathcal{A}\)</span>). In such cases, the two representations are coupled in the neural data, making it impossible to separate them.</p>
+<p>However, neural manifold learning offers a promising approach to decouple these representations. For instance, consider the hypothetical scenario below, where the data forms a torus:</p>
+<div class="grid">
+<div class="g-col-6">
+<p><img src="images/varying_spatial.jpg" class="img-fluid" style="width:100.0%"></p>
+</div>
+<div class="g-col-6">
+<p><img src="images/varying_audio.jpg" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+<div class="cell figure">
+<p>Figure 3 - Left: varying spatial representation, Right: varying audio representation.</p>
+</div>
+<p>In our current dataset, we only have a single varying neural representation and therefore expect a simpler 1D ring topology. However, in the above scenario, the data might lie on a torus. On this structure, the spatial representation (<span class="math inline">\(\mathcal{H}\)</span>) could vary along the major circle of the torus, while the auditory representation (<span class="math inline">\(\mathcal{A}\)</span>) varies along the minor circle. This structure enables us to disentangle and decode the two neural representations independently. This could prove useful in the future when using this method on experiments of this type. We wish to validate this method for single varying representations, and then move on to two varying representations.</p>
 </section>
 </section>
 <section id="main-goal" class="level2">
 <h2 class="anchored" data-anchor-id="main-goal">Main Goal</h2>
-<p>Our main goal is therefore to determine this <span class="math inline">\(\mathcal{H}\)</span> value without using a Fourier Transform and instead somehow find a <strong>temporally finer</strong>, within lap estimation of <span class="math inline">\(\mathcal{H}\)</span>. Some key questions that <strong>motivate</strong> this research include:</p>
+<p>Our main goal is therefore to determine this <span class="math inline">\(\mathcal{H}\)</span> value without using a Fourier Transform and instead somehow find a temporally finer, within lap estimation of <span class="math inline">\(\mathcal{H}\)</span> using manifold learning. Some key questions that motivate this research include:</p>
 <ul>
-<li><p>How does the <strong>velocity</strong> of the rat affect the <span class="math inline">\(\mathcal{H}\)</span> value?</p></li>
-<li><p>What patterns does the <span class="math inline">\(\mathcal{H}\)</span> value exhibit over the course of a lap? Does it relate to <strong>other</strong> behavioural variables?</p></li>
-<li><p>Can we somehow decode the hippocampal gain <strong>online</strong>, by looking only at the raw neural data? (this is a longer term goal.)</p></li>
+<li><p>How does the velocity of the rat affect the <span class="math inline">\(\mathcal{H}\)</span> value?</p></li>
+<li><p>What patterns does the <span class="math inline">\(\mathcal{H}\)</span> value exhibit over the course of a lap? Does it relate to other behavioural variables?</p></li>
 </ul>
-<p>We turn to <strong>CEBRA</strong> <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span> to address this question and explore some potential answers. In the next section, we will see how <strong>CEBRA</strong> can help decode <span class="math inline">\(\mathcal{H}\)</span> reliably.</p>
-<p>The basic idea is <strong>as follows</strong>: First, we aim to project the neural data into some latent space (likely, but not necessarily a lower dimensional space). In this space, we want the points to map out the topology of the task - specifically, to encode <strong>hippocampal position</strong> (the rat’s position in the hippocampal reference frame).</p>
-<p>We assume that this task forms a <strong>1D ring topology</strong>, given the cyclic nature of the dome setup and the periodic firing of place cells. Our first goal is to validate and construct a latent parametrization of this manifold, specifically designed to directly reflect the <strong>hippocampal position</strong>. With an accurate hippocampal position parametrization, we could then decode <span class="math inline">\(\mathcal{H}\)</span>, giving us a more temporally fine estimation of <span class="math inline">\(\mathcal{H}\)</span>.</p>
-<p>Next, we move on to what <strong>CEBRA</strong> is and how it can help us achieve our goal.</p>
+<p>Some more important goals of this research include a method of decoding the “hippocampal gain” online and feeding these values back into the dome apparatus to control the <span class="math inline">\(\mathcal{H}\)</span> value to the desired value for the experiment.</p>
+<p>We turn to CEBRA <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span> as our method of manifold learning. In the next section, we will see how CEBRA can help decode <span class="math inline">\(\mathcal{H}\)</span> reliably.</p>
+<p>The basic idea is as follows: First, we aim to project the neural data into some latent space. In this space, we want the points to map out the topology of the task - specifically, to encode hippocampal position/angle (the rat’s position in the hippocampal reference frame). We assume that this task forms a 1D ring topology, given the cyclic nature of the dome setup and the periodic firing of place cells. Then we want to validate and construct a latent parametrization of this manifold, specifically designed to directly reflect the hippocampal position. With an accurate hippocampal position parametrization, we could then decode <span class="math inline">\(\mathcal{H}\)</span>, giving us a more temporally fine estimation of <span class="math inline">\(\mathcal{H}\)</span>.</p>
+<p>Next, we move on to what CEBRA is and how it can help us achieve our goal.</p>
 </section>
 <section id="what-is-cebra" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-cebra">What is CEBRA?</h2>
-<p><strong>CEBRA</strong>, introduced in <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span>, is a powerful self-supervised learning algorithm designed to create consistent, interpretable embeddings of high-dimensional neural recordings using auxiliary variables such as behavior or time. CEBRA generates consistent embeddings across trials, animals, and even different recording modalities​.</p>
-<p>In our analysis, we will use the <strong>discovery mode</strong> of CEBRA, with only time as our auxiliary variable. CEBRA is implemented in python, with extensive documentation and demos for users. The code and data used in the paper is open source.</p>
+<p>CEBRA, introduced in <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span>, is a powerful self-supervised learning algorithm designed to create consistent, interpretable embeddings of high-dimensional neural recordings using auxiliary variables such as behavior or time. CEBRA generates consistent embeddings across trials, animals, and even different recording modalities​.</p>
+<p>In our analysis, we will use the discovery mode of CEBRA, with only time as our auxiliary variable. CEBRA is implemented in python.</p>
 <section id="the-need-for-cebra" class="level3">
 <h3 class="anchored" data-anchor-id="the-need-for-cebra">The Need for CEBRA</h3>
-<p>In neuroscience, understanding how neural populations encode behavior is a large challenge. Traditional linear methods like PCA, or even non-linear approaches like UMAP and t-SNE, fall short because they fail to capture temporal dynamics and lack consistency across different sessions or animals. CEBRA addresses these limitations by using contrastive learning to structure the embedding space around auxiliary variables such as time. The ability to encode temporal information makes CEBRA a powerful tool for analyzing our neural data, as time plays a crucial role in our experimental set up.</p>
+<p>In neuroscience, understanding how neural populations encode behavior is a large challenge. Traditional linear methods like PCA, or even non-linear approaches like UMAP and t-SNE, fail in this context because they fail to capture temporal dynamics and lack consistency across different sessions or animals. CEBRA gets past these limitations by both considering temporal dynamics and providing consistency across different sessions or animals.</p>
 </section>
 <section id="how-does-cebra-work" class="level3">
 <h3 class="anchored" data-anchor-id="how-does-cebra-work">How Does CEBRA Work?</h3>
-<p>CEBRA uses a convolutional neural network (CNN) encoder trained with contrastive learning to produce a latent space. The algorithm identifies positive and negative pairs of data points, using temporal proximity to structure the embedding space. For example, in our experiment, data points that are temporally close will be mapped closer together in the latent space, while those further apart in time will be separated​.</p>
-</section>
-<section id="key-features-of-cebra" class="level3">
-<h3 class="anchored" data-anchor-id="key-features-of-cebra">Key Features of CEBRA</h3>
-<ul>
-<li><p><strong>Nonlinear Embedding</strong>: CEBRA allows the discovery of non linear patterns in neural data.</p></li>
-<li><p><strong>Consistency Across Sessions and Animals</strong>: Unlike other methods, CEBRA produces embeddings that are consistent across animals and sessions, making it highly generalizable for multi-session or multi-animal experiments.</p></li>
-<li><p><strong>Temporal Encoding</strong>: CEBRA captures neural representations with high temporal resolution, enabling finer decoding of neural activity over time.</p></li>
-</ul>
+<p>CEBRA uses a convolutional neural network (CNN) encoder trained with contrastive learning to produce a latent embedding of the neural data. The algorithm identifies positive and negative pairs of data points, using temporal proximity to structure the embedding space.</p>
 </section>
 <section id="cebra-architecture" class="level3">
 <h3 class="anchored" data-anchor-id="cebra-architecture">CEBRA Architecture</h3>
-<section id="cnn" class="level4">
-<h4 class="anchored" data-anchor-id="cnn">CNN</h4>
-<p>In CEBRA, the first layer is a <strong>Convolutional Neural Network (CNN)</strong>, which serves as the encoder that processes the high-dimensional neural time series data, such as spike trains, into a lower-dimensional latent space. The CNN’s primary role is to transform the neural activity into representations that capture the underlying neural dynamics (in our case, hippocampal place cell firing). The CNN is designed to detect and extract hierarchical features from the neural data. This is especially effective in identifying spatial and temporal patterns in the neural activity. For example, in the case of neural recordings, the CNN could extract firing rate patterns or local correlations between neurons. This is useful for our purposes since we want to know how the neurons relate to one another at a population level as the mouse traverses the dome apparatus. These layers are followed by fully connected layers (typical in a CNN) that map the high-level features into a compact, low-dimensional representation or <strong>embedding</strong>.</p>
-</section>
 <section id="contrastive-learning" class="level4">
 <h4 class="anchored" data-anchor-id="contrastive-learning">Contrastive Learning</h4>
-<p>Once the latent space is produced, it is then trained on a network using a <strong>contrastive learning loss function</strong>. In CEBRA, this is achieved through <strong>InfoNCE</strong> (Noise Contrastive Estimation), which encourages the model to distinguish between similar (positive) and dissimilar (negative) samples.</p>
-<p>The loss function is defined as:</p>
-<p><span class="math display">\[
-\mathcal{L} = - \log \frac{\exp(\text{sim}(f(x), f(y^+)) / \tau)}{\exp(\text{sim}(f(x), f(y^+)) / \tau) + \sum_{i=1}^{K} \exp(\text{sim}(f(x), f(y_i^-)) / \tau)}
+<p>The CEBRA model is trained using a contrastive learning loss function. In CEBRA, this is achieved through InfoNCE (Noise Contrastive Estimation), which encourages the model to distinguish between similar (positive) and dissimilar (negative) samples.</p>
+<p>The loss function is defined as: <span class="math display">\[
+\mathcal{L} = - \log \frac{e^{\text{sim}(f(x), f(y^+)) / \tau}}{e^{\text{sim}(f(x), f(y^+)) / \tau} + \sum_{i=1}^{K} e^{\text{sim}(f(x), f(y_i^-)) / \tau}}
 \]</span></p>
-<p>Where f(x) and f(y) are the <strong>encoded representations</strong> of the neural data after passing through the CNN, $ (f(x), f(y)) $ is a similarity measure between two embeddings, implemented as <strong>cosine similarity</strong>, <span class="math inline">\(y^+\)</span> represents the <strong>positive pair</strong> (similar to $ x $ in time), $ y_i^- $ represents the <strong>negative pairs</strong> (dissimilar to $ x $ in time), $ $ is a <strong>temperature parameter</strong> that controls the sharpness of the distribution.</p>
-<p>Note that the similarity measure depends on the CEBRA mode used, and we have used time as our similarity measure. The contrastive loss encourages the encoder to map temporally close data points (positive pairs) to close points in the latent space, while mapping temporally distant data points (negative pairs) further apart. This way, the embeddings reflect the temporal structure of the data. The final output is then the embedding value in the latent space. Below is a schematic taken from the original paper, showing the CEBRA architecture.</p>
+<p>Where <span class="math inline">\(f(x)\)</span> and <span class="math inline">\(f(y)\)</span> are the encoded representations of the neural data after passing through the CNN, <span class="math inline">\(\text{sim}(f(x), f(y))\)</span> represents a similarity measure between the two embeddings, implemented as cosine similarity. Here, <span class="math inline">\(y^{+}\)</span> denotes the positive pair (similar to <span class="math inline">\(x\)</span> in time), <span class="math inline">\(y_{i}^{-}\)</span> denotes the negative pairs (dissimilar to <span class="math inline">\(x\)</span> in time), and <span class="math inline">\(\tau\)</span> is a temperature parameter that controls the sharpness of the distribution.</p>
+<p>Note that the similarity measure depends on the CEBRA mode used, and we have used time as our similarity measure. The contrastive loss encourages the encoder to map temporally close data points (positive pairs) to close points in the latent space, while mapping temporally distant data points (negative pairs) further apart. This way, the embeddings reflect the temporal structure of the data. The final output is then the embedding value in the latent space. Below is a schematic taken from ({<span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span>}), showing the CEBRA architecture.</p>
 <p><br></p>
 <div id="cebra_pipeline" class="cell figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/CEBRA_pipeline.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption>Figure 1 - CEBRA Architecture</figcaption>
+<figcaption>Figure 4 - CEBRA Architecture. Input: Neural spike data in the shape (time points, neuron #). Output: Low dimensional embedding</figcaption>
 </figure>
 </div>
 </div>
 <p><br></p>
-<p>Once we obtain the neural embeddings from CEBRA, the next step is to determine the underlying manifold that describes structure of the resulting point cloud. For example, let’s consider the output of a CEBRA embedding from one experimental session.</p>
+<p>Once we obtain the neural embeddings from CEBRA, the next step is to determine the underlying manifold that describes the structure of the resulting point cloud. For example, let’s consider the output of a CEBRA embedding from one experimental session.</p>
 <p><br></p>
 <div id="hipp_angle_no_curve" class="cell figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/hipp_angle_no_curve.gif" class="img-fluid figure-img" style="width:80.0%"></p>
-<figcaption>Figure 2: Cebra Embedding for an experiment with Hippocampal Position Annotated as a Color Map</figcaption>
+<p><img src="images/hipp_session_50.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption>Figure 5 - Cebra Embedding for an experiment with Hippocampal Position Annotated as a Color Map</figcaption>
 </figure>
 </div>
 </div>
 <p><br></p>
-<p>The embedding appears to form a 1D circle in 3D space. We can also see that the hippocampal position correctly traces the rat’s hippocampal position throughout the experiment. This observation aligns with our expectations, since we predict that the neural activity encodes the <strong>hippocampal reference frame</strong> position, not the <strong>lab frame</strong> position. To validate the 1D ring topology, we apply a technique known as Persistent Homology.</p>
+<p>The embedding appears to form a 1D circle in 3D space. We can also see that the hippocampal position correctly traces the rat’s hippocampal position throughout the experiment. This observation aligns with our expectations, since we predict that the neural activity encodes the hippocampal reference frame position, not the lab frame position. To validate the 1D ring topology, we apply a technique known as Persistent Homology.</p>
 </section>
 </section>
 </section>
 <section id="persistent-homology" class="level2">
 <h2 class="anchored" data-anchor-id="persistent-homology">Persistent Homology</h2>
-<p>Persistent homology allows us to quantify and verify the topological features of our embedded space. Specifically, we want to validate the assumption that the neural representation forms a 1D ring manifold, which corresponds to the rat’s navigation behavior within the environment. The idea of persistent homology is to create spheres of varying radii around each point in the point cloud, and from those spheres, track how the topological features of the shape change as the radius grows. By systematically increasing the radius, we can observe when distinct clusters merge, when loops (1D holes) appear, and when higher-dimensional voids form. These features persist across different radius sizes, and their persistence provides a measure of their significance. In the context of neural data, this allows us to detect the underlying topological structure of the manifold. Below is a figure describing showing this method <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span>:</p>
+<p>Persistent homology allows us to quantify and verify the topological features of our embedded space. Specifically, we want to validate the assumption that the neural representation forms a 1D ring manifold, which corresponds to the rat’s navigation behavior within the environment. The idea of persistent homology is to create spheres of varying radii around each point in the point cloud, and from those spheres, track how the topological features of the shape change as the radius grows. By systematically increasing the radius, we can observe when distinct clusters merge, when loops (1D holes) appear, and when higher-dimensional voids form. These features persist across different radius sizes, and their persistence provides a measure of their significance. In the context of neural data, this allows us to detect the underlying topological structure of the manifold. Below is a figure illustrating this method <span class="citation" data-cites="schneider2023">Schneider, Lee, and Mathis (<a href="#ref-schneider2023" role="doc-biblioref">2023</a>)</span>:</p>
 <p><br></p>
 <div id="betti_numbers" class="cell figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/persistent_cohomology.jpeg" class="img-fluid figure-img" style="width:80.0%"></p>
-<figcaption>Figure 3: Persistent Homology</figcaption>
+<figcaption>Figure 6 - Persistent Homology</figcaption>
 </figure>
 </div>
 </div>
 <p><br></p>
 <section id="validating-a-1d-ring-manifold" class="level3">
 <h3 class="anchored" data-anchor-id="validating-a-1d-ring-manifold">Validating a 1D Ring Manifold</h3>
-<p>To confirm the circular nature of the embedding, we analyze the Betti numbers derived from the point cloud. Betti numbers describe the topological features of a space, with the $ k $-th Betti number counting the number of $ k $-dimensional “holes” in the manifold. Below is a figure showing a few basic topological spaces and their corresponding Betti numbers <span class="citation" data-cites="walker2008">Walker (<a href="#ref-walker2008" role="doc-biblioref">2008</a>)</span>:</p>
+<p>To confirm the circular nature of the embedding, we analyze the Betti numbers derived from the point cloud. Betti numbers describe the topological features of a space, with the <span class="math inline">\(k\)</span>-th Betti number counting the number of <span class="math inline">\(k\)</span>-dimensional “holes” in the manifold. Below is a figure showing a few basic topological spaces and their corresponding Betti numbers <span class="citation" data-cites="walker2008">Walker (<a href="#ref-walker2008" role="doc-biblioref">2008</a>)</span>:</p>
 <p><br></p>
 <div id="betti_numbers" class="cell figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/betti_numbers_illustrate.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<figcaption>Figure 3: Some simple topological spaces and their Betti numbers&nbsp;</figcaption>
+<figcaption>Figure 7 - Some simple topological spaces and their Betti numbers&nbsp;</figcaption>
 </figure>
 </div>
 </div>
@@ -421,37 +473,37 @@ window.Quarto = {
 </section>
 <section id="spud-method" class="level2">
 <h2 class="anchored" data-anchor-id="spud-method">SPUD Method</h2>
-<p>Once we’ve validated the assumption that our data forms a 1D ring manifold, we can proceed to fitting a spline to the data. There are many different methods, but the one chosen for this purpose was taken from <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>, called Spline Parametrization and SPUD. They worked with similar experiments and goals. The spline is defined by a set of points, or knots, which are initialized using kmedoids clustering <span class="citation" data-cites="jin2011">Jin and Han (<a href="#ref-jin2011" role="doc-biblioref">2011</a>)</span>. The knots are then fit to the data further by minimizing a loss function defined as follows:</p>
+<p>Once we’ve validated the assumption that our data forms a 1D ring manifold, we can proceed to fitting a spline to the data. We do this so that we can parametrize our behavioural variable <span class="math inline">\(\mathcal{hippocampal angle}\)</span> along the point cloud. There are many different methods, but the one chosen for this purpose was taken from <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>. The spline is defined by a set of points, or knots, which I decided to initialize using kmedoids clustering <span class="citation" data-cites="jin2011">Jin and Han (<a href="#ref-jin2011" role="doc-biblioref">2011</a>)</span>. The knots are then fit to the data further by minimizing a loss function defined as follows:</p>
 <p><span class="math display">\[
 \text{cost} = \text{dist} + \text{curvature} + \text{length} - \text{log(density)}
 \]</span></p>
 <p>where <em>dist</em> is the distance of each point to the spline, <em>curvature</em> is the total curvature of the spline, <em>length</em> is the total length of the spline, and <em>density</em> is the point cloud density of each knot.</p>
 <section id="overview-of-the-spud-method" class="level3">
 <h3 class="anchored" data-anchor-id="overview-of-the-spud-method">Overview of the SPUD Method</h3>
-<p>Spline Parameterization for Unsupervised Decoding (SPUD) <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span> is a multi-step method designed to parametrize a neural manifold. The goal of SPUD is to provide an <strong>on-manifold local parameterization</strong> using a <strong>local coordinate system</strong> rather than a global one. This method is particularly useful when dealing with <strong>topologically non-trivial variables</strong> that have a circular structure. The researchers developed this method to understand head direction representations in rats moving in a 2D environment.</p>
+<p>Spline Parameterization for Unsupervised Decoding (SPUD) <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span> is a multi-step method designed to parametrize a neural manifold. The goal of SPUD is to provide an on-manifold local parameterization using a local coordinate system rather than a global one. This method is particularly useful when dealing with topologically non-trivial variables that have a circular structure.</p>
 <p><strong>Spline Parameterization</strong>: SPUD parameterizes the manifold by first fitting a spline to the underlying structure. <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span> demonstrated that this works for head direction cells in mice to accurately parametrize, i.e.&nbsp;decode the head direction. Our goal is to have the parametrization accurately decode our latent variable of interest, the Hippocampal Gain (<span class="math inline">\(\mathcal{H}\)</span>).</p>
 </section>
 <section id="deciding-the-parameterization-of-the-latent-variable" class="level3">
 <h3 class="anchored" data-anchor-id="deciding-the-parameterization-of-the-latent-variable">Deciding the Parameterization of the Latent Variable</h3>
 <section id="natural-parametrization" class="level4">
 <h4 class="anchored" data-anchor-id="natural-parametrization">Natural Parametrization</h4>
-<p>A <strong>natural parameterization</strong> would mean that equal distances in the embedding space correspond to equal changes in the latent variable. The belief in the <strong>natural parameterization</strong> is rooted in the idea that neural systems allocate resources based on the significance or frequency of stimuli. For example, in systems like the visual cortex, stimuli that occur frequently (e.g., vertical or horizontal orientations) might be encoded with higher resolution. However, for systems like head direction, where all angles are equally probable, the natural parameterization reflects this uniform encoding strategy, with no overrepresentation of certain angles (<span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>). This would be expected with the hippocampal formation as well, that no place in a non biased circular maze should be allocated extra resources than another place in the maze.</p>
+<p>A <strong>natural parameterization</strong> would mean that equal distances in the embedding space correspond to equal changes in the latent variable. The natural parameterization comes from the assumption that neural systems allocate resources based on the significance or frequency of stimuli. For example, in systems like the visual cortex, stimuli that occur frequently (e.g., vertical or horizontal orientations) might be encoded with higher resolution. However, for systems like place cell firing, where all angles are spaces are equally probable in the dome, the natural parameterization reflects this uniform encoding strategy, with no overrepresentation of certain places (<span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>).</p>
 </section>
 <section id="alternative-parameterization-and-its-limitations" class="level4">
 <h4 class="anchored" data-anchor-id="alternative-parameterization-and-its-limitations">Alternative Parameterization and its Limitations</h4>
 <p>An alternative parameterization method was considered, in which intervals between consecutive knots in the spline were set to represent equal changes in the latent variable. This approach was designed to counteract any potential biases in the data due to over- or under-sampling in certain regions of the manifold.</p>
-<p>However, this alternative was not determined to be effective in practice by <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>. Given sufficient data, the natural parameterization performed better, supporting the conclusion that it better reflects how neural systems encode variables. In preliminary results, this is what seems to be the case for our experiment. Look to the following figure, in which a spline is fit to the data and a color map is applied to the natural parametrization. We can see that it aligns almost exactly with the hippocampal angle. Great, that’s exactly what we wanted!</p>
+<p>However, this alternative was not determined to be effective in practice by <span class="citation" data-cites="chaudhuri2019">Chaudhuri et al. (<a href="#ref-chaudhuri2019" role="doc-biblioref">2019</a>)</span>. Given sufficient data, the natural parameterization performed better, supporting the conclusion that it better reflects how neural systems encode variables. This is also the case for our experiment. Look to the following figure, in which a spline is fit to the data and a color map is applied to the natural parametrization. We can see that it aligns almost perfectly with the hippocampal angle. Great, that’s exactly what we wanted!</p>
 <p><br></p>
 <div id="hipp_angle_with_curve" class="cell figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/hipp_angle.gif" class="img-fluid figure-img" style="width:80.0%"></p>
-<figcaption>Figure 4: Spline fit on CEBRA embedding</figcaption>
+<figcaption>Figure 8 - Spline fit on CEBRA embedding</figcaption>
 </figure>
 </div>
 </div>
 <p><br></p>
-<p>So, what do we do now?</p>
+<p>So, what do we do now that we have an accurate parametrization of the <span class="math inline">\(\mathcal{hippocampal \. angle}\)</span>?</p>
 </section>
 </section>
 </section>
@@ -459,37 +511,140 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="decoding-hippocampal-gain-mathcalh">Decoding Hippocampal Gain (<span class="math inline">\(\mathcal{H}\)</span>)</h2>
 <section id="final-step" class="level3">
 <h3 class="anchored" data-anchor-id="final-step">Final Step</h3>
-<p>The next step is to determine if we can accurately decode Hippocampal Gain from the CEBRA embedding <em>alone</em>. The method to do this is straightforward (after all the setup is complete). Once we have parametrized the spline accurately to the neural data, we calculate the hippocampal gain by comparing the distance traveled in the neural manifold (derived from our spline) to the distance in the lab frame (actual movement of the rat).</p>
+<p>The final step is to decode <span class="math inline">\(\mathcal{H}\)</span> from the parametrization. The method to do this is straightforward. Once we have parametrized the spline accurately to the neural data, we calculate the hippocampal gain by comparing the distance/angle traveled in the neural manifold (derived from our spline) to the distance/angle in the lab frame (actual movement of the rat).</p>
 <p>The idea is that:</p>
 <p><span class="math display">\[
 \mathcal{H} = \frac{d\theta_\mathcal{H}}{d\theta_\mathcal{L}}
 \]</span></p>
-<p>where <span class="math inline">\(\theta_H\)</span> is the change in distance in the hippocampal reference frame, decoded from our spline parametrization of the neural manifold, and <span class="math inline">\(\theta_L\)</span> is the physical distance traveled by the rat in the lab frame.</p>
-<p>Note that this is actually just the original definition of $ $, but now <span class="math inline">\(\theta_H\)</span> is determined by our spline parameter, not the Fourier Transform method.</p>
-<p>For example, let’s take a time interval, say 1–2 seconds. To determine the hippocampal gain within that frame, we observe where the neural activity at times 1 and 2 maps in our manifold, calling these $ <em>{H1} $ and $ </em>{H2} $, respectively. Then, using the lab frame angles at times 1 and 2, which we’ll call $ <em>{L1} $ and $ </em>{L2} $, we find that:</p>
+<p>where <span class="math inline">\(\theta_H\)</span> is the change in angle in the hippocampal reference frame, decoded from our spline parametrization of the neural manifold, and <span class="math inline">\(\theta_L\)</span> is the physical angle traveled by the rat in the lab frame.</p>
+<p>Note that this is actually just the original definition of <span class="math inline">\(\mathcal{H}\)</span>, but now <span class="math inline">\(\theta_H\)</span> is determined by our spline parameter, not the Fourier Transform method.</p>
+<p>For example, let’s take a time interval, say 1–2 seconds. To determine the hippocampal gain within that frame, we observe where the neural activity at times 1 and 2 maps in our manifold, calling these <span class="math inline">\(\theta_{H1}\)</span> and <span class="math inline">\(\theta_{H2}\)</span>, respectively. Then, using the lab frame angles at times 1 and 2, which we’ll call <span class="math inline">\(\theta_{L1}\)</span> and <span class="math inline">\(\theta_{L2}\)</span>, we find that:</p>
 <p><span class="math display">\[
   \mathcal{H}(\text{between } t=1 \text{ and } t=2) = \frac{\theta_{\mathcal{H2}} - \theta_{\mathcal{H1}}}{\theta_{\mathcal{L2}} - \theta_{\mathcal{L1}}}
 \]</span></p>
-<p>We can apply this approach to any time interval (up to our sampling rate) to determine our <span class="math inline">\(H\)</span> value with precision.</p>
+<p>We extend the above example to all consecutive time points in the experiment to compute hippocampal gain (<span class="math inline">\(\mathcal{H}\)</span>) dynamically. The following Python code demonstrates how this is implemented:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> differentiate_and_smooth(data<span class="op">=</span><span class="va">None</span>, window_size<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Compute finite differences.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    diffs <span class="op">=</span> np.diff(data)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the moving average of differences.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    kernel <span class="op">=</span> np.ones(window_size) <span class="op">/</span> window_size</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    avg_diffs <span class="op">=</span> np.convolve(diffs, kernel, mode<span class="op">=</span><span class="st">'valid'</span>) </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> avg_diffs</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>derivative_decoded_angle_rad_unwrap <span class="op">=</span> differentiate_and_smooth(data<span class="op">=</span>filtered_decoded_angles_unwrap, window_size<span class="op">=</span><span class="dv">60</span>) <span class="co">#hippocampal angle from manifold parametrization.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>derivative_true_angle_rad_unwrap <span class="op">=</span> differentiate_and_smooth(data<span class="op">=</span>binned_true_angle_rad_unwrap, window_size<span class="op">=</span><span class="dv">60</span>) <span class="co">#true angle from session recordings.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>derivative_hipp_angle_rad_unwrap <span class="op">=</span> differentiate_and_smooth(data<span class="op">=</span>binned_hipp_angle_rad_unwrap, window_size<span class="op">=</span><span class="dv">60</span>) <span class="co">#hippocampal angle from Fourier Transform (traditional method, can be thought of as ground truth).</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>decode_H <span class="op">=</span> (derivative_decoded_angle_rad_unwrap) <span class="op">/</span> (derivative_true_angle_rad_unwrap) <span class="co">#take the "derivative" of hippocampal angle at each time point and divide by "derivative" of true angle at each time point.</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Now, plot H from manifold optimization vs H from traditional method (shown in results).</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This code calculates the hippocampal gain, <span class="math inline">\(\mathcal{H}\)</span>, by dividing the derivative of the hippocampal angle (obtained from the manifold parameterization) by the derivative of the true angle (obtained from session recordings). The result can be compared to <span class="math inline">\(\mathcal{H}\)</span> from the traditional Fourier-based method, as shown in the results section.</p>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>We now display and discuss the results. Below are a few results from applying this method to real experimental data from “Control and recalibration of path integration in place cells” (<span class="citation" data-cites="madhav2024">Madhav et al. (<a href="#ref-madhav2024" role="doc-biblioref">2024</a>)</span>). We first show two “good” trials (session 50 and 36), and two “bad” trials (session 26 and 29). We had trials where our data did not trace out a 1D ring topology in the pointcloud as can be clearly seen from the spline parametrization (and which can be easily quanitatively assessed using persistent homology). I will explain more clearly below what we mean by “good” and “bad”.</p>
+<section id="point-clouds-and-parametrization" class="level3">
+<h3 class="anchored" data-anchor-id="point-clouds-and-parametrization">Point clouds and parametrization</h3>
+<div id="hipp_angle_with_curve" class="cell figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/hipp_joined.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Figure 9 - Embeddings for both successful and unsuccessful trials: (a) Session 50 (top) and Session 36 (bottom) show embeddings with and without the spline fit (in red), representing successful trials. (b) Session 26 (top) and Session 29 (bottom) show embeddings for unsuccessful trials, where the manifold does not form a clear 1D ring topology.</figcaption>
+</figure>
+</div>
+</div>
+<p>Now we plot our H value decoded from the manifold versus the H value decoded from the Fourier Transform method and compare for “good” trials and “bad” trials.</p>
+</section>
+<section id="h-values" class="level3">
+<h3 class="anchored" data-anchor-id="h-values">H values</h3>
+<div class="grid">
+<div class="g-col-6">
+<p><strong>a</strong> <img src="images/H_session_50.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+<div class="g-col-6">
+<p><strong>b</strong> <img src="images/H_session_26.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+<div class="g-col-6">
+<p><strong>c</strong> <img src="images/H_session_36.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+<div class="g-col-6">
+<p><strong>d</strong> <img src="images/H_session_29.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+<div class="cell figure">
+<p>Figure 5 - Plot of manifold-decoded gain (red) vs.&nbsp;gain from the traditional method (blue) for different sessions: (a) Session 50, (b) Session 26, (c) Session 36, and (d) Session 29.</p>
+</div>
+<p>After observing both successful and unsuccessful trials, I asked: what distinguishes “good” results from “bad” ones?</p>
+<p>It became evident that the quality of results was strongly influenced by the <strong>number of neurons</strong> in the experimental recording. To quantify the quality of an embedding, I used the <strong>Structure Index (SI) score</strong> (<span class="citation" data-cites="sebastian2022">Sebastian, Esparza, and Prida (<a href="#ref-sebastian2022" role="doc-biblioref">2022</a>)</span>). The SI score measures how well the hippocampal angle is distributed across the point cloud.</p>
+<ul>
+<li><strong>SI ranges from 0 to 1:</strong>
+<ul>
+<li><strong>0:</strong> The hippocampal angle is randomly distributed within the point cloud.</li>
+<li><strong>1:</strong> The hippocampal angle is perfectly distributed, indicating a clear and accurate representation.</li>
+</ul></li>
+</ul>
+<p>Thus, a higher SI score corresponds to a better alignment between the hippocampal angle and the manifold parameterization.</p>
+</section>
+<section id="results-1" class="level3">
+<h3 class="anchored" data-anchor-id="results-1">Results</h3>
+<p>Consider the trials discussed earlier:</p>
+<ul>
+<li><strong>Successful trials (Sessions 50 and 36):</strong> SI scores were <strong>0.89</strong> and <strong>0.9</strong>, respectively.</li>
+<li><strong>Unsuccessful trials (Sessions 26 and 29):</strong> SI scores were <strong>0.34</strong> and <strong>0.67</strong>, respectively.</li>
+</ul>
+<p>The plot below illustrates the relationship between the number of neurons (or clusters) and the SI score. This highlights what I refer to as the “<strong>curse of clusters</strong>”: A minimum number of clusters (neurons) is required to achieve a successful trial.</p>
+<div class="cell figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Linear_and_logistic_fit.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Figure 10 - Relationship between number of clusters (neurons) and SI score.</figcaption>
+</figure>
+</div>
+</div>
+<p>This shows that trials with fewer neurons (&lt;35 clusters) are more likely to fail, while those with more neurons (&gt;35 clusters) generally produce high-quality embeddings with accurate parameterization.</p>
+<p>If the number of neurons was less than 35, we got “bad” results, and if the number of neurons was greater than 35, we got “good” results. We determined that in order to get an accurate <span class="math inline">\(\mathcal{H}\)</span> decoding, we need at least 35 neurons in the recording. Look at the plot below, where we look at the relationship between number of clusters and <span class="math inline">\(\mathcal{H}\)</span> decode error. The <span class="math inline">\(\mathcal{H}\)</span> decode error is calculated as, <span class="math display">\[
+\text{mean} \, \mathcal{H} \, \text{decode error} = \frac{1}{n} \sum_{i=1}^{n} \left( H_{\text{decode}}[i] - H_{\text{traditional}}[i] \right),
+\]</span></p>
+<p>where the sum is taken over all time indices in each array, and ( n ) is the number of time points.</p>
+<div id="hipp_angle_with_curve" class="cell figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/num_clusters_vs_mean_H_error.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Figure 11 - Plot of number of clusters (neurons) vs mean <span class="math inline">\(\mathcal{H}\)</span> error.</figcaption>
+</figure>
+</div>
+</div>
+<p>The majority of trials with more than 35 clusters (neurons) have a mean <span class="math inline">\(\mathcal{H}\)</span> decode error of less than 0.01. However, some trials with more than 35 clusters exhibit a higher decode error.</p>
+<p>The reason for this discrepancy lies in the topology of the manifold produced by CEBRA. Even when the trial appears “good” based on the SI metric, CEBRA does not always produce a 1D ring topology, which is crucial for accurate <span class="math inline">\(\mathcal{H}\)</span> decoding.</p>
+<p>Addressing this limitation will be part of the next steps in our methodology.</p>
 </section>
 </section>
 <section id="next-steps" class="level2">
 <h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
-<p>Next steps will be to first validate our natural parametrization quantitavely among the many experiments to see how accurately it decodes hippocampal position. And then to actually decode the hippocampal gain and explore the results we get and (hopefully) gain new insights into the neural mechanisms of navigation.</p>
 <ol type="1">
-<li><p><strong>Validate the Natural Parametrization</strong>: We will quantitatively assess the accuracy of our natural parametrization across multiple experiments to ensure it reliably decodes hippocampal position. This validation will confirm that the manifold is a faithful representation of the neural dynamics.</p></li>
-<li><p><strong>Decode the Hippocampal Gain</strong>: Once validated, we will proceed with decoding the hippocampal gain (<span class="math inline">\(H\)</span>) from the neural manifold and explore the results. This analysis will allow us to gain new insights into the neural mechanisms underlying navigation and path integration, potentially revealing novel aspects of how the hippocampus processes spatial information.</p></li>
-<li><p><strong>Apply to New Sessions</strong>: We can then leverage the cross-session consistency of CEBRA embeddings to apply this method to knew experimental sessions and modalities.</p></li>
+<li><p><strong>Apply the Method to Raw, Unfiltered Spike Data</strong><br>
+Instead of relying on manual, ad hoc clustering to identify neurons and spike trains, we propose applying CEBRA directly to the raw recorded neural data. This approach could help with issues related to the “curse of clusters,” as it eliminates the dependency on clustering quality and the number of detected clusters.</p></li>
+<li><p><strong>Simulate an Online Environment</strong><br>
+Test whether this method can be applied in a simulated “online” experimental environment. This would involve decoding neural representations in real time during an experiment, enabling closed-loop feedback and dynamic manipulation of experimental variables.</p></li>
+<li><p><strong>Modify the CEBRA Loss Function</strong><br>
+Adapt the CEBRA loss function to incorporate constraints that bias the resulting point cloud to lie on a desired topology. For instance, by guiding the embedding toward a 1D ring or a higher-dimensional structure, we could improve the consistency and interpretability of the manifold representation.</p></li>
 </ol>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>In this work, we demonstrated the power of CEBRA to decode hippocampal gain (<span class="math inline">\(\mathcal{H}\)</span>) at finer temporal resolutions without relying on traditional Fourier transform-based approaches. By embedding neural population activity into a low-dimensional latent space that captures the underlying topological structure of the experimental task, we successfully reconstructed a 1D ring manifold corresponding to the rat’s hippocampal reference frame. Persistent homology validated the circular topology, and the SPUD method was used to parametrize the manifold, enabling the decoding of hippocampal gain.</p>
+<p>We found that at least 35 well-isolated clusters (neurons) were needed for robust manifold estimation. Below this threshold, we had poor quality and topology of the embeddings, leading to inaccurate <span class="math inline">\(\mathcal{H}\)</span> decoding. Despite these issues, the results demonstrate the potential of manifold learning for experimental tasks of this type. This work will enable new experiments for causal modeling of the neural circuits responsible for cognitive representations.</p>
 
 
 
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-behrens2018" class="csl-entry" role="listitem">
-Behrens, Timothy E. J., Timothy H. Muller, James C. R. Whittington, Shirley Mark, Alon B. Baram, Kimberly L. Stachenfeld, and Zeb Kurth-Nelson. 2018. <span>“What Is a Cognitive Map? Organizing Knowledge for Flexible Behavior.”</span> <em>Neuron</em> 100 (2): 490–509. <a href="https://doi.org/10.1016/j.neuron.2018.10.002">https://doi.org/10.1016/j.neuron.2018.10.002</a>.
-</div>
 <div id="ref-chaudhuri2019" class="csl-entry" role="listitem">
 Chaudhuri, Rishidev, Berk Gerçek, Biraj Pandey, Adrien Peyrache, and Ila Fiete. 2019. <span>“The Intrinsic Attractor Manifold and Population Dynamics of a Canonical Cognitive Circuit Across Waking and Sleep.”</span> <em>Nature Neuroscience</em> 22: 1512–20. <a href="https://doi.org/10.1038/s41593-019-0460-x">https://doi.org/10.1038/s41593-019-0460-x</a>.
 </div>
@@ -502,8 +657,20 @@ Jin, Xiang, and Jiawei Han. 2011. <span>“K-Medoids Clustering.”</span> In <e
 <div id="ref-madhav2024" class="csl-entry" role="listitem">
 Madhav, Manu S., Ravikrishnan P. Jayakumar, Brian Y. Li, Shahin G. Lashkari, Kelly Wright, Francesco Savelli, James J. Knierim, and Noah J. Cowan. 2024. <span>“Control and Recalibration of Path Integration in Place Cells Using Optic Flow.”</span> <em>Nature Neuroscience</em>. <a href="https://doi.org/10.1038/s41593-024-01681-9">https://doi.org/10.1038/s41593-024-01681-9</a>.
 </div>
+<div id="ref-mitchell-heggs2023" class="csl-entry" role="listitem">
+Mitchell-Heggs, Rufus, Seigfred Prado, Giuseppe P. Gava, Mary Ann Go, and Simon R. Schultz. 2023. <span>“Neural Manifold Analysis of Brain Circuit Dynamics in Health and Disease.”</span> <em>Journal of Computational Neuroscience</em> 51: 1–21.
+</div>
+<div id="ref-moser2008" class="csl-entry" role="listitem">
+Moser, Edvard I., Emilio Kropff, and May-Britt Moser. 2008. <span>“Place Cells, Grid Cells, and the Brain’s Spatial Representation System.”</span> <em>Annual Review of Neuroscience</em> 31: 69–89.
+</div>
 <div id="ref-schneider2023" class="csl-entry" role="listitem">
 Schneider, Steffen, Jin Hwa Lee, and Mackenzie Weygandt Mathis. 2023. <span>“Learnable Latent Embeddings for Joint Behavioural and Neural Analysis.”</span> <em>Nature</em> 617: 360–68. <a href="https://doi.org/10.1038/s41586-023-05842-x">https://doi.org/10.1038/s41586-023-05842-x</a>.
+</div>
+<div id="ref-sebastian2022" class="csl-entry" role="listitem">
+Sebastian, Enrique R., Julio Esparza, and Liset M. de la Prida. 2022. <span>“Quantifying the Distribution of Feature Values over Data Represented in Arbitrary Dimensional Spaces.”</span> <em>Institute Cajal, CSIC, Madrid, Spain</em>. <a href="https://doi.org/10.1371/journal.pcbi.1011768.g001">https://doi.org/10.1371/journal.pcbi.1011768.g001</a>.
+</div>
+<div id="ref-tolman1948" class="csl-entry" role="listitem">
+Tolman, Edward C. 1948. <span>“Cognitive Maps in Rats and Men.”</span> <em>Psychological Review</em> 55 (4): 189–208.
 </div>
 <div id="ref-walker2008" class="csl-entry" role="listitem">
 Walker, Brenton. 2008. <span>“Using Persistent Homology to Recover Spatial Information from Encounter Traces.”</span> <em>In Proceedings of the ACM</em>. <a href="https://doi.org/10.1145/1374618.1374668">https://doi.org/10.1145/1374618.1374668</a>.
@@ -591,8 +758,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -703,7 +868,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

@@ -56,7 +56,7 @@ The inner for loop is the same as Algorithm1, where the coordinates are updated 
 
 ## Results
 ### Results of SARS-CoV2 datasets
-After obtaining an ab-initio model containing pose information from CryoSparc, we ran RECOVAR with a dimension of 4 on our SARS-CoV2 spike dataset after downsample particles to 128. Notice that in practice a grid size of 256 or higher is recommended to construct density maps with decent resolution, but we used 128 here for fast test of the original pipeline and extensions later. K-Means clustering was performed to find 5 cluster centers among the embeddings. Here for comparison with the modified algorithms in the later sections, we showed the complete movie of one RBD transiting from open state with ACE2 to close state below:
+After obtaining an ab-initio model containing pose information from CryoSparc, we ran RECOVAR with a dimension of 4 on our SARS-CoV2 spike dataset after downsampling particles to 128. Notice that in practice a grid size of 256 or higher is recommended to construct density maps with decent resolution, but we used 128 here for fast test of the original pipeline and extensions later. K-Means clustering was performed to find 5 cluster centers among the embeddings. Here for comparison with the modified algorithms in the later sections, we showed the complete movie of one RBD transiting from open state with ACE2 to close state below:
 {{< video img/movie5.mp4>}}:
 
 The original pipeline of RECOVAR is able to capture the motion of RBD between open and close states, as well as compositional changes in ACE2.

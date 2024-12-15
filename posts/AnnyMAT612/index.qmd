@@ -5,7 +5,7 @@ jupyter: python3
 author:
   - name: "Mo Wang"
 
-date: "October 24, 2024"
+date: "December 15, 2024"
 categories: [landscape-analysis, agriculture]
 
 callout-icon: false
@@ -13,7 +13,9 @@ format:
   html:
     mathjax: true
     code-fold: true
-# bibliography: bibliography.bib
+    allow-html: true
+bibliography: references.bib
+
 
 execute:
   eval: true
@@ -21,127 +23,488 @@ execute:
   freeze: auto
   warning: false
 ---
+## 1. Introduction and Motivation
 
-## Introduction
+In modern agriculture, the geometric features of farmland play a crucial role in farm management and planning. Understanding these characteristics enables farmers to make informed decisions, manage resources more efficiently, and promote sustainable agricultural practices.
 
-In modern agriculture, geometric features of farmland may affect crop yields and biodiversity. Understanding these characteristics has the potential to help farmers make better decisions, manage resources more efficiently, and promote sustainable agricultural practices. In this blog, we will explore whether field shape metrics (such as shape index, convexity/concavity, and aspect ratio) have an impact on crop yield and biodiversity.
+This research leverages data from [Litefarm](https://www.litefarm.org/), an open-source agri-tech application designed to support sustainable agriculture. Litefarm provides detailed information about farmland, including field shapes, offering valuable insights for analysis. However, as an open platform, Litefarm's database may include unrealistic or inaccurate data entries, such as "fake farms." Cleaning and validating this data is essential for ensuring the reliability of agricultural analyses.
 
-To conduct this research, we used data from [Litefarm](https://www.litefarm.org/), an open-source agri-tech application designed to support sustainable agriculture decision-making. Litefarm provides a wealth of data about farmland, including field shape, crop type and environmental conditions. The aim of this project is to investigate potential links between farmland shape characteristics and agricultural outcomes to understand whether geometric factors can play a role in improving productivity or promoting biodiversity.
+In this blog, we focus on identifying fake farms by analyzing field shapes to detect unrealistic entries. Our goal is to enhance data accuracy, providing a stronger foundation for future agriculture-related research.
 
 ![Litefarm Interface](img/Litefarm.png)
-Our research focuses on three main geometric characteristics:
 
-## Motivation
 
-This study aims to achieve two main goals:
 
-1. **Identify Fake Farms**: Using geometric metrics—**Shape Index**, **Convexity**, and **Aspect Ratio**—to filter out unrealistic fields that may indicate data errors.
+## 2. Dataset Overview and Preparation
 
-2. **Analyze Relationships Between Field Geometry and Crop Outcomes**: Investigate how the geometric characteristics of fields relate to **crop yield** and **crop diversity**, aiming to determine whether certain field shapes contribute to better farming efficiency or support greater biodiversity.
+### Data Source
+The data for this study was extracted from Litefarm's database, which contains detailed information about farm geometries, locations, and user associations. The dataset included the following key attributes:
 
-By understanding these aspects, we hope to provide insights that can improve farming practices, promote ecological health, and contribute to more sustainable agriculture.
+- **Farm-Level Information**:  
+  Each farm is uniquely identified by a **farm_ID**, representing an individual farm within the Litefarm database.
 
-## Geometric Characteristics of Fields
+- **Polygon-Level Information**:  
+  Each farm consists of multiple polygons, corresponding to distinct areas such as **fields**, **gardens**, or **barns**. Each polygon is uniquely identified by a **location_ID**, ensuring that every area within a farm is individually traceable.
 
-Three main geometric characteristics:
+- **Geometric Attributes**:  
+  - **Area**: The total surface area of the polygon.  
+  - **Perimeter**: The boundary length of the polygon.  
 
-### 1. **Shape Index**
-The **Shape Index** measures the complexity or irregularity of a polygon. A Shape Index close to 1 indicates a regular, compact shape, while higher values suggest more irregular shapes.
+- **Vertex Coordinates**:  
+  The geographic shape of each polygon is defined by a list of vertex coordinates in latitude and longitude format, represented as:
+  `[(lat1, lon1), (lat2, lon2), ..., (latN, lonN)]`.
 
-- **Formula**: 
+- **Polygon Types**:  
+  The polygons in each farm are categorized into various types:  
+  - **Fields**  
+  - **Farm site boundaries**  
+  - **Residences**  
+  - **Barns**  
+  - **Gardens**  
+  - **Surface water**  
+  - **Natural areas**  
+  - **Greenhouses**  
+  - **Ceremonial areas**  
+
+This rich dataset captures farm structures and geometries comprehensively, enabling the analysis of relationships between polygon features and agricultural outcomes.
+
+This study focuses specifically on **productive areas**—gardens, greenhouses, and fields—as these contribute directly to agricultural output. Since different polygon types possess unique geometric characteristics, we focused on a single type to maintain analytical consistency.
+
+As the Litefarm database is dynamic and continuously updated, the data captured as of November 28th showed that 36.4% of farms included garden areas, 20.7% had greenhouse areas, and nearly 70% contained fields. To ensure a robust and representative analysis, we focused on field polygons, which had the highest proportion within the dataset.
+
+### Refined Litefarm Dataset
+To ensure that only valid and realistic farm data was included in the analysis, we applied rigorous SQL filters to the Litefarm database. These filters excluded:
+
+- Placeholder farms and internal test accounts.  
+- Deleted records.  
+- Farms located in countries with insufficient representation (fewer than 10 farms).
+
+The table below summarizes the results of the filtering process and the composition of the cleaned dataset:
+
+| Description                                  | Count |
+|----------------------------------------------|-------|
+| Initial number of farms in Litefarm          | 3,559 |
+| Farms after SQL filtering                    | 2,919 |
+| Farms with field areas                       | 2,022 |
+| Farms with garden areas                      | 1,063 |
+| Farms with greenhouse areas                  | 607   |
+| Total number of field polygons               | 6,340 |
+
+By narrowing the focus to field polygons, we ensured that the dataset was both robust and suitable for exploring the relationship between geometric features and agricultural outcomes.
+
+## 3. Shape Analysis
+
+This study focuses on the geometric properties of field polygons, as these are essential for understanding farm structures and ensuring data reliability. Each field polygon is represented by a series of vertices in latitude-longitude pairs, which outline its geometric boundaries. These vertices are the foundation for calculating key metrics such as **area**, **perimeter**, and more complex shape properties. 
+
+To perform a robust analysis, we systematically processed and evaluated the field polygon data through the following steps:
+
+
+### 1. Vertex Distribution Analysis
+
+The first step in our analysis was to examine the **vertex distribution** of the field polygons to understand their general characteristics and ensure data quality. A box plot was created to visualize the distribution of vertex counts:
+![boxplot of vertices' number distribution](img/boxplot.png)
+
+The results revealed a wide range of vertex counts, spanning from 3 to 189 vertices. This variability required filtering to address potential outliers. Using the **z-score method**, we identified and excluded extreme values, capping the maximum vertex count at 34.
+
+After filtering, we analyzed the revised vertex distribution using a histogram, which revealed that 47.4% of field polygons had exactly four vertices:
+
+![histogram of number of veritces](img/number_of_vertices.png)
+
+### 2. Validation of Area and Perimeter Metrics
+
+#### Recalculation Process:
+1. Vertex coordinates, initially in latitude-longitude format, were transformed into a planar coordinate system (`EPSG:6933`) to enable precise calculations.
+2. **Area** and **perimeter** were computed directly from the transformed vertex data.
+
+Scatter plots comparing the user-provided values with the recalculated metrics showed strong alignment, with most points clustering around the diagonal (dashed line), confirming the accuracy of the recalculated values:
+
+- **Perimeter Comparison**  
+  ![Perimeter Scatter Plot](img/perimeter1.png)
+
+- **Area Comparison**  
+  ![Area Scatter Plot](img/area1.png)
+
+This validation step provided confidence in the accuracy of the recalculated metrics, allowing us to proceed with subsequent shape analysis using reliable data.
+
+
+## Field Polygon Standardization and Preparation
+
+To focus on the geometric properties of field polygons, we projected all polygons into a **size-and-shape space**. This transformation isolates the shape and scale of the polygons while removing variations caused by rotation and translation. The size-and-shape space ensures consistent and meaningful comparisons of the underlying geometric features.
+
+While this study emphasizes polygon shapes, we recognize that **area** is a critical feature in agricultural studies due to its relationship with factors like regional regulations and agricultural policies. Thus, we preserved the size (scaling) component in our analysis to maintain the relevance of area.
+
+To ensure uniformity and consistency in the dataset, we performed the following preprocessing steps:
+
+1. **Standardizing Landmark Points**:  
+
+To enable meaningful comparisons in the size-and-shape space, each polygon was resampled to have exactly 34 evenly spaced points along its boundary. The following Python function illustrates this process:
+
+```{python}
+#| eval: false
+import folium
+import json
+from shapely.geometry import shape, Polygon, Point, MultiPoint, MultiPolygon, LineString,LinearRing, MultiLineString
+from shapely.ops import unary_union, transform, nearest_points
+from collections import defaultdict
+import geopy.distance
+import pandas as pd
+import math
+import numpy as np
+from itertools import combinations
+import itertools
+import pyproj
+from functools import partial
+from collections import defaultdict
+import altair as alt
+import matplotlib.pyplot as plt
+import plotly.graph_objs as go
+from pyproj import Transformer, CRS 
+import seaborn as sns
+import plotly.express as px
+import logging
+from shapely.validation import explain_validity
+import geopandas as gpd
+import ast
+from geographiclib.geodesic import Geodesic
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from geopy.distance import geodesic
+from geomstats.geometry.pre_shape import PreShapeSpace
+from geomstats.visualization import KendallDisk, KendallSphere
+```
+
+```{python}
+
+#| eval: false
+def resample_polygon(projected_coords, num_points=34):
+    """
+    Resample a polygon's boundary to have a specified number of evenly spaced points.
+
+    Parameters:
+    - projected_coords: List of coordinates defining the polygon's boundary.
+    - num_points: The number of evenly spaced points to resample (default is 34).
+
+    Returns:
+    - new_coords: List of resampled coordinates.
+    """
+    ring = LinearRing(projected_coords)
+    
+    total_length = ring.length
+
+    distances = np.linspace(0, total_length, num_points, endpoint=False)
+    
+    new_coords = [ring.interpolate(distance).coords[0] for distance in distances]
+    
+    return new_coords
+```
+
+2. **Ensuring Consistent Vertex Direction**:  
+
+All polygons were standardized to have vertices drawn in the same direction (clockwise or counterclockwise). This step ensures that the orientation of the vertices does not introduce inconsistencies in the analysis.
+
+```{python}
+#| eval: false
+def is_clockwise(coords):
+    """
+    Check if the polygon vertices are in a clockwise direction.
+
+    Parameters:
+    - coords: List of coordinates defining the polygon's boundary.
+
+    Returns:
+    - True if the polygon is clockwise; False otherwise.
+    """
+    ring = LinearRing(coords)
+    return ring.is_ccw == False 
+
+def make_clockwise(coords):
+    """
+    Convert the polygon's vertices to a clockwise direction, if it is not 
+
+    Parameters:
+    - coords: List of coordinates defining the polygon's boundary.
+
+    Returns:
+    - List of coordinates ordered in a clockwise direction.
+    """
+    if not is_clockwise(coords):  
+        return [coords[0]] + coords[:0:-1]  # Reverse the vertex order, keeping the start point
+    return coords
+```
+
+The image illustrates four polygons that have been standardized by resampling them to have 34 evenly spaced points, with all vertices aligned in a clockwise direction.
+
+![The standardized polygon](img/resampled_polygon.png)
+
+
+#### Validation of Standardization
+
+To confirm the accuracy of these transformations, we compared the areas and perimeters of the resampled polygons with the original values. The results demonstrated minimal deviation, indicating the transformations preserved the integrity of the shapes.
+
+- **Perimeter Comparison**  
+
+![perimeter comparison](img/resamples_perimeter.png)
+
+- **Area Comparison**  
+
+![area comparison](img/resampled_area.png)
+
+By meeting these preprocessing requirements, we ensured that the polygons were accurately prepared for subsequent shape analysis.
+
+## Shape Alignment and Fréchet Mean Analysis
+
+With data preparation complete, the polygons were ready for analysis in the **size-and-shape space**. This specialized framework enables consistent comparison of shapes by accounting for geometric differences, including scaling, translation, and rotation. It provides a robust foundation for meaningful geometric analysis.
+
+The polygons were aligned using **Procrustes analysis**[@dryden2016shape], and their **Fréchet Mean** was iteratively computed in Euclidean space. This process standardizes the shapes, ensuring variations caused by translation and rotation are removed, allowing for accurate and meaningful comparisons.
+
+The **Fréchet Mean**[@dryden2016shape] represents the "average" shape in a geometric space (manifold), minimizing the average squared distance to all sample shapes. It serves as a standardized and central representation of the dataset.
+
+---
+
+#### Step-by-Step Overview
+
+1. **Shape Alignment**:
+   - The `align_shape` function performs Procrustes alignment through the following steps:
+     1. **Removing Translation**:  
+        - The centroid (average position of all points) of each shape is computed. The shape is then centered by subtracting its centroid from all points, ensuring the shape is position-independent.
+     2. **Removing Rotation**:  
+        - Using Singular Value Decomposition (SVD), the optimal rotation matrix is calculated to align the target shape with the reference shape. This step removes rotation differences while preserving the relative positions of the points.
+
+2. **Measuring Shape Differences**:
+   - The `riemannian_distance` function computes the **Riemannian distance** between two shapes in size-and-shape space. This metric quantifies geometric differences between shapes, considering both size and rotation.
+
+---
+##### Riemannian Distance in Size-and-Shape Space
+
+Given two  $k$-point configurations in $m$-dimensions, $X_1^o, X_2^o \in \mathbb{R}^{k \times m}$, the **Riemannian distance**[@dryden2016shape] in size-and-shape space is defined as:
+
 $$
-\text{Shape Index} = \frac{P}{2\sqrt{\pi A}}
+d_S(X_1^o, X_2^o) = \sqrt{S_1^2 + S_2^2 - 2 S_1 S_2 \cos \rho(X_1^o, X_2^o)}
 $$
-  Where $P$ is the perimeter and $A$ is the area.
 
-### 2. **Convexity/Concavity**
+where:
 
-Assesses whether a field has inward curves or if it is fully convex. Convex fields might support more efficient use of resources.
+- $S_1, S_2$: Centroid sizes of $X_1^o$ and $X_2^o$, representing the Frobenius norms of the centered shapes.
 
-### 3. **Aspect Ratio**
+- $\rho(X_1^o, X_2^o)$: Riemannian shape distance.
 
-Measures the proportion between the width and height of a field, offering insights into whether the field is elongated or compact, which could affect farming operations.
+This formula ensures that the distance captures both shape similarity and scaling differences, making it a robust tool for geometric analysis.
 
-By examining these metrics, we hope to uncover any relationship between field geometry and crop outcomes, which will ultimately promote more productive and sustainable farming practices.
+3. **Iterative Fréchet Mean Calculation**:
+   - The algorithm begins with an initial **reference shape** and aligns all other shapes to it using Procrustes alignment. 
+   - The Fréchet Mean is then calculated as the average shape in Euclidean space.
+   - The shapes are iteratively re-aligned to the updated Fréchet Mean, refining the alignment and mean calculation until convergence is achieved.
+
+---
+
+#### Python Implementation
+
+The following Python code implements the entire process of shape alignment, Riemannian distance computation, and iterative Fréchet Mean calculation.
+
+```{python}
+#| eval: false
+def align_shape(reference_shape, target_shape):
+    """
+    Align the target shape to the reference shape using Procrustes alignment.
+
+    Parameters:
+    - reference_shape: The reference shape to align to.
+    - target_shape: The shape to be aligned.
+
+    Returns:
+    - aligned_shape: The aligned target shape.
+    """
+    reference_shape = np.array(reference_shape)
+    target_shape = np.array(target_shape)
+
+    # Step 1: Remove the translation
+    centroid_reference = np.mean(reference_shape, axis=0)
+    centroid_target = np.mean(target_shape, axis=0)
+    centered_reference = reference_shape - centroid_reference
+    centered_target = target_shape - centroid_target
+
+    # Step 2: Remove the rotation
+    u, s, vh = np.linalg.svd(np.matmul(np.transpose(centered_target), centered_reference))
+    r = np.matmul(u, vh)
+    aligned_shape = np.matmul(centered_target, r)
+
+    return aligned_shape
+
+def riemannian_distance(reference_shape, target_shape):
+    """
+    Compute the Riemannian distance between two shapes.
+
+    Parameters:
+    - reference_shape: The reference shape.
+    - target_shape: The target shape.
+
+    Returns:
+    - distance: The Riemannian distance between the shapes.
+    """
+    reference_shape = np.array(reference_shape)
+    target_shape = np.array(target_shape)
+
+    # Step 1: Compute centroid sizes
+    S1 = np.linalg.norm(reference_shape)  
+    S2 = np.linalg.norm(target_shape)
+
+    # Step 2: Remove translation by centering the shapes
+    centered_reference = reference_shape - np.mean(reference_shape, axis=0)
+    centered_target = target_shape - np.mean(target_shape, axis=0)
+
+    # Step 3: Compute optimal rotation using SVD
+    H = np.dot(centered_target.T, centered_reference)
+    U, _, Vt = np.linalg.svd(H)
+    R = np.dot(U, Vt)
+
+    # Step 4: Align target shape
+    aligned_target = np.dot(centered_target, R)
+
+    # Step 5: Compute the Riemannian distance
+    cosine_rho = np.trace(np.dot(aligned_target.T, centered_reference)) / (S1 * S2)
+    cosine_rho = np.clip(cosine_rho, -1, 1)
+    distance = np.sqrt(S1**2 + S2**2 - 2 * S1 * S2 * cosine_rho)
+
+    return distance
+
+# Iterative Fréchet Mean Calculation
+epsilon = 1e-6  
+max_iterations = 100  
+reference_shape = field_data['resampled_point'].iloc[0]  
+aligned_shapes = []
+
+# Align all shapes to the initial reference shape
+for target_shape in field_data['resampled_point']:
+    aligned_shape = align_shape(reference_shape, target_shape)
+    aligned_shapes.append(aligned_shape)
+
+# Initialize Euclidean space and calculate initial Fréchet Mean
+euclidean_space = Euclidean(dim=aligned_shapes[0].shape[1])
+frechet_mean = FrechetMean(euclidean_space)
+previous_frechet_mean_shape = frechet_mean.fit(aligned_shapes).estimate_
+converged = False
+iteration = 0
+frechet_means = [previous_frechet_mean_shape]
+
+while not converged and iteration < max_iterations:
+    iteration += 1
+    aligned_shapes2 = []
+    for target_shape in field_data['resampled_point']:
+        aligned_shape = align_shape(previous_frechet_mean_shape, target_shape)
+        aligned_shapes2.append(aligned_shape)
+
+    # Calculate new Fréchet Mean
+    frechet_mean = FrechetMean(euclidean_space)
+    current_frechet_mean_shape = frechet_mean.fit(aligned_shapes2).estimate_
+    frechet_means.append(current_frechet_mean_shape)
+    
+    # Check convergence
+    difference = riemannian_distance(previous_frechet_mean_shape, current_frechet_mean_shape)
+    if difference < epsilon:
+        converged = True
+    else:
+        previous_frechet_mean_shape = current_frechet_mean_shape
+```
 
 
 
-## Dataset Overview
+## Global Fréchet Mean and Outlier Detection
 
-In this section, we describe the dataset from Litefarm and how we represent each farm field as a polygon for analysis.
+Here is the global Fréchet mean calculated from all field polygons:
 
-The dataset from Litefarm provides geographic data for each farm field, which Litefarm can automatically use to calculate the perimeter and area of each field. However, these values can be overwritten by the user. To maintain consistency and accuracy in our analysis, we chose to calculate the perimeter and area ourselves.
+![The global mean shape ](img/mean_shape.png)
 
-The dataset includes the following fields:
+The following image illustrates the original polygon and its alignment with the Fréchet mean:
 
-- **FarmID**: Unique identifier for each farm.
-- **Longitude**: Longitude value of the geographic coordinate.
-- **Latitude**: Latitude value of the geographic coordinate.
-- **Field Coordinates**: A list of coordinates representing the boundary of the field.
-- **Calculated Perimeter**: The perimeter of the field, calculated by iterating through each coordinate, pairing each point with the next to form a side, and accumulating the distance for each side.
-- **Calculated Area**: The area of the field, calculated by converting geographic coordinates into UTM coordinates to create a projection suitable for precise measurements.
+![Aligned Shape](img/aligned_shape.png)
 
-![farm polygon](img/polygon.png)
+After aligning all shapes to the Fréchet mean, the `riemannian_distance` function was used to calculate the distances between the mean shape and each aligned shape. To identify potential outliers, the z-score method was applied to these distance values.
 
-## Filtering and Identifying Fake Fields
+Below are the four field polygons detected as outliers using the global Fréchet mean:
 
-To ensure the quality and reliability of the dataset, it is important to filter out fields that are not suitable for our analysis. In this study, we used **shape index**, **convexity**, and **aspect ratio** as the main tools to identify and filter potential false fields, because extreme values ​​in these indices may indicate overly complex or irregular boundaries, which are unlikely to occur in real-world agricultural scenarios.
+```{python,echo = False}
+import pandas as pd
 
-### Filtering Criteria
+# Load the CSV file
+four_potiential_fake_farm = pd.read_csv("/Users/app/Desktop/UBC/MAT612/blog/posts/AnnyMAT612/data/potiential_fake_field.csv")
 
-**Shape Index**: 
-
-Fields with a shape Index greater than 1 is inefficient in terms of perimeter relative to area, while values significantly greater than 1 or less than 1 may indicate that the polygon is unrealistic.
-
-Shape index is calculated based on the perimeter and area ($\text{Shape Index} = \frac{P}{2\sqrt{\pi A}}$).
-
-   - If a shape index of polygon is significantly greater than 1 may indicate that the polygon is unrealistic or a data entry error.
-   - If a shape Index less than 1 is unusual and often indicates a data error, 
-
-**Low Convexity**
-
-Fields with low convexity, characterized by significant inward curves or irregular boundaries, are flagged as potentially unrealistic. These shapes are not typical for well-managed agricultural fields and may indicate data entry errors or geographic anomalies that make the field impractical for farming.
-
-- **Create Polygon Object**: We create a `Polygon` object using `shapely` package and a list of geographic coordinates that represent the boundary of the field.
-
-- **Calculate Convex Hull**: We calculate the convex hull of the polygon using the `polygon.convex_hull`  attribute of the Polygon object. The convex hull represents the smallest convex shape that contains all the points of the original polygon.
-
-- **Calculate Convexity**: Convexity is calculated as the ratio of the area of the original polygon to the area of its convex hull (`convexity = calculated area / convex_hull.area`).
-    - If the value is close to 1, it means the polygon is mostly convex.
-    - If the value is significantly less than 1, it means there are significant inward curves or concavities.
+# Display the table
+four_potiential_fake_farm   # Or use `data` to show the entire table
+```
 
 
-**Unusual Low Aspect Ratio**
 
-Fields with extremely high or low aspect ratios, indicating that the field is very elongated or unusually compact, are also flagged for further review. These fields may be difficult to manage effectively due to their shape, making them less likely to be realistic farm plots.
+## Fréchet Mean Shape by Country
 
-- **Create Polygon Object**: We create a `Polygon` object using `shapely` package and a list of geographic coordinates that represent the boundary of the field.
+The shape of field polygons varies significantly across different countries. To capture this variation, we calculated the **Fréchet mean shape*** for each country based on the fields located within that specific country.
 
-- **Get Bounding Box**: The bounding box of the polygon is calculated using `polygon.bounds`, which returns four values:
-    - `minx`, `miny`: These are the minimum x and y values, representing the bottom-left corner of the bounding box.
-    - `maxx`, `maxy`: These are the maximum x and y values, representing the top-right corner of the bounding box.
+The plot below summarizes the Fréchet mean shapes for all countries in the dataset.  
 
-- **Calculate Width and Height**: The width is calculated as the difference between `maxx` and `minx`, while the height is the difference between `maxy` and `miny`.
+In this visualization, **different colors represent different continents**. It is evident that both the shapes and areas of the field polygons differ substantially across regions, highlighting the diversity in field geometry across countries.
 
-- **Calculate Aspect Ratio**: The aspect ratio is determined by dividing the width by the height (`width / height`). This measure provides an indication of how elongated the field is:
-    - An aspect ratio close to **1** suggests a more square or compact field.
-    - A very high or low aspect ratio indicates an elongated shape, which could be more challenging for farming operations.
+![Summary of Countries' Mean Shapes](img/output.png)
+
+### Assessing Mean Shape Representation in Countries with Limited Data
+
+To evaluate the representativeness of the mean shape, we specifically selected countries with fewer than 10 polygons. The small number of polygons in these cases allows for easier visualization, helping us assess whether the mean shape effectively captures the overall geometric characteristics of these datasets.
+
+#### Zambia
+
+![Field polygons and Fréchet mean for Zambia](img/small_number_country1.png)
+
+#### Chile
+
+![Field polygons and Fréchet mean for Chile](img/small_number_country.png)
+
+From the above plots, we can draw the following conclusions:
+
+- **Effective Representation with Similar Shapes**:  
+
+  When the field polygons within a country have similar shapes, the calculated Fréchet mean serves as an effective representation of the general shape trend.
+
+- **Limitations with Diverse Shapes**:  
+
+  If the field polygons within a country show significant variation in their shapes, the Fréchet mean becomes less representative and may fail to adequately capture the geometric diversity of the dataset.
 
 
-Filter out fields with high Shape Index value, Shape Index less than one, low Convexity, or unusual Aspect Ratios, as these fields may indicate unrealistic shapes or data errors. For example, fields with high complexity, highly irregular inward curves, or extremely elongated forms may be impractical for farming, suggesting potential data errors or unrealistic scenarios.
+
+### Detecting Potential Fake Field Polygons
+
+Building on the country-level mean shape analysis, we applied the same methodology to detect potential fake field polygons. For each country, field polygons were aligned to their corresponding **Fréchet mean**, and the **z-score technique** was used to identify anomalies based on the distances between each polygon and the mean shape.
+
+Through this analysis, we identified **51 potential fake field polygons**. To verify their validity, we visualized each field polygon on satellite imagery. The results are summarized in the plot below:
+
+- **Gray markers**: Fake fields  
+- **Pink markers**: True fields  
+- **Orange markers**: Potential fake fields  
+
+![Satellite plot for all 51 potential fake fields](img/satelite.png)
+
+After visualizing all 51 potential fake field polygons, the findings were as follows:
+
+- **45.1%** were confirmed as fake fields.  
+- **29.4%** were ambiguous, meaning they could potentially be either fake or real fields, requiring further investigation.
+- **25.5%** were determined to be true fields.
+
+Below are examples of confirmed fake fields. These polygons often exhibit:  
+
+- **Unusual geometric shapes**  
+
+- **Sizes that are disproportionately large compared to neighboring field polygons**
 
 
-## Evaluating Relationships Between Field Geometry and Crop Characteristics
+![fake field polygons](img/fake_farm.jpg)
 
-Once the polygons are validated, we aim to analyze the relationship between field geometry and crop characteristics:
 
-### **Crop Yield vs. Field Geometry**
+### Future Work
 
-We will link the geometric features of fields, such as Shape Index, Convexity, and Aspect Ratio, with crop yield data to determine if more compact or convex fields tend to be more productive. By comparing yield data with geometric characteristics, we hope to identify patterns that suggest whether fields with certain shapes are more efficient for farming and yield better results.
+Our analysis successfully identified a significant number of potential fake field polygons, with nearly half of these cases being validated as genuinely fake. While this demonstrates the effectiveness of our approach, there is still room to improve the accuracy and reliability of the detection process. To further refine our results, future efforts will focus on:
 
-### **Crop Diversity vs. Field Geometry**
+1. **Incorporate Geographic Information**:  
+   Enrich the dataset with geographic features such as proximity to natural landmarks (e.g., mountains, rivers) or man-made structures (e.g., urban areas, roads). These features could provide valuable context for improving the calculation of the Fréchet mean and detecting anomalies more effectively.
+2. **Improve Outlier Detection Methods**:  
+   Leverage advanced machine learning models, such as clustering algorithms or ensemble methods, to identify subtle patterns and relationships that may indicate fake fields. Techniques like unsupervised learning or deep anomaly detection could also be explored to improve performance.  
 
-We will also explore the relationship between field shapes and crop diversity. Specifically, we are interested in whether concave or complex field shapes might support greater biodiversity by providing natural features that can accommodate multiple types of crops or diverse ecosystems. Fields with more irregular shapes may have areas that promote diverse cropping systems, leading to improved ecological health and sustainability.
+### References
 
-By examining these metrics, we hope to uncover any relationships between field geometry and crop outcomes, which could ultimately contribute to more productive and sustainable agricultural practices. However, the goal is exploratory, as it is uncertain whether these geometric characteristics will significantly influence crop productivity or biodiversity.
 

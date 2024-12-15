@@ -1,5 +1,5 @@
 ---
-title: "Extentions to RECOVAR for heterogeneity analysis of SARS-CoV2 spike protein from cryo-EM data"
+title: "Extensions to RECOVAR for heterogeneity analysis of SARS-CoV2 spike protein from cryo-EM data"
 bibliography: references.bib
 date: "December 11 2024" # Format example: August 9 2024
 author:

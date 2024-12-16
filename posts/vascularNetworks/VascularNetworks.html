@@ -166,7 +166,8 @@ window.Quarto = {
     <div class="quarto-title column-body">
       <h1 class="title">Vascular Networks</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">MATH 612</div>
+                <div class="quarto-category">Graph theory</div>
+                <div class="quarto-category">Vascular Networks</div>
               </div>
                   </div>
   </div>
@@ -201,13 +202,39 @@ window.Quarto = {
    
   <ul>
   <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
   <li><a href="#anderson-chaplain-model-of-angiogenesis" id="toc-anderson-chaplain-model-of-angiogenesis" class="nav-link" data-scroll-target="#anderson-chaplain-model-of-angiogenesis">Anderson-Chaplain Model of Angiogenesis</a></li>
   <li><a href="#branching-annihilating-random-walker" id="toc-branching-annihilating-random-walker" class="nav-link" data-scroll-target="#branching-annihilating-random-walker">Branching-Annihilating Random Walker</a></li>
-  <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing">Data Pre-Processing</a></li>
+  </ul></li>
+  <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing">Data Pre-Processing</a>
+  <ul class="collapse">
   <li><a href="#time-evolution-of-networks" id="toc-time-evolution-of-networks" class="nav-link" data-scroll-target="#time-evolution-of-networks">Time Evolution Of Networks</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#enhanced-loop-detection-algorithm" id="toc-enhanced-loop-detection-algorithm" class="nav-link" data-scroll-target="#enhanced-loop-detection-algorithm">Enhanced Loop Detection Algorithm</a></li>
+  <li><a href="#statistical-analysis-of-loops" id="toc-statistical-analysis-of-loops" class="nav-link" data-scroll-target="#statistical-analysis-of-loops">Statistical Analysis of Loops</a></li>
+  <li><a href="#geometric-shape-analysis-fréchet-and-hausdorff-distances" id="toc-geometric-shape-analysis-fréchet-and-hausdorff-distances" class="nav-link" data-scroll-target="#geometric-shape-analysis-fréchet-and-hausdorff-distances">Geometric Shape Analysis: Fréchet and Hausdorff Distances</a>
+  <ul class="collapse">
+  <li><a href="#fréchet-distance" id="toc-fréchet-distance" class="nav-link" data-scroll-target="#fréchet-distance">Fréchet Distance</a></li>
+  <li><a href="#hausdorff-distance" id="toc-hausdorff-distance" class="nav-link" data-scroll-target="#hausdorff-distance">Hausdorff Distance</a></li>
+  <li><a href="#interpretation-of-heatmap-1" id="toc-interpretation-of-heatmap-1" class="nav-link" data-scroll-target="#interpretation-of-heatmap-1">Interpretation of Heatmap</a></li>
+  <li><a href="#comparison-of-metrics" id="toc-comparison-of-metrics" class="nav-link" data-scroll-target="#comparison-of-metrics">Comparison of Metrics</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#clustering" id="toc-clustering" class="nav-link" data-scroll-target="#clustering">Clustering</a></li>
+  <li><a href="#feature-transformation-and-dimensionality-reduction-in-shape-analysis" id="toc-feature-transformation-and-dimensionality-reduction-in-shape-analysis" class="nav-link" data-scroll-target="#feature-transformation-and-dimensionality-reduction-in-shape-analysis">Feature Transformation and Dimensionality Reduction in Shape Analysis</a>
+  <ul class="collapse">
+  <li><a href="#dimensionality-reduction" id="toc-dimensionality-reduction" class="nav-link" data-scroll-target="#dimensionality-reduction">Dimensionality Reduction</a>
+  <ul class="collapse">
+  <li><a href="#t-sne-t-distributed-stochastic-neighbor-embedding" id="toc-t-sne-t-distributed-stochastic-neighbor-embedding" class="nav-link" data-scroll-target="#t-sne-t-distributed-stochastic-neighbor-embedding">t-SNE (t-Distributed Stochastic Neighbor Embedding)</a></li>
+  <li><a href="#umap-uniform-manifold-approximation-and-projection" id="toc-umap-uniform-manifold-approximation-and-projection" class="nav-link" data-scroll-target="#umap-uniform-manifold-approximation-and-projection">UMAP (Uniform Manifold Approximation and Projection)</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul></li>
   <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -218,12 +245,12 @@ window.Quarto = {
 
 
 
-<section id="abstract" class="level2">
-<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
 <p>I have introduced some basic concepts of micro-circulation and the vascular networks and how they get created (angiogenesis) in health and disease. Then I discuss some angiogenesis models (Anderson-Chaplain as well as BARW) and use the tools of the geomstats to analyze the loopy structure in these networks. I explained the characteristics of the loopy structures in the networks in terms of the parameters of the model. Furthermore, I consider the time evolution of the graphs created by these networks and how the characterization of the loopy structures change through time in these networks.</p>
 </section>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
 <p>Vascular network in animals is a complex network of vessels to carry the nutrients to and wastes out from the tissue. Main parts of the blood circulation system is determined during the embryo development (like the location and characterization of the main veins and arteries). However, the exact positioning and hierarchy of the capillary networks is not predetermined genetically, but is an adaptive process. A tissue under hypoxia (experiencing low oxygen) will initiate biochemical signals to recruit new vessels. One of the main signaling molecules is the tumor angiogenic factor (TAF) and as the name suggests it is highly expressed by tumor under oxygen stress (hypoxia). The TAF molecules will diffuse in the interstitial space. Upon interaction with pre-existing vessels, they will digest through the basal membrane of the pre-existing vessels and will activate the endothelial cells (that are lining the inner part lumen of all vessels in the body). The endothelial cells activated by TAF will turn into tip cells which will move up in the gradient of TAF, and they will make branches of vessels which will grow as the tip cells are moving. See figure below for details.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -232,7 +259,6 @@ window.Quarto = {
 </figure>
 </div>
 <p>There are also other factors important in the process of tip cell movement among which is the concentration of fibronectin in the environment. Fibronectin is a protein that acts like a glue and attaches the cells to intracellular matrix, which mediates the cell movement. In the section related to the angiogenesis models we will discuss how this protein is considered in the models.</p>
-</section>
 <section id="anderson-chaplain-model-of-angiogenesis" class="level2">
 <h2 class="anchored" data-anchor-id="anderson-chaplain-model-of-angiogenesis">Anderson-Chaplain Model of Angiogenesis</h2>
 <p>Anderson-Chaplain model of angiogenesis describes the angiogenesis process considering the factors like TAF and fibronectin. This model contains three variables <span class="math inline">\(\newcommand{\R}{\mathbb{R}}\)</span> <span class="math inline">\(\newcommand{\abs}[1]{|#1|}\)</span></p>
@@ -267,8 +293,9 @@ window.Quarto = {
 </figure>
 </div>
 </section>
-<section id="data-pre-processing" class="level2">
-<h2 class="anchored" data-anchor-id="data-pre-processing">Data Pre-Processing</h2>
+</section>
+<section id="data-pre-processing" class="level1">
+<h1>Data Pre-Processing</h1>
 <p>The data generated by the Anderson-Chaplain model or BARW model are typically matrices (i.e.&nbsp;images) (however, there are certain ways to construct a graph representing the final structure during the simulation). To be able to do any form of computation with the simulated data (like finding the loops, etc) it is convenient to turn the images into a graph.</p>
 <p>For the outputs of the Anderson-Chaplain model , since the vessels are more crowded at some regions, we first did a dilation followed by a erosion (using OpenCV) to enhance the images for further processing. We then applied a connectivity-8 kernel to the enhanced images to find the nodes, and finally used the processes information to turn the vascular network in the image into a graph in python (using NetworkX library). See figure below for more details. We also applied the same processing pipeline on the data generated by the BARW model which is shown in the following figure</p>
 <div class="quarto-figure quarto-figure-center">
@@ -291,7 +318,6 @@ window.Quarto = {
 </figure>
 </div>
 <p><strong>Study Plan</strong>: In this section we will use the notions of Kendall shape space to study the structure of the loops that appear under different parameters of the model.</p>
-</section>
 <section id="time-evolution-of-networks" class="level2">
 <h2 class="anchored" data-anchor-id="time-evolution-of-networks">Time Evolution Of Networks</h2>
 <p>Vascular networks are not static structure, but rather the evolve in time in response to the changing metabolic demand of the underlying tissue, as well as the metabolic cost of the network itself, and the overall energy required to pump the fluid through the network (See <span class="citation" data-cites="Pries2010">Pries and Secomb (<a href="#ref-Pries2014" role="doc-biblioref">2014</a>)</span> for more discussion). To put this in different words, the role of vascular networks is to deliver nutrients to the tissue and remove the wastes. To do this, it needs to have a space filling configuration with lots of branches. However, due to the Poiseuille law for the flow of fluids in a tube, the power needed to pump the fluid through the tube scales with <span class="math inline">\(r^{-4}\)</span> where <span class="math inline">\(r\)</span> is the radius of the tube. I.e. smaller vessel segments needs a huge power to pump the blood through them. Thus have a massively branched structure is not an optimal solution. On the other hand, the vascular network consists of cells which requires maintenance as well. Thus the optimized vascular network should have a low volume as well. Because of these dynamics in action, in the angiogenesis process first a mesh of new blood vessels form which later evolve to a more ordered and hierarchical structure in a self-organization process.</p>
@@ -308,6 +334,146 @@ window.Quarto = {
 <figcaption>Time evolution of optimal transport network. A triangulation of a 2D domain is considered to be the graph over which we optimize the flow. The sink term is represented by green dot, while the sources are represented by yellow dots. Different sub-figures show the flow network at different time steps towards converging to the optimal configuration.</figcaption>
 </figure>
 </div>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+<p>We have performed different goemetrical analysis and clustering methods on the loops tructure of the generated graphs by Branching-Annihilating-Random-Walker model. We need to highlight that assigning meaningful biological explanations was not the focus of this study.</p>
+<p>In summary, we did the following improvements to the model using the concepts that we learned in this course: * Enhanced Loop Detection Algorithms * Multiscale Loop Detection WorkFlow * Statistical Analysis of Loops * Loop Structure Clustering * Geometrical Analysis of Loops</p>
+<section id="enhanced-loop-detection-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="enhanced-loop-detection-algorithm">Enhanced Loop Detection Algorithm</h2>
+<p>Before, we used to generate .png images of the simulation result (see figures above) and then perform image analysis to detect loops. For instance we have convolving the image with 4-connectivity and 8-connectivity matrices to extract the graph structres present in the images. In the new approch, instead, we managed to record the structre of the network in a NetworkX datastructre. This is not easy task to perform without smart useage of the object oriented programming structure for the code. We organized our code into following classes</p>
+<p><img src="images/plantuml.svg" class="img-fluid"></p>
+<p>Using this structure, we can record the graph structure of the generated networks as a NetworkX dataframe. Then we can use some of the built-in functions of this library to get the loops (cycles) of the network. However, since the generated networks are large, finding all of the loops (of all scales) is computationally very costly. Instead, we first found a minimal set of cycles in the graph that forms a basis for the cycles space. I.e. we found the loops that can be combined (by symmetric difference) to generate new loops. The following figure shows the basis loops highlighted on the graph.</p>
+<p><img src="images/improvedDetection.png" class="img-fluid"></p>
+<p>As mentioned above, detected cycles are the basis cycles. The space of all cycles in a graph form a vector space and the basis cycles is a basis for that space. In other words, these cycles are all the cycles necessary to generate all of the cycles in the graph. The addition operation between two cycles is the symmetric difference of their edge set (or XOR of their edges). We can combined the basis cycles to generate higher level (and lower level) structure as shown below.</p>
+<p><img src="images/multiScaleCycles.png" class="img-fluid"></p>
+<p>We can also extract and scale all of the loops for further analysis. The following figure shows all the loops in the network</p>
+<p><img src="images/grid_basis.png" class="img-fluid"></p>
+<p>The following figures shows some of the loop strucgures that we can get by combining the loops above.</p>
+<p><img src="images/grid_Generated.png" class="img-fluid"></p>
+</section>
+<section id="statistical-analysis-of-loops" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-analysis-of-loops">Statistical Analysis of Loops</h2>
+<p>The mechanism that generated the vascular networks is an stochastic process (Branching process + Simple Radnom Walk process + local interactions (annihilation)). So we need to use statistical notions to make some observations. In the figure below, the histogram of the cycle length is plotted. The interesting observation is the fact that the number of cycles is exponentially distributed (with respect to the Cycle length). The slope of this line (on log-log plot) can reveal some very important facts about the universality class that our model belongs to. Not only this is very interesting and important from theoretical point of view, but also it can have very useful practical applications. For instance, in comparing the simulated network with real vascualr networks, this slope can be one of the components of comparison.</p>
+<p><img src="images/CountVsLengthLogLog.png" class="img-fluid"></p>
+<p>Furthremore, it is instructive to study the correlation matrix between some of the features of the loop.</p>
+<p><img src="images/FeatureCorrelationMatrix.png" class="img-fluid"></p>
+</section>
+<section id="geometric-shape-analysis-fréchet-and-hausdorff-distances" class="level2">
+<h2 class="anchored" data-anchor-id="geometric-shape-analysis-fréchet-and-hausdorff-distances">Geometric Shape Analysis: Fréchet and Hausdorff Distances</h2>
+<p>In geometric shape analysis, comparing cycles involves quantifying their similarity based on the spatial arrangement of points in each cycle. Two widely used measures for such comparisons are the <strong>Fréchet Distance</strong> and the <strong>Hausdorff Distance</strong>. These metrics provide different insights into the relationship between cycles, and their results can be visualized as heatmaps of pairwise distances.</p>
+<section id="fréchet-distance" class="level3">
+<h3 class="anchored" data-anchor-id="fréchet-distance">Fréchet Distance</h3>
+<p>The <strong>Fréchet Distance</strong> between two curves $ A = {a(t) t } $ and $ B = {b(t) t } $ is defined as:</p>
+<p><span class="math display">\[
+d_F(A, B) = \inf_{\alpha, \beta} \max_{t \in [0,1]} \| a(\alpha(t)) - b(\beta(t)) \|,
+\]</span></p>
+<p>where:</p>
+<ul>
+<li>$ (t) $ and $ (t) $ are continuous, non-decreasing reparameterizations of the curves $ A $ and $ B $.</li>
+<li>$ | | $ denotes the Euclidean norm.</li>
+<li>The infimum is taken over all possible parameterizations $ $ and $ $.</li>
+</ul>
+<section id="interpretation-of-heatmap" class="level4">
+<h4 class="anchored" data-anchor-id="interpretation-of-heatmap">Interpretation of Heatmap</h4>
+<p>The heatmap for the Fréchet distance shows the pairwise distances between all cycles. Each entry $ (i, j) $ in the heatmap represents $ d_F(C_i, C_j) $, the Fréchet distance between cycle $ C_i $ and cycle $ C_j $. Key insights include:</p>
+<ul>
+<li><strong>Small Values:</strong> Cycles with low Fréchet distances are geometrically similar in terms of overall shape and trajectory.</li>
+<li><strong>Large Values:</strong> Larger distances indicate significant differences in the geometry or shape of the cycles.</li>
+</ul>
+<p>The heatmap highlights clusters of similar cycles and outliers with unique geometries.</p>
+<p><img src="images/FrechetDistance.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="hausdorff-distance" class="level3">
+<h3 class="anchored" data-anchor-id="hausdorff-distance">Hausdorff Distance</h3>
+<p>The <strong>Hausdorff Distance</strong> between two sets of points $ A $ and $ B $ is defined as:</p>
+<p><span class="math display">\[
+d_H(A, B) = \max \{ \sup_{a \in A} \inf_{b \in B} \| a - b \|, \sup_{b \in B} \inf_{a \in A} \| b - a \| \}.
+\]</span></p>
+<p>This can be broken down into:</p>
+<ul>
+<li>$ <em>{a A} </em>{b B} | a - b | $: The maximum distance from a point in $ A $ to the closest point in $ B $.</li>
+<li>$ <em>{b B} </em>{a A} | b - a | $: The maximum distance from a point in $ B $ to the closest point in $ A $.</li>
+</ul>
+<p>The Hausdorff distance quantifies the greatest deviation between the two sets of points, considering how well one set covers the other.</p>
+</section>
+<section id="interpretation-of-heatmap-1" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation-of-heatmap-1">Interpretation of Heatmap</h3>
+<p>The heatmap for the Hausdorff distance shows pairwise distances between cycles. Each entry $ (i, j) $ represents $ d_H(C_i, C_j) $, the Hausdorff distance between cycle $ C_i $ and cycle $ C_j $. Key insights include:</p>
+<ul>
+<li><strong>Small Values:</strong> Indicates that the points of one cycle are closely aligned with the points of another cycle.</li>
+<li><strong>Large Values:</strong> Reflects that one cycle has points significantly farther away from the other, suggesting geometric dissimilarity.</li>
+</ul>
+<p>The heatmap highlights cycles that are well-aligned (small distances) and those that are far apart in terms of shape.</p>
+<p><img src="images/HausdorffDistance.png" class="img-fluid"></p>
+</section>
+<section id="comparison-of-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-of-metrics">Comparison of Metrics</h3>
+<ul>
+<li><strong>Fréchet Distance:</strong> Sensitive to the ordering of points along the curves, making it suitable for comparing trajectories or continuous shapes.</li>
+<li><strong>Hausdorff Distance:</strong> Ignores the order of points and focuses on the maximum deviation between sets, making it useful for analyzing shape coverage.</li>
+</ul>
+<p>Both metrics complement each other in analyzing the geometric properties of cycles. While the Fréchet distance emphasizes trajectory similarity, the Hausdorff distance focuses on the extent of shape overlap.</p>
+</section>
+</section>
+</section>
+<section id="clustering" class="level1">
+<h1>Clustering</h1>
+<section id="features-used-for-clustering" class="level4">
+<h4 class="anchored" data-anchor-id="features-used-for-clustering">Features Used for Clustering</h4>
+<p>For each cycle in the networks, the following features are extracted:</p>
+<ul>
+<li>Length: Total length of the cycle, calculated as the sum of the lengths of all edges in the cycle.</li>
+<li>Area: Enclosed area of the cycle, approximated using the Shoelace formula.</li>
+<li>Compactness: Ratio of the area to the square of the perimeter (area/perimeter<span class="math inline">\(^2\)</span>).</li>
+<li>Centroid: The geometric center of the cycle, defined as the mean of the x- and y-coordinates of all points in the cycle.</li>
+</ul>
+</section>
+<section id="principal-component-analysis-pca" class="level4">
+<h4 class="anchored" data-anchor-id="principal-component-analysis-pca">Principal Component Analysis (PCA)</h4>
+<p>PCA is used for dimensionality reduction by projecting high-dimensional data onto a lower-dimensional subspace while preserving as much variance as possible. The original features (length, area, compactness, centroid) are normalized and reduced to two dimensions using PCA. The first two principal components capture the maximum variance in the data, allowing clustering methods to operate in a simplified feature space.</p>
+<ul>
+<li>Interpretation: The axes in the PCA-reduced space represent linear combinations of the original features. Clusters in this space indicate groups of cycles with similar characteristics.</li>
+</ul>
+<p><img src="images/PCAClustering1.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="feature-transformation-and-dimensionality-reduction-in-shape-analysis" class="level1">
+<h1>Feature Transformation and Dimensionality Reduction in Shape Analysis</h1>
+<p>In analyzing geometric properties of cycles in networks, high-dimensional feature spaces often obscure relationships between cycles. This section describes the use of feature engineering and nonlinear dimensionality reduction techniques (<strong>t-SNE</strong> and <strong>UMAP</strong>) to uncover hidden patterns, simplify visualization, and enhance interpretability. The outputs are 2D visualizations that highlight structural and functional groupings within the data. The following composite features were derived:</p>
+<ul>
+<li><strong>Area-to-Length Ratio:</strong> Computed as $ $. This feature differentiates between compact cycles (high ratio) and elongated cycles (low ratio).</li>
+<li><strong>Normalized Compactness:</strong> Computed as $ $. This feature accounts for the relative efficiency of cycles in enclosing their area.</li>
+</ul>
+<section id="dimensionality-reduction" class="level2">
+<h2 class="anchored" data-anchor-id="dimensionality-reduction">Dimensionality Reduction</h2>
+<p>Nonlinear dimensionality reduction methods project high-dimensional data into a lower-dimensional space while preserving specific structural properties.</p>
+<section id="t-sne-t-distributed-stochastic-neighbor-embedding" class="level3">
+<h3 class="anchored" data-anchor-id="t-sne-t-distributed-stochastic-neighbor-embedding">t-SNE (t-Distributed Stochastic Neighbor Embedding)</h3>
+<p><strong>t-SNE</strong> minimizes the divergence between probability distributions over pairwise distances in high-dimensional and low-dimensional spaces. It focuses on preserving local structures (relationships between nearby points) and is particularly effective at uncovering clusters. The key parameters are <strong>Perplexity:</strong> Controls the balance between local and global structure (default: 30), and <strong>Output Dimension:</strong> Reduced to 2D for visualization.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/TSNECycles.png" class="img-fluid figure-img"></p>
+<figcaption>Some notes to interpret the plot: that cycles forming tight clusters share strong similarities in features such as length, area, or compactness. Isolated points (outliers) indicate rare or unique geometries. t-SNE emphasizes local structures, making it ideal for detecting smaller, tightly-knit groups.</figcaption>
+</figure>
+</div>
+</section>
+<section id="umap-uniform-manifold-approximation-and-projection" class="level3">
+<h3 class="anchored" data-anchor-id="umap-uniform-manifold-approximation-and-projection">UMAP (Uniform Manifold Approximation and Projection)</h3>
+<p><strong>UMAP</strong> approximates the high-dimensional data manifold and optimally preserves both local and global structures. It provides more interpretable embeddings with smooth transitions between clusters. The key parameters are <strong>Number of Neighbors:</strong> Defines the size of the local neighborhood considered for embedding (default: 15), and <strong>Output Dimension:</strong> Reduced to 2D for visualization.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/UMap.png" class="img-fluid figure-img"></p>
+<figcaption>Some notes to interpret the plot: UMAP preserves both local and global structures, making it suitable for analyzing large-scale patterns. Transitions between clusters indicate gradual changes in feature space, useful for understanding progression or hierarchy in cycle characteristics. Dense clusters suggest strong feature alignment, while sparse areas highlight feature variability.</figcaption>
+</figure>
+</div>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>We used a stochastic process (Branching Annihilating Random Walker) to generate some random networks (that resembes the vascular networks). Then we translated this structure to a networkX data frame for easier processing. We extracted the cycle basis for the cycle space of the graph and using the symmetric difference operation we generated new cycles (of different scales). Then performed different statistical and geometrical analysis on the shape of the loops in the graph. Also we calculated different features for the graph and used dimnsionality reduction methods to see if we can observe any structures (clusters) in low dimension.</p>
+</section>
 </section>
 <section id="appendix" class="level2">
 <h2 class="anchored" data-anchor-id="appendix">Appendix</h2>
@@ -359,6 +525,7 @@ For a graph, the Laplacian matrix contains the information on the in/out flow of
 
 
 
+</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">

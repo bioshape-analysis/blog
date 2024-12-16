@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Qiyu Wang">
+<meta name="dcterms.date" content="2024-12-11">
+
+<title>Extensions to RECOVAR for heterogeneity analysis of SARS-CoV2 spike protein from cryo-EM data – bioshape-analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/videojs/video.min.js"></script>
+<link href="../../site_libs/quarto-contrib/videojs/video-js.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">bioshape-analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Extensions to RECOVAR for heterogeneity analysis of SARS-CoV2 spike protein from cryo-EM data</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">cryo-EM</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Qiyu Wang </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 11, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#review-of-the-original-recovar-pipeline" id="toc-review-of-the-original-recovar-pipeline" class="nav-link" data-scroll-target="#review-of-the-original-recovar-pipeline">Review of the original RECOVAR pipeline</a></li>
+  <li><a href="#extensions-to-recovar-mppc-for-path-discovery" id="toc-extensions-to-recovar-mppc-for-path-discovery" class="nav-link" data-scroll-target="#extensions-to-recovar-mppc-for-path-discovery">Extensions to RECOVAR: MPPC for path discovery</a></li>
+  <li><a href="#extensions-to-recovar-atomic-model-fitting" id="toc-extensions-to-recovar-atomic-model-fitting" class="nav-link" data-scroll-target="#extensions-to-recovar-atomic-model-fitting">Extensions to RECOVAR: atomic model fitting</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#results-of-sars-cov2-datasets" id="toc-results-of-sars-cov2-datasets" class="nav-link" data-scroll-target="#results-of-sars-cov2-datasets">Results of SARS-CoV2 datasets</a></li>
+  <li><a href="#comparison-of-paths-discovered-by-density-vs.-mppc" id="toc-comparison-of-paths-discovered-by-density-vs.-mppc" class="nav-link" data-scroll-target="#comparison-of-paths-discovered-by-density-vs.-mppc">Comparison of paths discovered by density vs.&nbsp;MPPC</a></li>
+  <li><a href="#results-of-atomic-model-fitting" id="toc-results-of-atomic-model-fitting" class="nav-link" data-scroll-target="#results-of-atomic-model-fitting">Results of atomic model fitting</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p>In the previous post <em>Heterogeneity analysis of cryo-EM data of proteins dynamic in comformation and composition using linear subspace methods</em>, we reviewed the pipeline of RECOVAR <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span> to generate movies showing the heterogeneity of proteins, and discussed its pros, cons and some improvements we could make. RECOVAR is a linear method which borrows the idea from principal component analysis to project complex structure information within cryo-EM data corresponding to each particle onto a lower dimensional space, where a trajectory is computed to illustrate the conformational and compositional changes (see previous post for details).</p>
+<p>Compared with other methods, mostly based on deep learning, RECOVAR has several advantages, include but not limited to fast computation of embeddings, easy trajectory discovery in latent space and fewer hyperparameters to tune. Nevertheless, we’ve noticed several problems when we tested RECOVAR on our SARS-CoV2 datasets. One shortcoming is that the density-based trajectory discovery algorithm used by RECOVAR involves a deconvolution operation between two large matrices, which is extremely expensive. The other improvement we would like to make is to extend the series of density maps output by RECOVAR to the series of atomic models, which is usually the final product structure biologists desire in order to obtain atomic interpretations. In this post, we will focus on how we address these two problems, and present and interpret results from our SARS-CoV2 dataset.</p>
+<p>Before getting to the Methods, I would like to provide background information about SARS-CoV2 spike protein. SARS-CoV2 spike protein is a trimer binding to the surface of SARS-CoV2 virus. It has a so-called recpetor-binding domain (RBD) capable of switching between “close” and “open” states. When in the open state, the spike is able to recognize and bind to angiotensin-converting enzyme 2 (ACE2), an omnipresent enzyme on the membrane of the cells of the organs in the respiratory system, heart, intestines, testis and kidney <span class="citation" data-cites="hikmet_2020">(<a href="#ref-hikmet_2020" role="doc-biblioref">Hikmet et al. 2020</a>)</span>. The binding to ACE2 helps the virus dock on the target cells and initalize the invasion and infection of the cells. Therefore, spike is often the major target for antibody development. Previous researches mainly focus on developing drugs neutralizing the RBD regions in the open state. However as I mentioned before, spike can switch to the close state, in which the antibody targeting open RBD will not longer be able to access it, making the drugs less effective. Motivated by recent progress in the heterogeneity analysis of proteins, researchers now focus on the conformational changes instead of a homogeneous state. Developing drugs to block the shape change of spike is considered an potentially more efficient way to neutralize viruses. This is why it is important to have a reliable pipeline to generate movies showing the conformational changes in spike proteins.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/spike_ace2.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>An illustration of how shape changes in RBD of SARS-CoV2 spike lead to the binding of ACE2. Spike is a trimer with three chains (in grey, purple and green). The RBD is located in the part of the spike away from virus membrane. In this figure, the RBD of one chain (in green) is open and binds to ACE2.<span class="citation" data-cites="PPR:PPR217218">(<a href="#ref-PPR:PPR217218" role="doc-biblioref">Taka et al. 2020</a>)</span></figcaption>
+</figure>
+</div>
+<p>The dataset we used comprises of 271,448 SARS-CoV2 spike protein particles, with some binding to ACE2. Therefore we would expect the algorithm to be able to deal with both conformational and compositional heterogeneity.</p>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<section id="review-of-the-original-recovar-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="review-of-the-original-recovar-pipeline">Review of the original RECOVAR pipeline</h3>
+<p>In this section I will briefly review RECOVAR. You can refer to the previous blog for more formal and detailed formulation of the problem.</p>
+<p>RECOVAR starts with estimating the mean <span class="math inline">\(\hat{\mu}\)</span> and covariance matrix <span class="math inline">\(\hat{\Sigma}\)</span> of the conformations by solving the least square problems between the projection of the mean conformation and the particle images in the dataset. Next, principal components (PCs) can be computed from <span class="math inline">\(\hat{\mu}\)</span> and <span class="math inline">\(\hat{\Sigma}\)</span>, and we obtained embeddings projected from conformations on the latent space formed by those (PCs). In order to generate a movie, the authors compute conformational densities by deconvolving densities in the latent space with embedding uncertainty, and finds a path between two specified states maximizing the accumulated densities along the path. Then each embeddings are converted into density maps via kernel regression.</p>
+</section>
+<section id="extensions-to-recovar-mppc-for-path-discovery" class="level3">
+<h3 class="anchored" data-anchor-id="extensions-to-recovar-mppc-for-path-discovery">Extensions to RECOVAR: MPPC for path discovery</h3>
+<p>The density-based path discovery algorithm used by RECOVAR is based on physical considerations that molecules prefer to take the path with lowest free energy, which is the path with highest conformational density, and is robust against outliers. Nevertheless, the time to deconvolve density is exponential of the number of PCs, and deconvolution requires large memory. Our 24GB GPU can deconvolve density at most a dimension of 4, but 4 PCs are usually not enough to capture enough heterogeneity as shown in the figure below, which indicates how the eigenvalues change with the number of PCs when applying RECOVAR to the SARS-CoV2 spike dataset. There are still quite large drops in the eigenvalue after 4 PCs.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/eigenvalue.png" class="img-fluid figure-img" style="width:45.0%"></p>
+<figcaption>Eigenvalues (y-axis) of PCs (indexed by x-axis) of the SARS-CoV2 spike dataset applied with RECOVAR</figcaption>
+</figure>
+</div>
+<p>Therefore, we proposed an alternative method to discover path by computing multiple penalized principal curves (MPPC) <span class="citation" data-cites="slav2017">(<a href="#ref-slav2017" role="doc-biblioref">Kirov and Slepčev 2017</a>)</span>. The basic idea of MPPC is to find one or multiple curves to fit all the given points as close as possible, with constraints in the number and lengths of the curves. In order to be solved numerically, the curves are usually discretized. Let <span class="math inline">\(y^1 = (y_1, y_2, ..., y_{m_1}), y^2 = (y_{m_1+1}, y_{m_1+2}, ..., y_{m_1+m_2}),...,y^k = (y_{m-m_k+1}, y_{m-m_k+2},...,y_{m})\)</span> to be <span class="math inline">\(k\)</span> curves represented by <span class="math inline">\(m=m_1+m_2+...+m_k\)</span> points. Let <span class="math inline">\(s_c = \sum_{j=1}^{c}m_j\)</span> be the indices of the end points of curve <span class="math inline">\(c\)</span>. Each point <span class="math inline">\(x_i\)</span> in the data to fit is assigned to the closest point on the curves, and we denote <span class="math inline">\(I_j\)</span> to be the group of indices of data points that are assigned to curve point <span class="math inline">\(y_j\)</span>. The goal is to minimize: <span class="math display">\[\sum_{j=1}^m\sum_{i\in I_j}w_i|x_i-y_j|^2+\lambda_1\sum_{c=0}^{k-1}\sum_{j=1}^{m_c+1}|y_{s_c+j+1}-y_{s_c+j}|+\lambda_1 \lambda_2 (k-1)\]</span></p>
+<p>where <span class="math inline">\(w_i\)</span> is the weight assigned to <span class="math inline">\(i\)</span>th data point, and <span class="math inline">\(\lambda_1\)</span> and <span class="math inline">\(\lambda_2\)</span> reglarize the lengths and number of the curves.<span class="math inline">\(\sum_{j=1}^m\sum_{i\in I_j}w_i|x_i-y_j|^2\)</span> penalizes the distance of the curves to data points, <span class="math inline">\(\lambda_1\sum_{c=0}^{k-1}\sum_{j=1}^{m_c+1}|y_{s_c+j+1}-y_{s_c+j}|\)</span> is the total length of all the curves, and <span class="math inline">\(\lambda_1 \lambda_2 (k-1)\)</span> controls the number of curves. Applied to our case, we set <span class="math inline">\(w_i\)</span> to be the inverse of the trace of the covariance matrix of the embedding to make the curves fit better to those embeddings with high confidence.</p>
+</section>
+<section id="extensions-to-recovar-atomic-model-fitting" class="level3">
+<h3 class="anchored" data-anchor-id="extensions-to-recovar-atomic-model-fitting">Extensions to RECOVAR: atomic model fitting</h3>
+<p>When resolving homogenoeous structures of proteins, atomic models are usually the final product instead of density maps as they contain more structural information. Atomic models are fitted into density maps either manually or automatically, but most start from scratch, which is very inefficient to be applied to density map series because the difference between the neighboring maps should be relatively small. We can take advantage of this property by updating coordinates of the fitted model of the previous frame to get the model fitted in the current density map. Hence, we proposed two algorithms to fit atomic model, both are based on gradient descent.</p>
+<p>Let <span class="math inline">\(R_{t-1}\in \mathbb{R}^{N_a\times 3}\)</span> be the fitted atomic model of the <span class="math inline">\(t-1\)</span>th density map, where <span class="math inline">\(N_a\)</span> is the number of atoms in the protein. We can use deposited protein structure or model predicted from sequence using algorithms like AlphaFold as <span class="math inline">\(R_0\)</span>. Let <span class="math inline">\(V_t\in\mathbb{R}^{N\times N\times N}\)</span> be the <span class="math inline">\(t\)</span>th density map we want to fit in, where <span class="math inline">\(N\)</span> is the grid size. We cannot directly minimize the “distance” between <span class="math inline">\(R_{t-1}\)</span> and <span class="math inline">\(V_t\)</span>, because atomic coordinates cannot be compared with volume maps. A natural way to solve this issue is to map atomic coordinates to density map with a function <span class="math inline">\(f: \mathbb{R}^{N_a\times 3}\rightarrow \mathbb{R}^{N\times N\times N}\)</span>, for example, by summing up the gaussian kernels centered at each coordinate i.e. <span class="math display">\[V_t({\bf r}=(x,y,z)^T) = \sum_{k=1}^{N_a} \exp -\frac{\|{\bf r} - R_t[k]\|_2^2}{2\sigma_k^2}\]</span></p>
+<p>However, the computational time for one mapping is <span class="math inline">\(O(N^3N_a)\)</span>, which is already very slow, even without considering the fact that we have to map coordinates to densities in many update iterations. Hence in practice we used truncated gaussian kernels.</p>
+<p>Now we have all the tools needed to have algorithms fit atomic model <span class="math inline">\(R_{t-1}\)</span> into density map <span class="math inline">\(V_t\)</span>. Our first algorithm purely based on gradient descent will be:</p>
+<p><img src="img/algorithm1.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:120.0%"></p>
+<p>When computing the loss used for gradient descent, we included not only the difference between <span class="math inline">\(V_t\)</span> and mapped density from coordinates, but also the difference between the starting and current bond lengths/angles to preserve the original structure. In practice, we computed intra-residue bond lengths i.e.&nbsp;bond lengths of <span class="math inline">\(N-CA, CA-C \text{ and } C-O\)</span> and inter-residue bond lengths <span class="math inline">\(C_i-N_{i+1}\)</span>. In practice proteins can have multiple chains (like SARS-CoV2 spike which has three chains), so we set the inter-residue bond lengths at end points of the chains to be <span class="math inline">\(0\)</span>. We used dihedral angles <span class="math inline">\(\phi\)</span> (i.e.&nbsp;angles formed by <span class="math inline">\(C_i-N_{i+1}-CA_{i+1}-C_{i+1}\)</span>) and <span class="math inline">\(\psi\)</span> (i.e.&nbsp;angles formed by <span class="math inline">\(N_i-CA_i-C_i-N_{i+1}\)</span>) as bond angles, and similarly set the dihedral angles cross the chains to be <span class="math inline">\(0\)</span>.</p>
+<p>One weakness of gradient descent is that it can be easily stuck in local optima. Leveraging the recent progress in diffusion models for protein generation, we proposed the second algorithm as following:</p>
+<p><img src="img/algorithm2.png" class="img-fluid" style="display: block; margin-left: auto; margin-right: auto;;width:120.0%"></p>
+<p>The inner for loop is the same as Algorithm1, where the coordinates are updated through gradient descent. The difference is that an outer loop is added which diffuses and then denoises the fitted coordinates from previous round of gradient descent and uses the denoised coordinates as the starting model of the current round of gradient descent. We adapted the diffusion model and graph neural network (GNN) based denoiser from Chroma <span class="citation" data-cites="ingraham2023">(<a href="#ref-ingraham2023" role="doc-biblioref">Ingraham et al. 2023</a>)</span>.</p>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="results-of-sars-cov2-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="results-of-sars-cov2-datasets">Results of SARS-CoV2 datasets</h3>
+<p>After obtaining an ab-initio model containing pose information from CryoSPARC <span class="citation" data-cites="punjani_2017">(<a href="#ref-punjani_2017" role="doc-biblioref">Punjani et al. 2017</a>)</span>, we ran RECOVAR with a dimension of 4 on our SARS-CoV2 spike dataset after downsampling particles to 128. Notice that in practice a grid size of 256 or higher is recommended to construct density maps with decent resolution, but we used 128 here for fast test of the original pipeline and extensions later. K-Means clustering was performed to find centers among the embeddings. Here for comparison with the modified algorithms in the later sections, we showed the complete movie of one RBD transiting from open state with ACE2 to close state below: </p><div class="quarto-video"><video id="video_shortcode_videojs_video2" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="img/movie5.mp4"></video></div><p></p>
+<p>The original pipeline of RECOVAR is able to capture the motion of RBD between open and close states, as well as compositional changes in ACE2.</p>
+</section>
+<section id="comparison-of-paths-discovered-by-density-vs.-mppc" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-of-paths-discovered-by-density-vs.-mppc">Comparison of paths discovered by density vs.&nbsp;MPPC</h3>
+<p>To compare the paths generated by MPPC to original density-based approaches, we ran MPPC on the embedings with a dimension of 4. The figure below shows the path generated by density-based methods from state 0 to 1 and 2 to 3, and path output by MPPC:</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/path_compare_4d.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Paths in 4D space output by density-based methods and MPPC. In each sub-figure, the path is visuliazed on the plane formed by 6 pairs of principal components.</figcaption>
+</figure>
+</div>
+<p>We can see that path between 0 and 1 is completely missing in MPPC path. Path from 2 to 3 presents in MPPC path between the orange node and purple node, but is slightly pulled towards outliers.</p>
+<p>It is mentioned in Methods that one advantage to use MPPC is that its low computational cost allows us to fit data in higher dimension, so we also fit MPPC to data in 10D. The results are present in the figure below:</p>
+<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="img/movie4.mp4"></video></div>
+<p>We can see that the spike in the 10D movie is more flexible and there are more changes in the shape than 4D.</p>
+</section>
+<section id="results-of-atomic-model-fitting" class="level3">
+<h3 class="anchored" data-anchor-id="results-of-atomic-model-fitting">Results of atomic model fitting</h3>
+<p>We first tested two atomic model fitting algorithms on the simplest case where we started from an atomic model and fit into a density map that is close to the starting model. We took deposited SARS-CoV2 spike protein structure 7V7R as initial model and generated target density map with truncated gaussian kernels from another protein 7V7Q.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/starting_model.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption>Starting (7V7R in blue) and target (7V7Q in brown) SARS-CoV2 spike used to test atomic model fitting algorithms</figcaption>
+</figure>
+</div>
+<p>We ran 12000 iterations for Algorithm1. To make a fair comparison, same number of total loops, composed of 60 outer diffusion loops and 200 inner gradient descent loops were run with Algorithm2. We kept the regularization parameters the same for both algorithms. Both algorithms took about 950 seconds to complete. In UCSF Chimera <span class="citation" data-cites="pettersen2004">(<a href="#ref-pettersen2004" role="doc-biblioref">Pettersen et al. 2004</a>)</span>, we aligned initial model 7V7R, fitted model from Algorithm1 and fitted model output by Algorithm2 with 7V7Q, computed root mean square deviation (RMSD) between aligned coordinates, and annotated the structures with red-blue color where red denotes high RMSD (large difference) and blue means low RMSD (small difference). The results are shown below:</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/fit_result.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Left: initial model (7V7R) aligned with target model (7V7Q); Middle: fitted model from Algorithm1 aligned with target model (7V7Q); Right: fitted model from Algorithm2 aligned with target model (7V7Q)</figcaption>
+</figure>
+</div>
+<p>Surprisingly, Algorithm1 performs better than Algorithm2, with more regions in deep blue color indicating low RMSD, though its design is relatively simple. Overall, both algorithms make significant progress from the initial model to fit into the target density map. There are certain white regions with medium RMSD, but the most important motions in the RBD regions are succressfully captured.</p>
+<p>To test whether there will be a significant accumulation of errors if we kept using fitted model from last frame as the initial model to fit the current frame, we used our algorithms to fit into a series of three density maps, generated from proteins 7V7R, 7V7Q, and 7V7S, starting from 7V7P. Consecutive proteins in the series were aligned and local RMSD was computed to visualize the degree of conformational changes at different regions of different frames more intuitively.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/series.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption>Starting from 7V7P (brown), we fit the density map simulated from 7V7R (pink), 7V7Q (blue), and 7V7S (green) sequentially</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/series_rmsd.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Aligment of consecutive proteins in the series for test</figcaption>
+</figure>
+</div>
+<p>Most conformational changes in this series occur in the RBD region, with 7V7S undergoing the most significant changes, and expected to be the hardest model to fit. We used the same parameters as before to fit each model with both algorithms, and followed the same procedure to compute and visualize local RMSD for each frame in the series.</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/series_simple.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Test results on series from Algorithm1</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/series_gnn.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Test results on series from Algorithm2</figcaption>
+</figure>
+</div>
+<p>Same as the previous test, Algorithm1 performs better than Algorithm2 in fitting all the maps in the series. Compared with fitting to maps generated from 7V7Q starting with “true” 7V7R, initializing model with fitted 7V7R from previous step does not lead to siginificant increase in RMSD in fitted 7V7Q. There are some white regions with medium RMSD shared by three fitted models, but the RMSD of these regions does not increase. There is a part with high RMSD in the left region of the last structure 7V7S in the series, but it seems that the error is not accumulated from previous fitting as the RMSD of this region of the privious fitting is very low.</p>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<p>In this project we proposed MPPC as an alternative approach to compute path. Although this a method can be used to find paths in higher dimension with very fast speed, it is more sensitive to outliers. One way to address this issue is to iteratively remove points that are far away from the curves and then fit the curve. Another feature of MPPC is that it does not take the starting and ending points. This can be either an advantage or disadvantage, depending on the objective. MPPC works if the goal is to study the conformational change trajectory in the entire space. Nevertheless, if we are more interested in how proteins transit between two specific states, MPPC may output path even not passing these two states. On the other hand, the movie output from trajectories found by MPPC in higher dimension indeed captures more changes in shape, which helps discover rare conformations.</p>
+<p>One problem occurring to lots of datasets like the one we tested is that the output path contains both conformational and compositional heterogeneity. From the movies of the spike we can see ACE2 suddenly appear or disappear at the top of the lifted RBD region. This is essential as we want the algorithm to discover compositional heterogeneity as well, but it causes trouble to atomic fitting. In the conventional pipeline, people address this problem via discrete 3D classification to separate particles with different compositions, which may not have very high accuracy when applied to complex datasets with both compositional and comformational heterogeneity. Actually 3D classification of cryoSPARC fails to distinguish particles with and without ACE2 on our spike protein dataset without templates. Here instead we may want to leverage the powerful tool of RECOVAR, and directly classify particles in the continuous latent space. One potential approach would be segmenting latent space based on the mass of the volume associated with the embeddings. This approach may not work in the case where the compositional difference does not lead to a change in mass, but as long as the compositional heterogeneity leads to difference in mass that is more significant than noise (like SARS-CoV2 spike + ACE2 in our case), this method should work. We checked the feasibility of this approach by computing mass of the density maps along time in a movie output by RECOVAR using our SARS-CoV2 data as following:</p>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/mass.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Illustrations of how mass of the density map changes in the movie of SARS-CoV2 spike, some binding to ACE2</figcaption>
+</figure>
+</div>
+<p>This movie demonstrates a relatively complex changes in spike proteins, where the spike undergoes the following changes: one RBD up + one ACE2 -&gt; one RBD up -&gt; all RBDs down -&gt; 1 RBD up -&gt; 2 RBDs up + 1 ACE2 -&gt; 2 RBDs up + 2 ACE2’s. There is a clear cutoff at mass of around 900,000 above which ACE2 is present. The difference in the mass between those with 1 ACE2 and 2 ACE2’s is not very obvious, but separating spike with and without ACE2 is enough for the purpose of atomic model fitting to the density maps from closed states up to the moment where the RBD completely lifts but without ACE2.</p>
+<p>Regarding to our atomic model fitting algorithms, Algorithm1 which is purely based on gradient descent works surprisingly well and even better than Algorithm2 whose design is more complex. Both algorithms update the changes in the RBD region with high accuracy. Although some regions with medium quality of fitting in the first frame are inherited by later fittings, the RMSD does not rise further. One improvement we can make to our current algorithms is to change the constant sigma in the gaussian kernel to map coordinates to density maps to an annealing parameter. Initially we make sigma large to enable the model to undergo large conformational changes. Later we shrink the size of sigma for better fitting in the local region.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Gilles2023" class="csl-entry" role="listitem">
+Gilles, Marc Aurèle, and Amit Singer. 2024. <span>“Cryo-EM Heterogeneity Analysis Using Regularized Covariance Estimation and Kernel Regression.”</span> <a href="https://doi.org/10.1101/2023.10.28.564422">https://doi.org/10.1101/2023.10.28.564422</a>.
+</div>
+<div id="ref-hikmet_2020" class="csl-entry" role="listitem">
+Hikmet, Feria, Loren Méar, Åsa Edvinsson, Patrick Micke, Mathias Uhlén, and Cecilia Lindskog. 2020. <span>“The Protein Expression Profile of ACE2 in Human Tissues.”</span> <em>Molecular Systems Biology</em> 16 (7). https://doi.org/<a href="https://doi.org/10.15252/msb.20209610">https://doi.org/10.15252/msb.20209610</a>.
+</div>
+<div id="ref-ingraham2023" class="csl-entry" role="listitem">
+Ingraham, John B., Max Baranov, Zak Costello, Karl W. Barber, Wujie Wang, Ahmed Ismail, Vincent Frappier, et al. 2023. <span>“Illuminating Protein Space with a Programmable Generative Model.”</span> <em>Nature</em> 623 (7989): 1070–78. https://doi.org/<a href="https://doi.org/10.1038/s41586-023-06728-8">https://doi.org/10.1038/s41586-023-06728-8</a>.
+</div>
+<div id="ref-slav2017" class="csl-entry" role="listitem">
+Kirov, Slav, and Dejan Slepčev. 2017. <span>“Multiple Penalized Principal Curves: Analysis and Computation.”</span> <em>Journal of Mathematical Imaging and Vision</em> 59 (2): 234–56. https://doi.org/<a href="https://doi.org/10.1007/s10851-017-0730-8">https://doi.org/10.1007/s10851-017-0730-8</a>.
+</div>
+<div id="ref-pettersen2004" class="csl-entry" role="listitem">
+Pettersen, Eric F., Thomas D. Goddard, Conrad C. Huang, Gregory S. Couch, Daniel M. Greenblatt, Elaine C. Meng, and Thomas E. Ferrin. 2004. <span>“UCSF Chimera–a Visualization System for Exploratory Research and Analysis.”</span> <em>Journal of Computational Chemistry</em> 25 (13): 1605–12. https://doi.org/<a href="https://doi.org/10.1002/jcc.20084">https://doi.org/10.1002/jcc.20084</a>.
+</div>
+<div id="ref-punjani_2017" class="csl-entry" role="listitem">
+Punjani, Ali, John L Rubinstein, David J Fleet, and Marcus A Brubaker. 2017. <span>“cryoSPARC: Algorithms for Rapid Unsupervised Cryo-EM Structure Determination.”</span> <em>Nature Methods</em> 14 (3): 290–96. https://doi.org/<a href="https://doi.org/10.1038/nmeth.4169">https://doi.org/10.1038/nmeth.4169</a>.
+</div>
+<div id="ref-PPR:PPR217218" class="csl-entry" role="listitem">
+Taka, Elhan, Sema Yilmaz, Mert Golcuk, Ceren Kilinc, Umut Aktas, Ahmet Yildiz, and Mert Gur. 2020. <span>“Critical Interactions Between the SARS-CoV-2 Spike Glycoprotein and the Human ACE2 Receptor.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2020.09.21.305490">https://doi.org/10.1101/2020.09.21.305490</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/bioshape-analysis\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<script>videojs(video_shortcode_videojs_video1);</script>
+<script>videojs(video_shortcode_videojs_video2);</script>
+
+
+
+
+</body></html>

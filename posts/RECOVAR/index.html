@@ -209,7 +209,11 @@ window.Quarto = {
   <li><a href="#estimation-of-state-density" id="toc-estimation-of-state-density" class="nav-link" data-scroll-target="#estimation-of-state-density">Estimation of state density</a></li>
   <li><a href="#motion-recovery" id="toc-motion-recovery" class="nav-link" data-scroll-target="#motion-recovery">Motion recovery</a></li>
   </ul></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#results-of-public-datasets" id="toc-results-of-public-datasets" class="nav-link" data-scroll-target="#results-of-public-datasets">Results of public datasets</a></li>
+  <li><a href="#results-of-sars-cov2-datasets" id="toc-results-of-sars-cov2-datasets" class="nav-link" data-scroll-target="#results-of-sars-cov2-datasets">Results of SARS-CoV2 datasets</a></li>
+  </ul></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
   </ul>
 </nav>
@@ -233,7 +237,7 @@ window.Quarto = {
 </div>
 <p>The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM data started from relatively simple 3D classfication, which outputs discrete classes of different conformations. This is usually done by expectation-maximization (EM) algorithms, where 2D particle stacks were iteratively assigned to classes and used to reconstruct the volume of that class. However, such an approach has two problems: first, the classification decreases the number of images used to reconstruct the volume, and thus lower the resolution we are able to achieve; second, the motion of biomolecule is continuous in reality and discrete classification may not describe the heterogeneity very well, and we may miss some transient states.</p>
 <p>Therefore, nowadays people start to focus on methods modeling continuous heterogeneity without any classification step to avoid the above issues. Most methods adopt similar structures, where 2D particle stacks are mapped to latent embeddings, clusters/trajectories are estimated in latent space, and finally volumes are mapped and reconstructed from latent embeddings. Early methods use linear mapping (e.g.&nbsp;3DVA), but with the applications of deep learning techniques in the field of cryo-EM data processing, people find methods adapted from variational autoencoder (VAE) achieving better performance (e.g.&nbsp;cryoDRGN, 3DFlex). Nevertheless, the latent space obtained from VAE and other deep learning methods is hard to interpret, and do not conserve distances and densities, imposing difficulties in reconstructing motions/trajectories, which are what most structure biologists desire at the end.</p>
-<p>Recent developed software RECOVAR <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>, using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. In this blog, I will review the pipeline of RECOVAR, present heterogeneity analysis results from the original paper and our SARS-CoV2 spike protein dataset, and discuss some possible improvements we can make to this pipeline.</p>
+<p>Recent developed software RECOVAR <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>, using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. For this project, I will review the pipeline of RECOVAR, discussed improvements and extensions we made to this pipeline, and present heterogeneity analysis results from the original paper and our SARS-CoV2 spike protein dataset.</p>
 </section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
@@ -297,6 +301,8 @@ window.Quarto = {
 </section>
 <section id="results" class="level2">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="results-of-public-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="results-of-public-datasets">Results of public datasets</h3>
 <p>The original paper of RECOVAR presents results on precatalytic spliceosome dataset (EMPIAR-10180), integrin dataset (EMPIAR-10345) and ribosomal subunit dataset (EMPIAR-10076), all of which are public dataset and could be accessed from https://www.ebi.ac.uk/empiar/.</p>
 <p>Results on EMPIAR-10180 focuses on comformational heterogeneity. Three local maxima in conformational density were identified, a path between two of which was identified to show arm regions moving down followed by head regions moving up.</p>
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
@@ -319,8 +325,11 @@ window.Quarto = {
 <figcaption>The volume of two stable states are reconstructed, correspinding to two peaks in densities</figcaption>
 </figure>
 </div>
-<p>We also tested RECOVAR on our own dataset which contains 271,448 SARS-CoV2 spike protein particles, extracted using CryoSparc. Some of these particles are bounded to human angiotensin-converting enzyme 2 (ACE2), which is an enzyme on human membrane targeted by SARS-CoV2 spike protein. Therefore, this dataset has both compositional and conformational heterogeneity.</p>
-<p>After obtaining an ab-initio model from CryoSparc, we ran RECOVAR with a dimension of 4. K-Means clustering was performed to find 5 cluster centers among the embeddings.</p>
+</section>
+<section id="results-of-sars-cov2-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="results-of-sars-cov2-datasets">Results of SARS-CoV2 datasets</h3>
+<p>We also tested RECOVAR on our own dataset which contains 271,448 SARS-CoV2 spike protein particles, extracted using CryoSparc. Some of these particles are binding to human angiotensin-converting enzyme 2 (ACE2), which is an enzyme on human membrane targeted by SARS-CoV2 spike protein. Therefore, this dataset has both compositional and conformational heterogeneity.</p>
+<p>After obtaining an ab-initio model from CryoSparc, we ran RECOVAR with a dimension of 4 and a relatively small grid size of 128. K-Means clustering was performed to find 5 cluster centers among the embeddings.</p>
 <p>Here we present two volumes reconstructed from center 0 and center 1, showing a very obvious compositional heterogeneity, where ACE2 is clearly present in center 0 and missing in center 1.</p>
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
 <figure class="figure">
@@ -336,11 +345,12 @@ window.Quarto = {
 </figure>
 </div>
 </section>
+</section>
 <section id="discussion" class="level2">
 <h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
 <p>RECOVAR has several advantages over other heteogeneity analysis methods. Besides the high interpretability we mentioned before, RECOVAR is proved to be able to discover compositional heterogeneity, which cannot be solved by some popular deep learning methods like 3DFlex. Moreover, RECOVAR has much less hyper-parameters to tune compared with deep learning models. The main hyper-parameter the user needs to specify is the number of proncipal components to use, which is a trade-off between the amount of heterogeneity to capture and computational cost.</p>
-<p>However, one problem RECOVAR and many other heterogeneity analysis algorithms share is that it requires the input of a homogeneous model/poses of images. However the estimation of the consensus model is often biased by heterogeneity, while the heterogeneity analysis assumes the input consensus model is correct(a dead loop!). Nevertheless, we would expect this issue to be solved by an EM-algorithm iteratively constructing consensus model and performing heterogeneity analysis.</p>
-<p>The other drawback of RECOVAR is that the density-based path recovery approach is computationally expensive. The cost increases expoenentially with dimension. In practice, our NVIDIA 24GB GPU could deal with at most a dimension of 4, which is usually insufficient to capture enough heteogeneity in cryo-EM datasets with low SNR. We have to look at cheaper ways of finding path without estimating densities. We are also interested in methods to quantify the compositional heterogeneity along the path e.g.&nbsp;the probability of SARS-CoV2 spike proteins bounded to ACE2 with certain conformation.</p>
+<p>However, one problem RECOVAR and many other heterogeneity analysis algorithms share is that it requires the input of a homogeneous model/poses of images. However the estimation of the consensus model is often biased by heterogeneity, while the heterogeneity analysis assumes the input consensus model is correct(a dead loop!). Nevertheless, we would expect this issue to be solved by an EM-algorithm iteratively constructing consensus model and performing heterogeneity analysis. In future we may also be interested in benchmarking on pose estimation errors, and other parameters such as the number of principal components, grid size, and particle number, which were not be done in the original paper.</p>
+<p>The other drawback of RECOVAR is that the density-based path recovery approach is computationally expensive. The cost increases expoenentially with dimension. In practice, our NVIDIA 24GB GPU could deal with at most a dimension of 4, which is usually insufficient to capture enough heteogeneity in cryo-EM datasets with low SNR. We have to look at cheaper ways of finding path without estimating densities. We are also interested in methods to quantify the compositional heterogeneity along the path e.g.&nbsp;the probability of SARS-CoV2 spike proteins binding to ACE2 with certain conformation.</p>
 <p>The last but not least, it will be much easier for structure biologists to study the heterogeneity if we could extend the movie of density map to the movie of atomic model. This requires fitting atomic models to density maps. Since here the density maps in the movies are very similar, we don’t want to fit from scratch every time. Instead, a better approach would be fitting an initial model and then locally updating each density map.</p>
 
 

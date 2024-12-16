@@ -2,118 +2,122 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/cvt/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.859Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.777Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/sy mds tunnel/index.html</loc>
-    <lastmod>2024-12-16T18:54:22.147Z</lastmod>
+    <lastmod>2024-12-16T19:24:39.089Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/OTalignment/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.815Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.733Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/point-cloud/pointcloud.html</loc>
-    <lastmod>2024-12-16T18:54:21.039Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.985Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/AlphaShape/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.631Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.549Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/ribosome-landmarks/index.html</loc>
-    <lastmod>2024-12-16T18:54:21.187Z</lastmod>
+    <lastmod>2024-12-16T19:24:38.137Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/outlier-detection/DeCOr-MDS.html</loc>
-    <lastmod>2024-12-16T18:54:20.955Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.905Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/quasiconformalmap/index.html</loc>
-    <lastmod>2024-12-16T18:54:21.043Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.993Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/vascularNetworks/VascularNetworks.html</loc>
-    <lastmod>2024-12-16T18:54:22.147Z</lastmod>
+    <lastmod>2024-12-16T19:24:39.089Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/elastic-metric/osteosarcoma_analysis.html</loc>
-    <lastmod>2024-12-16T18:54:20.887Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.805Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/MATH-612/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.671Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.589Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/cryo_ET/demo.html</loc>
-    <lastmod>2024-12-16T18:54:20.851Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.769Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/AFM-data/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.611Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.529Z</lastmod>
   </url>
   <url>
-    <loc>https://bioshape-analysis.github.io/blog/posts/rloop-analysis/rloop-analysis.html</loc>
-    <lastmod>2024-12-16T18:54:22.139Z</lastmod>
-  </url>
-  <url>
-    <loc>https://bioshape-analysis.github.io/blog/about.html</loc>
-    <lastmod>2024-12-16T18:54:20.607Z</lastmod>
+    <loc>https://bioshape-analysis.github.io/blog/posts/extension_to_RECOVAR/index.html</loc>
+    <lastmod>2024-12-16T19:24:37.837Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.607Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.525Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/about.html</loc>
+    <lastmod>2024-12-16T19:24:37.525Z</lastmod>
+  </url>
+  <url>
+    <loc>https://bioshape-analysis.github.io/blog/posts/rloop-analysis/rloop-analysis.html</loc>
+    <lastmod>2024-12-16T19:24:39.085Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/CC-cells/Shape_Analysis_of_Contractile_Cells.html</loc>
-    <lastmod>2024-12-16T18:54:20.631Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.549Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/morphology/proposal.html</loc>
-    <lastmod>2024-12-16T18:54:20.955Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.905Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/biology/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.851Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.769Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/AFM-data_2/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.631Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.549Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/elastic-metric/elastic_metric.html</loc>
-    <lastmod>2024-12-16T18:54:20.859Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.777Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/RECOVAR/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.847Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.765Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/index.html</loc>
-    <lastmod>2024-12-16T18:54:22.131Z</lastmod>
+    <lastmod>2024-12-16T19:24:39.077Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/Neural-Manifold/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.815Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.729Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/landmarks-final/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.947Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.893Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/Embryonic-Shape/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.659Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.577Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/principal-curves/principal-curves.html</loc>
-    <lastmod>2024-12-16T18:54:21.043Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.993Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/HDM/index.html</loc>
-    <lastmod>2024-12-16T18:54:20.659Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.577Z</lastmod>
   </url>
   <url>
     <loc>https://bioshape-analysis.github.io/blog/posts/ET/ey.html</loc>
-    <lastmod>2024-12-16T18:54:20.631Z</lastmod>
+    <lastmod>2024-12-16T19:24:37.549Z</lastmod>
   </url>
 </urlset>

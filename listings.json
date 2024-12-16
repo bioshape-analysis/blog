@@ -2,8 +2,9 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/Embryonic-Shape/index.html",
       "/posts/MATH-612/index.html",
+      "/posts/Embryonic-Shape/index.html",
+      "/posts/landmarks-final/index.html",
       "/posts/rloop-analysis/rloop-analysis.html",
       "/posts/vascularNetworks/VascularNetworks.html",
       "/posts/CC-cells/Shape_Analysis_of_Contractile_Cells.html",

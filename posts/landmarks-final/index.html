@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ella Teasell">
+<meta name="dcterms.date" content="2024-12-15">
+
+<title>Landmarking the ribosome exit tunnel – bioshape-analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">bioshape-analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Landmarking the ribosome exit tunnel</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">ribosome</div>
+                <div class="quarto-category">cryo-em</div>
+                <div class="quarto-category">bioinformatics</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Ella Teasell </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 15, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#protocol-overview" id="toc-protocol-overview" class="nav-link" data-scroll-target="#protocol-overview">Protocol Overview</a></li>
+  <li><a href="#implementation-details" id="toc-implementation-details" class="nav-link" data-scroll-target="#implementation-details">Implementation Details</a>
+  <ul class="collapse">
+  <li><a href="#separation-by-kingdom" id="toc-separation-by-kingdom" class="nav-link" data-scroll-target="#separation-by-kingdom">Separation by Kingdom</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
+  <li><a href="#alignments" id="toc-alignments" class="nav-link" data-scroll-target="#alignments">Alignments</a></li>
+  <li><a href="#selecting-landmarks" id="toc-selecting-landmarks" class="nav-link" data-scroll-target="#selecting-landmarks">Selecting Landmarks</a></li>
+  <li><a href="#sec-locating-landmarks" id="toc-sec-locating-landmarks" class="nav-link" data-scroll-target="#sec-locating-landmarks">Locating landmarks</a></li>
+  </ul></li>
+  <li><a href="#usage-instructions" id="toc-usage-instructions" class="nav-link" data-scroll-target="#usage-instructions">Usage Instructions</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#future-directions" id="toc-future-directions" class="nav-link" data-scroll-target="#future-directions">Future Directions</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>I present a complete Python protocol for assigning landmarks to the ribosome exit tunnel surface based on conservation and distance. The motivation and background for this topic can be found in my <a href="https://bioshape-analysis.github.io/blog/posts/ribosome-landmarks/">previous post</a>. This blog post outlines implementation details and usage instructions for a more robust version of the protocol, available in full on <a href="https://github.com/eteasell/ribosome-exit-tunnel-v2">GitHub</a>.</p>
+</section>
+<section id="protocol-overview" class="level2">
+<h2 class="anchored" data-anchor-id="protocol-overview">Protocol Overview</h2>
+<p>Landmarks assigned on the surface of the tunnel are defined as the mean atomic coordinates of conserved residues that are close to the tunnel surface. The general steps in the protocol are:</p>
+<ol type="1">
+<li>Run Multiple Sequence Alignment (MSA) on the relevant polymers and select residues that are above a conservation threshold.</li>
+<li>Of the conserved residues, select only the residues that are within a distance threshold of the tunnel as represented by the Mole model<span class="citation" data-cites="mole"><sup><a href="#ref-mole" role="doc-biblioref">1</a></sup></span>.</li>
+<li>Extract the 3D coordinates of the selected residues.</li>
+</ol>
+<div id="fig-gif" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gif-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/4UG0_landmarks.gif" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gif-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Landmarks shown in blue on a mesh representation of the 4UG0 tunnel, with proteins shown for reference (uL4 in pink, uL22 in green, and eL39 in yellow).
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="implementation-details" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-details">Implementation Details</h2>
+<section id="separation-by-kingdom" class="level3">
+<h3 class="anchored" data-anchor-id="separation-by-kingdom">Separation by Kingdom</h3>
+<p>The protocol has two main entry points: <code>main.py</code> and <code>main_universal.py</code>. The <code>main</code> file assigns intra-kingdom landmarks; conserved residues are chosen only based on sequences from the given kingdom, meaning that the landmarks are specific to one of the three biological super-kingdoms (eukaryota, bacteria, and archaea). Using <code>main</code>, landmarks for one kingdom do not directly correspond to landmarks for another kingdom. While this separation prevents inter-kingdom comparison directly, it allows for a higher number of landmarks to be assigned to each specimen, due to higher degrees of conservation within kingdoms. The alternative is to use <code>main_universal</code>, which chooses conserved residues based on all sequences. This provides less landmarks per ribosome, but allows for inter-kingdom comparison, as each landmark will have correspondence across all specimens.</p>
+</section>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">Data</h3>
+<p>The protocol uses data from RibosomeXYZ<span class="citation" data-cites="riboxyz"><sup><a href="#ref-riboxyz" role="doc-biblioref">2</a></sup></span> and the Protein Data Bank (PDB) via API access. For each ribosome structure, the protocol requests sequences and metadata (chain names, taxonomic information, etc.) from RibosomeXYZ for selected proteins and RNA and the full <code>mmcif</code> structural file from the PDB. This data is stored locally to facilitate repeated access during runtime.</p>
+</section>
+<section id="alignments" class="level3">
+<h3 class="anchored" data-anchor-id="alignments">Alignments</h3>
+<p>The program uses MAFFT<span class="citation" data-cites="mafft"><sup><a href="#ref-mafft" role="doc-biblioref">3</a></sup></span> to preform Multiple Sequence Alignment (MSA) on all of the available sequences for each of the relevant polymers. It accesses sequence data from RibosomeXYZ polymer files. When the program is run on new specimens, if the sequences are not already in the input <code>fasta</code> files, they are automatically added and the alignments are re-run to include the new specimens.</p>
+<div id="fig-msa" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-msa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/eukaryota-uL4-seq-align.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-msa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A visualization of a subsection of the MSA showing a highly conserved region of uL4.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="selecting-landmarks" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-landmarks">Selecting Landmarks</h3>
+<p>Landmarks are selected using a prototype ribosome and based on conservation and distance. The program searches for landmarks only on polymers which are known to be close to the tunnel<span class="citation" data-cites="dao2019differences"><sup><a href="#ref-dao2019differences" role="doc-biblioref">4</a></sup></span>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Kingdom</th>
+<th>Prototype</th>
+<th>Selected Polymers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Eukaryota</td>
+<td>4UG0</td>
+<td>uL4, uL22, eL39, 25/28S rRNA</td>
+</tr>
+<tr class="even">
+<td>Bacteria</td>
+<td>3J7Z</td>
+<td>uL4, uL22, uL23, 23S rRNA</td>
+</tr>
+<tr class="odd">
+<td>Archaea</td>
+<td>4V6U</td>
+<td>uL4, uL22, eL39, 23S rRNA</td>
+</tr>
+<tr class="even">
+<td>Universal</td>
+<td>3J7Z</td>
+<td>uL4, uL22, 23/25/28S rRNA</td>
+</tr>
+</tbody>
+</table>
+<p><em>The prototype IDs and polymers used in the protocol</em></p>
+<section id="conservation" class="level4">
+<h4 class="anchored" data-anchor-id="conservation">Conservation</h4>
+<p>To be chosen as a landmark, residues must be at least 90% conserved. This threshold is a tuneable parameter. For each of the relevant polymers, the program iterates through each position in the MSA alignment file for that polymer and selects alignment positions for which at least 90% of specimens share the same residue. This excludes positions where gaps are the most common element. The program calls the below method on every column of the MSA for each of the relevant polymers to obtain a short-list of alignment positions to be considered for landmarks.</p>
+<div id="b7a543d7" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_conserved(column, threshold):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">=</span> Counter(column)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> counter.most_common(<span class="dv">1</span>)[<span class="dv">0</span>]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (mode[<span class="dv">0</span>] <span class="op">!=</span> <span class="st">'-'</span> <span class="kw">and</span> mode[<span class="dv">1</span>] <span class="op">/</span> <span class="bu">len</span>(column) <span class="op">&gt;=</span> threshold):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mode[<span class="dv">0</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">None</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="distances" class="level4">
+<h4 class="anchored" data-anchor-id="distances">Distances</h4>
+<p>For each candidate conserved position, the program first locates the residue’s coordinates on the prototype specimen (see <a href="#sec-locating-landmarks" class="quarto-xref">Section&nbsp;3.5</a> for more detail). For each prototype, I have run the Mole tunnel search algorithm to extract the centerline coordinates of the tunnel and the radius at each point. Then for each candidate landmark <span class="math inline">\(p_l\)</span>, I find the nearest centerline point <span class="math inline">\(p_c\)</span> by euclidean distance, and compute the distance from <span class="math inline">\(p_l\)</span> to the sphere centered at <span class="math inline">\(p_c\)</span> with the given radius <span class="math inline">\(r_c\)</span>: <span class="math display">\[ d = ||p_l - p_c|| - r_c\]</span> If <span class="math inline">\(d\)</span> is less than the distance threshold, the candidate position is considered a landmark. See the code below for reference:</p>
+<div id="fc0d30e4" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_closest_point(p, instance):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    coords <span class="op">=</span> get_tunnel_coordinates(instance)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    dist <span class="op">=</span> np.inf</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> np.array(p)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> coord <span class="kw">in</span> coords.values():</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        xyz <span class="op">=</span> np.array(coord[<span class="dv">0</span>:<span class="dv">3</span>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        euc_dist <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(np.square(xyz <span class="op">-</span> p))) <span class="op">-</span> coord[<span class="dv">3</span>]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> euc_dist <span class="op">&lt;</span> dist:</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            dist <span class="op">=</span> euc_dist</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dist</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Each selected landmark’s residue type and alignment location are saved to file, so that new ribosome specimens can use the list as a guideline.</p>
+</section>
+</section>
+<section id="sec-locating-landmarks" class="level3">
+<h3 class="anchored" data-anchor-id="sec-locating-landmarks">Locating landmarks</h3>
+<p>Locating the chosen landmarks in the structural file for a given ribosome specimen is the most involved step of the protocol. Often, a ribosome <code>mmcif</code> file contains some gaps, due to experimental/imaging conditions. For this reason, I take an approach using methods from RibosomeXYZ’s backend<span class="citation" data-cites="riboxyz"><sup><a href="#ref-riboxyz" role="doc-biblioref">2</a></sup></span> to keep track of residue locations as sequences are manipulated (aligned, flattened to remove gaps, etc.). We have access to two copies of the sequence for each polymer: the sequence from the RibosomeXYZ polymer data, which is well formed, and the <code>mmcif</code> PDB sequence that is tied to the 3D structure, which often has gaps. The protocol makes use of both versions.</p>
+<p>The PDB sequence is loaded into memory as an object using BioPython. This object holds all of the structural and hierarchical information present in the original file. This is more useful than working with sequences as strings. For example, indexing a protein sequence gives a unique residue object which holds structural information, rather than just a symbolic letter.</p>
+<p>I use the <code>SeqenceMappingContainer</code> class taken from RibosomeXYZ. The purpose of this class is to facilitate working with the PDB structural sequences with gaps. Initializing the class with a polymer sequence as a BioPython Chain object gives a ‘primary’ unchanged version of the sequence and a ‘flattened’ version with all gaps removed, as well as mappings for indices between the two. Given an index in the flattened sequence, we can use the maps to find the index in the primary sequence and therefore the author assigned residue IDs and structural information, and vice versa. This is the backbone of locating residues by sequence numbers from the landmark list on potential gappy polymer sequences.</p>
+<p>The algorithm for locating a landmark is as follows:</p>
+<ol type="1">
+<li>Access the aligned sequence from the MSA, and map the landmark from the location in the alignment to the location in the original RibsomeXYZ sequence for this polymer instance.</li>
+<li>Perform a pairwise sequence alignment on the original RibosomeXYZ sequence and the flattened PDB sequence.</li>
+<li>Use this pairwise alignment to map the landmark location in the original RibosomeXYZ sequence to the location in the flattened PDB sequence.</li>
+<li>From the flattened PDB sequence, use <code>SeqenceMappingContainer</code> mapping to find the residue ID in the primary PDB sequence, and use this ID to index the Residue object.</li>
+<li>Ensure that the residue type matches the landmark type (i.e.&nbsp;amino acids / nucleotides match), and return the mean coordinates of the atoms in the residue as the landmark coordinates.</li>
+</ol>
+<p>See the following code:</p>
+<div id="7b6f238d" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> locate_residues(landmark: Landmark, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                    polymer: <span class="bu">str</span>, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                    polymer_id: <span class="bu">str</span>, </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                    rcsb_id: <span class="bu">str</span>,  </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                    chain: Structure, </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                    flat_seq,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                    kingdom: <span class="bu">str</span> <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">    This method takes a landmark centered on the alignment, and finds this residue on the given rcsb_id's polymer.</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns the residues position and coordinates.</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">    landmark: the landmark to be located</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">    polymer: the poymer on which this landmark lies</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">    polymer_id: the polymer id specific to this rcsb_id</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">    rcsb_id: the id of the ribosome instance</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">    chain: the biopython Chain object holding the sequence</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">    flat_seq: from SequenceMappingContainer, tuple holding (seq, flat_index_to_residue_map, auth_seq_id_to_flat_index_map)</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">    kingdom: kingdom to which this rcsb_id belongs, or none if being called from main_universal.py</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">    '''</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># access aligned sequence from alignment files</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> kingdom <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> <span class="ss">f"data/output/fasta/aligned_sequences_</span><span class="sc">{</span>polymer<span class="sc">}</span><span class="ss">.fasta"</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> <span class="ss">f"data/output/fasta/aligned_sequences_</span><span class="sc">{</span>kingdom<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>polymer<span class="sc">}</span><span class="ss">.fasta"</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    alignment <span class="op">=</span> AlignIO.read(path, <span class="st">"fasta"</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    aligned_seq <span class="op">=</span> get_rcsb_in_alignment(alignment, rcsb_id)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find the position of the landmark on the original riboXYZ seq</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    alignment_position <span class="op">=</span> map_to_original(aligned_seq, landmark.position) </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># access riboXYZ sequence (pre alignment)</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    orig_seq <span class="op">=</span> check_fasta_for_rcsb_id(rcsb_id, polymer, kingdom)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> orig_seq <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Cannot access sequence"</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># run pairwise alignment on the riboXYZ sequence and the flattened PDB sequence</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    alignment <span class="op">=</span> run_pairwise_alignment(rcsb_id, polymer_id, orig_seq, flat_seq[<span class="dv">0</span>])</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> alignment <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># map the alignment_position from the original riboXYZ sequence to the pairwise-aligned flattened PDB sequence</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    flattened_seq_aligned <span class="op">=</span> alignment[<span class="dv">1</span>]</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    flat_aligned_position <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> alignment_position <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:  </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        flat_aligned_position <span class="op">=</span> map_to_original(flattened_seq_aligned, alignment_position)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> flat_aligned_position <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Cannot find </span><span class="sc">{</span>landmark<span class="sc">}</span><span class="ss"> on </span><span class="sc">{</span>rcsb_id<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>polymer<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span> </span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># use the MappingSequenceContainer flat_index_to_residue_map to access to residue in the PDB sequence</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    resi_id <span class="op">=</span> flat_seq[<span class="dv">1</span>][flat_aligned_position].get_id()</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    residue <span class="op">=</span> chain[resi_id]</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># check that the located residue is the same as the landmark</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    landmark_1_letter <span class="op">=</span> landmark.residue.upper()</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    landmark_3_letter <span class="op">=</span> ResidueSummary.one_letter_code_to_three(landmark_1_letter)</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (residue.get_resname() <span class="op">!=</span> landmark_1_letter <span class="kw">and</span> residue.get_resname() <span class="op">!=</span> landmark_3_letter):</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find atomic coordinates for the selected residue</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    atom_coords <span class="op">=</span> [atom.coord <span class="cf">for</span> atom <span class="kw">in</span> residue]</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="bu">len</span>(atom_coords) <span class="op">==</span> <span class="dv">0</span>): </span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>       <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># take the mean coordinate for the atoms in residue</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    vec <span class="op">=</span> np.zeros(<span class="dv">3</span>)</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> coord <span class="kw">in</span> atom_coords:</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>        tmp_arr <span class="op">=</span> np.array([coord[<span class="dv">0</span>], coord[<span class="dv">1</span>], coord[<span class="dv">2</span>]])</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>        vec <span class="op">+=</span> tmp_arr</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    vec <span class="op">=</span> vec <span class="op">/</span> <span class="bu">len</span>(atom_coords)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    vec <span class="op">=</span> vec.astype(np.int32)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {    </span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>                <span class="st">"parent_id"</span>: rcsb_id, </span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>                <span class="st">"landmark"</span>: landmark.name, </span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>                <span class="st">"residue"</span>: landmark.residue, </span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>                <span class="st">"position"</span>: resi_id[<span class="dv">1</span>],</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>                <span class="st">"x"</span>: vec[<span class="dv">0</span>], <span class="st">"y"</span>: vec[<span class="dv">1</span>], <span class="st">"z"</span>: vec[<span class="dv">2</span>]</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>            }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>See the full algorithm <a href="https://github.com/eteasell/ribosome-exit-tunnel-v2/blob/main/protocol/locate_residues.py">here.</a></p>
+<div id="fig-compare" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/landmarks-fig1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Atoms versus landmarks near the tunnel, shown with the Mole model (dark blue) and the mesh model (light blue) for reference. a) All atoms within 10 Å of the tunnel centerline. b) Mean atomic coordinates of conserved residues within 7.5 Å of the spherical tunnel.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="usage-instructions" class="level2">
+<h2 class="anchored" data-anchor-id="usage-instructions">Usage Instructions</h2>
+<p>The full protocol and datasets are avaiblable on <a href="https://github.com/eteasell/ribosome-exit-tunnel-v2/blob/main/protocol/locate_residues.py">GitHub</a>. At the time of writing, the protocol has been run on all 1348 ribosomes currently available on RibosomeXYZ. Landmark coordinates (kingdom-specific and universal) can be found in <code>data/output/landmarks</code>.</p>
+<p>To assign these initial landmarks, I compiled the sequences for the relevant polymers for all 1348 specimens into polymer-specific <code>fasta</code> files and ran MAFFT sequence alignment on each file. Then, I ran the code to select landmarks based on the full aligned files; therefore, conservation ratios for residues were based on all (currently) available data.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Kingdom</th>
+<th>Number of specimens</th>
+<th>Landmarks per specimen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Eukaryota</td>
+<td>424</td>
+<td>83</td>
+</tr>
+<tr class="even">
+<td>Bacteria</td>
+<td>842</td>
+<td>60</td>
+</tr>
+<tr class="odd">
+<td>Archaea</td>
+<td>82</td>
+<td>47</td>
+</tr>
+<tr class="even">
+<td>Universal</td>
+<td>1348</td>
+<td>42</td>
+</tr>
+</tbody>
+</table>
+<p><em>Distribution of assigned landmarks across currently available ribosomes</em></p>
+<p>To obtain landmarks on a ribosome specimen, first check if they have already been assigned. If not, the protocol can be run on new specimens as follows:</p>
+<ol type="1">
+<li>Use <code>main_universal.py</code> to assign universal landmarks or <code>main.py</code> to assign kingdom-specific landmarks</li>
+<li>Create a <code>conda</code> environment based on <code>requirements.txt</code> and activate it</li>
+<li>With the activated environment, run the following command: <code>python -m protocol file rcsb_id</code> where <code>file</code> is one of <code>main_universal.py</code> or <code>main.py</code>, and <code>rcsb_id</code> is the structure ID.
+<ul>
+<li>The protocol can be run on multiple instances simply by adding more <code>rcsb_id</code>’s to the command. For example: <code>python -m protocol file rcsb_id1 rcsb_id2</code></li>
+<li>Note that running multiple instances in the same command is more efficient when these are new instances, as the alignment will run only once after all new sequences have been added to the <code>fasta</code> files, rather than after each new instance.</li>
+</ul></li>
+</ol>
+<p>As mentioned above, the program will automatically update the <code>fasta</code> files and rerun the alignments to include new instances from the command. This should not change the conserved residues when small amounts of new ribosomes are added, but if you are adding many new ribosomes, you may consider changing the <code>reselect_landmarks</code> boolean flag to <code>True</code>, to ensure that the assigned landmarks reflect the conservation present in the entirety of the data. This flag can also used to apply changes to conservation and distance threshold parameters. It is important to note, however, that re-selecting landmarks disrupts the correspondence of newly assigned landmarks to previously assigned landmarks.</p>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<section id="alignment-efficiency" class="level4">
+<h4 class="anchored" data-anchor-id="alignment-efficiency">Alignment Efficiency</h4>
+<p>The protocol automatically runs MAFFT sequence alignment from the command line when the input <code>fasta</code> files are updated. However, running MAFFT online can be much faster. To maximize efficiency when running the protocol on many ribosomes, I suggest running the input <code>fasta</code> files through MAFFT online, and uploading the resulting alignments into the protocol directory (ensuring to match the location and naming of the original files).</p>
+</section>
+<section id="missing-landmarks" class="level4">
+<h4 class="anchored" data-anchor-id="missing-landmarks">Missing Landmarks</h4>
+<p>There remains missing landmarks on many ribosome specimens in the data, due to gaps in the experimental data or unusual specimens (e.g.&nbsp;imaged mid biogenesis). Filtering out these instances would be beneficial prior to analysis.</p>
+</section>
+<section id="distribution-of-species" class="level4">
+<h4 class="anchored" data-anchor-id="distribution-of-species">Distribution of Species</h4>
+<p>The available data from RibosomeXYZ is not uniformally distributed across species. There is a heavy skew towards a few model species (E. coli, T. thermophilus, etc.) as shown in <a href="#fig-distribution" class="quarto-xref">Figure&nbsp;4</a>. This biases the residue conservation calculations. Analysis done on the resulting landmark data should subset appropriately to obtain a more even spread of species.</p>
+<div id="fig-distribution" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./data/distribution.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Counts of species present in the data from RibosomeXYZ
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="future-directions" class="level2">
+<h2 class="anchored" data-anchor-id="future-directions">Future Directions</h2>
+<p>When choosing landmarks, the thresholding by distance is done by comparison to the Mole tunnel model. However, this model is too simplistic to capture the complex shape of the tunnel. A more accurate model is the mesh model as described in <a href="https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/">‘3D Tessellation of Biomolecular Cavities’</a>.</p>
+<p>There are gaps in the landmarks where the mesh model shows protrusions that the Mole model does not capture (see <a href="#fig-compare" class="quarto-xref">Figure&nbsp;3</a> for a visualization). Future improvements to the protocol should be made to measure distance to the tunnel using the mesh representation as a benchmark instead of the centerline and radii.</p>
+<p><em>Visualizations produced using PyVista<span class="citation" data-cites="pyvista"><sup><a href="#ref-pyvista" role="doc-biblioref">5</a></sup></span> and PyMol<span class="citation" data-cites="PyMOL"><sup><a href="#ref-PyMOL" role="doc-biblioref">6</a></sup></span>.</em></p>
+<section id="references" class="level4">
+
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-mole" class="csl-entry" role="listitem">
+<div class="csl-left-margin">1. </div><div class="csl-right-inline">Sehnal, D. <em>et al.</em> MOLE 2.0: Advanced approach for analysis of biomacromolecular channels. <em>Journal of cheminformatics</em> <strong>5</strong>, 1–13 (2013).</div>
+</div>
+<div id="ref-riboxyz" class="csl-entry" role="listitem">
+<div class="csl-left-margin">2. </div><div class="csl-right-inline">Kushner, A., Petrov, A. S. &amp; Dao Duc, K. <span class="nocase">RiboXYZ: a comprehensive database for visualizing and analyzing ribosome structures</span>. <em>Nucleic Acids Research</em> <strong>51</strong>, D509–D516 (2022).</div>
+</div>
+<div id="ref-mafft" class="csl-entry" role="listitem">
+<div class="csl-left-margin">3. </div><div class="csl-right-inline">Katoh, K., Rozewicki, J. &amp; Yamada, K. D. <span class="nocase">MAFFT online service: multiple sequence alignment, interactive sequence choice and visualization</span>. <em>Briefings in Bioinformatics</em> <strong>20</strong>, 1160–1166 (2017).</div>
+</div>
+<div id="ref-dao2019differences" class="csl-entry" role="listitem">
+<div class="csl-left-margin">4. </div><div class="csl-right-inline">Dao Duc, K., Batra, S. S., Bhattacharya, N., Cate, J. H. &amp; Song, Y. S. Differences in the path to exit the ribosome across the three domains of life. <em>Nucleic acids research</em> <strong>47</strong>, 4198–4210 (2019).</div>
+</div>
+<div id="ref-pyvista" class="csl-entry" role="listitem">
+<div class="csl-left-margin">5. </div><div class="csl-right-inline">Sullivan, C. B. &amp; Kaszynski, A. <a href="https://doi.org/10.21105/joss.01450"><span>PyVista</span>: 3D plotting and mesh analysis through a streamlined interface for the visualization toolkit (<span>VTK</span>)</a>. <em>Journal of Open Source Software</em> <strong>4</strong>, 1450 (2019).</div>
+</div>
+<div id="ref-PyMOL" class="csl-entry" role="listitem">
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">Schrödinger, LLC. The <span>PyMOL</span> molecular graphics system, version&nbsp;1.8. (2015).</div>
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/bioshape-analysis\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

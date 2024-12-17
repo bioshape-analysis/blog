@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Siddharth Rout">
+<meta name="dcterms.date" content="2024-10-24">
+
+<title>Optimal Mass Transport and its Convex Formulation – bioshape-analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">bioshape-analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Optimal Mass Transport and its Convex Formulation</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">optimal transport</div>
+                <div class="quarto-category">shape morphing</div>
+                <div class="quarto-category">Monge's Problem</div>
+                <div class="quarto-category">Kantorovich's Formulation</div>
+                <div class="quarto-category">Benamou-Brenier's Formulation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://scholar.google.com/citations?user=2r63M5kAAAAJ&amp;hl=en">Siddharth Rout</a> <a href="mailto:siddharth.rout@ubc.ca" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 24, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#what-is-optimal-transport" id="toc-what-is-optimal-transport" class="nav-link" data-scroll-target="#what-is-optimal-transport">What is Optimal Transport?</a></li>
+  <li><a href="#why-optimal-transport-for-disease-progression" id="toc-why-optimal-transport-for-disease-progression" class="nav-link" data-scroll-target="#why-optimal-transport-for-disease-progression">Why Optimal Transport for Disease Progression?</a></li>
+  <li><a href="#popular-applications-of-ot-to-study-disease-progression" id="toc-popular-applications-of-ot-to-study-disease-progression" class="nav-link" data-scroll-target="#popular-applications-of-ot-to-study-disease-progression">Popular Applications of OT to Study Disease Progression:</a></li>
+  </ul></li>
+  <li><a href="#mathematics-of-optimal-transport" id="toc-mathematics-of-optimal-transport" class="nav-link" data-scroll-target="#mathematics-of-optimal-transport">Mathematics of Optimal Transport</a>
+  <ul class="collapse">
+  <li><a href="#monge-formulation" id="toc-monge-formulation" class="nav-link" data-scroll-target="#monge-formulation">Monge Formulation</a></li>
+  <li><a href="#kantorovich-formulation" id="toc-kantorovich-formulation" class="nav-link" data-scroll-target="#kantorovich-formulation">Kantorovich formulation</a></li>
+  <li><a href="#benamou-brenier-formulation-convex-ot" id="toc-benamou-brenier-formulation-convex-ot" class="nav-link" data-scroll-target="#benamou-brenier-formulation-convex-ot">Benamou-Brenier Formulation (Convex OT)</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In the context of biomedics, understanding disease progression is critical in developing effective diagnostic and therapeutic strategies. Medical imaging provides us with invaluable data, capturing the spatial and structural changes in the human body over time. Yet, analyzing these changes quantitatively and consistently remains challenging. Here, we explore how optimal transport (OT) can be applied to model disease progression in a geometrically meaningful way, providing a tool to predict deformations and shape changes in diseases like neurodegeneration, cancer, and respiratory diseases.</p>
+<section id="what-is-optimal-transport" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-optimal-transport">What is Optimal Transport?</h2>
+<p>Optimal transport is a mathematical framework originally developed to solve the problem of transporting resources in a way that minimizes cost. The problem was formalized by the French mathematician Gaspard Monge in 1781. In the 1920s A.N. Tolstoi was among the first to study the transportation problem mathematically. However, the major advances were made in the field during World War II by the Soviet mathematician and economist Leonid Kantorovich. However, OT is a tough optimization problem. In 2000, Benamou and Brenier propose a convex formulation. Villani explains the history and mathematics behind OT in great detail in his book <span class="citation" data-cites="villani2021topics">(<a href="#ref-villani2021topics" role="doc-biblioref">Villani 2021</a>)</span>, which is in fact very popular and well appreciated.</p>
+<p>Mathematically, OT finds the most efficient way to “move” one distribution to match another, which is useful in medical imaging where changes in structure and morphology need to be quantitatively mapped over time. OT computes a transport map (or “flow”) that transforms one spatial distribution into another with minimal “work” (measured by the Wasserstein distance). This idea has strong applications in medical imaging, particularly for analyzing disease progression, as it provides a way to track changes in anatomical structures over time.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mri_agewise_annotated.jpg" class="img-fluid figure-img"></p>
+<figcaption>State of neurodegeneration in a kid at different ages. (<span class="citation" data-cites="neurodegeneration2020">Bastos et al. (<a href="#ref-neurodegeneration2020" role="doc-biblioref">2020</a>)</span>) OT can learn the progression or the transformation (T) of brain deformation from the state at 5 year age (<span class="math inline">\(\rho_0\)</span>) to the final state at 7 year age (<span class="math inline">\(\rho_1\)</span>) or 9 year age (<span class="math inline">\(\rho_2\)</span>).</figcaption>
+</figure>
+</div>
+</section>
+<section id="why-optimal-transport-for-disease-progression" class="level2">
+<h2 class="anchored" data-anchor-id="why-optimal-transport-for-disease-progression">Why Optimal Transport for Disease Progression?</h2>
+<p>The OT framework is uniquely suited for disease progression modeling because it allows us to:</p>
+<ul>
+<li><em>Capture spatial and structural changes</em>: OT computes a smooth, meaningful transformation, preserving the continuity of shapes, making it ideal for medical images that track evolving structures.</li>
+<li><em>Quantify changes robustly</em>: By calculating the minimal transport cost, OT provides a quantitative measure of how much a structure (e.g., brain tissue) changes, which can correlate with disease severity.</li>
+<li><em>Compare across patients and populations</em>: OT-based metrics can be standardized across subjects, enabling comparisons between different patient groups or disease stages.</li>
+</ul>
+</section>
+<section id="popular-applications-of-ot-to-study-disease-progression" class="level2">
+<h2 class="anchored" data-anchor-id="popular-applications-of-ot-to-study-disease-progression">Popular Applications of OT to Study Disease Progression:</h2>
+<ul>
+<li><em>Neurodegeneration (e.g., Alzheimer’s Disease)</em>: OT maps brain atrophy across time points in MRI scans, quantifying volume and cortical thickness changes crucial for staging and monitoring Alzheimer’s.</li>
+<li><em>Cancer</em>: OT tracks tumor morphology changes, helping assess treatment response by measuring growth, shrinkage, or shape shifts, even aiding relapse predictions.</li>
+<li><em>Respiratory Diseases (e.g., COPD)</em>: OT compares longitudinal lung CTs to quantify tissue loss distribution, providing spatial insights for monitoring COPD progression and treatment adjustment.</li>
+</ul>
+</section>
+</section>
+<section id="mathematics-of-optimal-transport" class="level1">
+<h1>Mathematics of Optimal Transport</h1>
+<section id="monge-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="monge-formulation">Monge Formulation</h2>
+<p>The Monge formulation of optimal transport, introduced in 1781, addresses the problem of moving mass efficiently from one distribution to another. Given two distributions:</p>
+<ul>
+<li><em>Source Distribution</em>: <span class="math inline">\(\mu\)</span> on <span class="math inline">\(X\)</span></li>
+<li><em>Target Distribution</em>: <span class="math inline">\(\nu\)</span> on <span class="math inline">\(Y\)</span></li>
+</ul>
+<p>we seek a transport map <span class="math inline">\(T\)</span>: <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span> that minimizes the transport cost, typically <span class="math inline">\(c(x, T(x)) = \|x - T(x)\|^p\)</span>.</p>
+<p>The Monge problem can be written as:</p>
+<p><span class="math display">\[
+\min_T \int_X c(x, T(x)) \, d\mu(x)
+\]</span></p>
+<p>subject to <span class="math inline">\(T_\# \mu = \nu\)</span>, meaning that the map <span class="math inline">\(T\)</span> must push <span class="math inline">\(\mu\)</span> to <span class="math inline">\(\nu\)</span>, ensuring all mass is preserved without splitting.</p>
+<p>Key Points:</p>
+<ol type="1">
+<li><em>Transport Map <span class="math inline">\(T\)</span></em>: Monge’s formulation requires a direct mapping of mass from <span class="math inline">\(\mu\)</span> to <span class="math inline">\(\nu\)</span>.</li>
+<li><em>No Mass Splitting</em>: Unlike relaxed formulations, the Monge problem doesn’t allow fractional mass transport, making it challenging to solve in complex cases.</li>
+<li><em>Cost Function</em>: The choice of <span class="math inline">\(c(x, y)\)</span> affects the solution—common choices include distance <span class="math inline">\(\|x - y\|\)</span> and squared distance <span class="math inline">\(\|x - y\|^2\)</span>.</li>
+</ol>
+<section id="shortcoming" class="level4">
+<h4 class="anchored" data-anchor-id="shortcoming">Shortcoming</h4>
+<p>The Monge formulation lacks flexibility due to its one-to-one mapping constraint, which led to the <strong>Kantorovich relaxation</strong>, allowing more general solutions by enabling mass splitting. The Monge formulation captures the essence of spatial mass transport with minimal cost, inspiring modern approaches in diverse fields.</p>
+</section>
+</section>
+<section id="kantorovich-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="kantorovich-formulation">Kantorovich formulation</h2>
+<p>The Kantorovich formulation, introduced by Leonid Kantorovich in 1942 (<span class="citation" data-cites="Kantorovich2006OnTT">Kantorovich (<a href="#ref-Kantorovich2006OnTT" role="doc-biblioref">2006</a>)</span>), generalizes the Monge problem by allowing “mass splitting,” where mass from one source point can be distributed to multiple target points. This flexibility makes it possible to solve a broader range of transport problems.</p>
+<p>Kantorovich’s Problem:</p>
+<p>Instead of finding a single transport map <span class="math inline">\(T\)</span>, the Kantorovich formulation seeks a <strong>transport plan</strong> <span class="math inline">\(\gamma\)</span>, a joint probability distribution on <span class="math inline">\(X \times Y\)</span>, such that:</p>
+<p><span class="math display">\[
+\min_\gamma \int_{X \times Y} c(x, y) \, d\gamma(x, y)
+\]</span></p>
+<p>where <span class="math inline">\(c(x, y)\)</span> represents the cost of transporting mass from <span class="math inline">\(x \in X\)</span> to <span class="math inline">\(y \in Y\)</span>. The transport plan <span class="math inline">\(\gamma\)</span> must satisfy marginal constraints:</p>
+<p><span class="math display">\[
+\int_Y d\gamma(x, y) = d\mu(x) \quad \text{and} \quad \int_X d\gamma(x, y) = d\nu(y),
+\]</span></p>
+<p>ensuring that <span class="math inline">\(\gamma\)</span> moves all mass from <span class="math inline">\(\mu\)</span> to <span class="math inline">\(\nu\)</span>.</p>
+<p>Key Points:</p>
+<ol type="1">
+<li><em>Transport Plan <span class="math inline">\(\gamma\)</span></em>: A probability measure over <span class="math inline">\(X \times Y\)</span> that allows fractional mass movement, broadening the solution space.</li>
+<li><em>Marginal Constraints</em>: These ensure <span class="math inline">\(\gamma\)</span> aligns with source <span class="math inline">\(\mu\)</span> and target <span class="math inline">\(\nu\)</span> distributions, preserving total mass.</li>
+<li><em>Cost Function</em>: Commonly, <span class="math inline">\(c(x, y) = \|x - y\|\)</span> or <span class="math inline">\(c(x, y) = \|x - y\|^2\)</span>, chosen based on the desired penalty for transport distance.</li>
+</ol>
+<p>Advantages:</p>
+<ul>
+<li><em>Flexibility</em>: Mass splitting allows for a solution even when <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\nu\)</span> have different structures (e.g., continuous to discrete).</li>
+<li><em>Computational Feasibility</em>: The problem can be solved via linear programming or faster algorithms using entropic regularization.</li>
+</ul>
+<p>Hence, the Kantorovich formulation provides a robust framework for optimal transport problems, enabling applications across fields where flexibility and computational efficiency are essential.</p>
+</section>
+<section id="benamou-brenier-formulation-convex-ot" class="level2">
+<h2 class="anchored" data-anchor-id="benamou-brenier-formulation-convex-ot">Benamou-Brenier Formulation (Convex OT)</h2>
+<p>The Benamou-Brenier formulation (<span class="citation" data-cites="benamou2000computational">Benamou and Brenier (<a href="#ref-benamou2000computational" role="doc-biblioref">2000</a>)</span>) provides a dynamic perspective on optimal transport, interpreting it as a fluid flow problem. Instead of transporting mass directly between two distributions, this approach finds the path of minimal “kinetic energy” needed to continuously transform one distribution into another over time.</p>
+<p>The Benamou-Brenier formulation considers a probability density <span class="math inline">\(\rho(x, t)\)</span> evolving over time <span class="math inline">\(t \in [0, 1]\)</span> from an initial distribution <span class="math inline">\(\rho_0\)</span> to a final distribution <span class="math inline">\(\rho_1\)</span>. The goal is to find a velocity field <span class="math inline">\(v(x, t)\)</span> that minimizes the action, or “kinetic energy” cost:</p>
+<p><span class="math display">\[
+\min_{\rho, v} \int_0^1 \int_X \frac{1}{2} \|v(x, t)\|^2 \rho(x, t) \, dx \, dt,
+\]</span></p>
+<p>subject to the <strong>continuity equation</strong>:</p>
+<p><span class="math display">\[
+\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho v) = 0,
+\]</span></p>
+<p>which ensures mass conservation from <span class="math inline">\(\rho_0\)</span> to <span class="math inline">\(\rho_1\)</span>.</p>
+<p>Key Points:</p>
+<ol type="1">
+<li><em>Dynamic Interpretation</em>: Unlike Monge and Kantorovich, the Benamou-Brenier formulation finds a time-dependent transformation, representing a continuous flow of mass.</li>
+<li><em>Velocity Field <span class="math inline">\(v(x, t)\)</span></em>: Defines the “direction” and “speed” of mass movement, yielding a smooth, physical path of minimal kinetic energy.</li>
+<li><em>Continuity Equation</em>: Ensures mass conservation over time, maintaining that mass neither appears nor disappears.</li>
+</ol>
+<p>Advantages:</p>
+<ul>
+<li><em>Smoothness</em>: Provides a continuous path for evolving distributions, well-suited for dynamic processes.</li>
+<li><em>Computational Benefits</em>: The problem is formulated as a convex optimization over a flow field, often solved with efficient numerical methods.</li>
+</ul>
+<p>The Benamou-Brenier formulation expands optimal transport by introducing a dynamic flow approach, making it especially useful for applications requiring continuous transformations. Its physical interpretation has brought valuable insights to fields that rely on time-evolving processes.</p>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>The three formulations of optimal transport—Monge, Kantorovich, and Benamou-Brenier—each provide unique perspectives and methodologies for addressing the fundamental problem of transporting mass efficiently between distributions. The <strong>Monge formulation</strong> offers a direct approach, seeking a one-to-one mapping that minimizes transportation cost while preserving mass, making it intuitive but limited in applicability due to its constraints. In contrast, the <strong>Kantorovich formulation</strong> expands this framework by allowing mass splitting through the use of transport plans, making it more versatile for a wider range of problems, including those involving discrete and continuous distributions. Finally, the <strong>Benamou-Brenier formulation</strong> introduces a dynamic interpretation of transport, framing it as a flow problem governed by velocity fields. This perspective is particularly valuable in scenarios where time evolution plays a crucial role, allowing for smooth transitions between states. Together, these formulations form a comprehensive toolbox for optimal transport theory, finding applications across diverse fields such as logistics, computer graphics, machine learning, and medical imaging.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-neurodegeneration2020" class="csl-entry" role="listitem">
+Bastos, Filipa, Mathieu Quinodoz, Marie-Claude Addor, Beryl Royer-Bertrand, Heidi Fodstad, Carlo Rivolta, Claudia Poloni, Andrea Superti-Furga, Eliane Roulet-Perez, and Sébastien Lebon. 2020. <span>“Childhood Neurodegeneration Associated with a Specific UBTF Variant: A New Case Report and Review of the Literature.”</span> <em>BMC Neurology</em> 20 (January).
+</div>
+<div id="ref-benamou2000computational" class="csl-entry" role="listitem">
+Benamou, Jean-David, and Yann Brenier. 2000. <span>“A Computational Fluid Mechanics Solution to the Monge-Kantorovich Mass Transfer Problem.”</span> <em>Numerische Mathematik</em> 84 (3): 375–93.
+</div>
+<div id="ref-Kantorovich2006OnTT" class="csl-entry" role="listitem">
+Kantorovich, Lev. 2006. <span>“On the Translocation of Masses.”</span> <em>Journal of Mathematical Sciences</em> 133: 1381–82.
+</div>
+<div id="ref-villani2021topics" class="csl-entry" role="listitem">
+Villani, Cédric. 2021. <em>Topics in Optimal Transportation</em>. Vol. 58. American Mathematical Soc.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/bioshape-analysis\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

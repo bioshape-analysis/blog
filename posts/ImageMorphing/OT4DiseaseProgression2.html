@@ -382,7 +382,7 @@ Figure&nbsp;4: Linear interpolation of brain MRI at 5 different ages.
 <div id="fig-example" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="example.png" class="img-fluid figure-img" width="400">
+<img src="Example.png" class="img-fluid figure-img" width="400">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;5: Images to use for OMT.
@@ -394,7 +394,7 @@ Figure&nbsp;5: Images to use for OMT.
 </section>
 <section id="import-libraries" class="level2">
 <h2 class="anchored" data-anchor-id="import-libraries">Import Libraries</h2>
-<div id="6eda57b0" class="cell" data-execution_count="1">
+<div id="eaad1712" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -409,7 +409,7 @@ Figure&nbsp;5: Images to use for OMT.
 </section>
 <section id="omt-class" class="level2">
 <h2 class="anchored" data-anchor-id="omt-class">OMT Class</h2>
-<div id="63feebc7" class="cell" data-execution_count="2">
+<div id="68e3cbb6" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> omtFD(nn.Module):</span>
@@ -485,7 +485,7 @@ Figure&nbsp;5: Images to use for OMT.
 </section>
 <section id="function-to-generate-omt-interpolation" class="level2">
 <h2 class="anchored" data-anchor-id="function-to-generate-omt-interpolation">Function to Generate OMT Interpolation</h2>
-<div id="9107bc95" class="cell" data-execution_count="3">
+<div id="60081415" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> LearnOMT(x0, x1, nt<span class="op">=</span><span class="dv">20</span>, device<span class="op">=</span><span class="st">'cpu'</span>):</span>
@@ -581,7 +581,7 @@ Figure&nbsp;5: Images to use for OMT.
 </section>
 <section id="running-omt" class="level2">
 <h2 class="anchored" data-anchor-id="running-omt">Running OMT</h2>
-<div id="97b7107f" class="cell" data-execution_count="4">
+<div id="1ba0f4c6" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> <span class="st">'cuda:0'</span> <span class="co"># default: 'cpu'</span></span>
@@ -603,7 +603,7 @@ Figure&nbsp;5: Images to use for OMT.
 </div>
 <section id="generate-linear-interpolation-for-compare" class="level3">
 <h3 class="anchored" data-anchor-id="generate-linear-interpolation-for-compare">Generate Linear Interpolation for Compare</h3>
-<div id="91c3c227" class="cell" data-execution_count="5">
+<div id="4155b13c" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>OMTInterpolation <span class="op">=</span> OMTInterpolation[<span class="dv">0</span>,<span class="dv">0</span>].detach().cpu().numpy()</span>
@@ -622,7 +622,7 @@ Figure&nbsp;5: Images to use for OMT.
 </section>
 <section id="visualization" class="level2">
 <h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
-<div id="379e8c67" class="cell" data-execution_count="6">
+<div id="7d6effc4" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># shape of Interpolation = [|B|,|C|,|X|,|Y|,|T|]</span></span>

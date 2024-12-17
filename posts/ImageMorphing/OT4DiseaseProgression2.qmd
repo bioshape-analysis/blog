@@ -120,7 +120,7 @@ Let us implement an OMT based interpolation on a to a toy problem, whose initial
 
 # PyTorch Implementation of OMT
 ## Example Images
-![Images to use for OMT.](example.png){#fig-example width=400}
+![Images to use for OMT.](Example.png){#fig-example width=400}
 
 [Click to download the first image file.](x0.pt)
 

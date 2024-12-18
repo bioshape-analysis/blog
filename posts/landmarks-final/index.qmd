@@ -57,7 +57,7 @@ Landmarks are selected using a prototype ribosome and based on conservation and 
 *The prototype IDs and polymers used in the protocol*
 
 
-#### Conservation
+#### Conservation {#sec-conservation}
 
 To be chosen as a landmark, residues must be at least 90% conserved. This threshold is a tuneable parameter. For each of the relevant polymers, the program iterates through each position in the MSA alignment file for that polymer and selects alignment positions for which at least 90% of specimens share the same residue. This excludes positions where gaps are the most common element. The program calls the below method on every column of the MSA for each of the relevant polymers to obtain a short-list of alignment positions to be considered for landmarks.
 
@@ -236,22 +236,22 @@ As mentioned above, the program will automatically update the `fasta` files and 
 
 ## Limitations
 
+#### Distribution of Species {#sec-distribution}
+The available data from RibosomeXYZ is not uniformally distributed across species. There is a heavy skew towards a few model species (E. coli, T. thermophilus, etc.) as shown in @fig-distribution. This biases the residue conservation calculations. Analysis done on the resulting landmark data should subset appropriately to obtain a more even spread of species.
+
+![Counts of species present in the data from RibosomeXYZ](./data/distribution.png){#fig-distribution}
+
 #### Alignment Efficiency
 The protocol automatically runs MAFFT sequence alignment from the command line when the input `fasta` files are updated. However, running MAFFT online can be much faster. To maximize efficiency when running the protocol on many ribosomes, I suggest running the input `fasta` files through MAFFT online, and uploading the resulting alignments into the protocol directory (ensuring to match the location and naming of the original files).
 
 #### Missing Landmarks
 There remains missing landmarks on many ribosome specimens in the data, due to gaps in the experimental data or unusual specimens (e.g. imaged mid biogenesis). Filtering out these instances would be beneficial prior to analysis.
 
-#### Distribution of Species
-The available data from RibosomeXYZ is not uniformally distributed across species. There is a heavy skew towards a few model species (E. coli, T. thermophilus, etc.) as shown in @fig-distribution. This biases the residue conservation calculations. Analysis done on the resulting landmark data should subset appropriately to obtain a more even spread of species.
-
-![Counts of species present in the data from RibosomeXYZ](./data/distribution.png){#fig-distribution}
-
 ## Future Directions
 
-When choosing landmarks, the thresholding by distance is done by comparison to the Mole tunnel model. However, this model is too simplistic to capture the complex shape of the tunnel. A more accurate model is the mesh model as described in ['3D Tessellation of Biomolecular Cavities'](https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/). 
+When choosing landmarks, the thresholding by distance is done by comparison to the Mole tunnel model. However, this model is too simplistic to capture the complex shape of the tunnel. A more accurate model is the mesh model as described in ['3D Tessellation of Biomolecular Cavities'](https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/). There are gaps in the landmarks where the mesh model shows protrusions that the Mole model does not capture (see @fig-compare for a visualization). Future improvements to the protocol should be made to measure distance to the tunnel using the mesh representation as a benchmark instead of the centerline and radii.
 
-There are gaps in the landmarks where the mesh model shows protrusions that the Mole model does not capture (see @fig-compare for a visualization). Future improvements to the protocol should be made to measure distance to the tunnel using the mesh representation as a benchmark instead of the centerline and radii.
+Additionally, due to limitations mentioned in @sec-distribution, there are biases present in the conservation calculations in this protocol. There exists improved measures for conservation which take taxonomy into account [@malhis2019]. It would be beneficial to replace the simplistic conservation calculation presently used (see @sec-conservation) with such methods to more accurately reflect conservation with respect to taxonomic differences.
 
 *Visualizations produced using PyVista [@pyvista] and PyMol [@PyMOL].*
 

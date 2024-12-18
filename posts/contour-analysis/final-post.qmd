@@ -22,6 +22,7 @@ Although the work done in this project is applicable to any AFM image, one of my
 For image denoising and binarization we will use the [OpenCV](https://github.com/opencv/opencv) library. Images will be loaded into Numpy arrays.
 
 ```{python}
+#| eval: false
 import cv2
 import numpy as np
 ```

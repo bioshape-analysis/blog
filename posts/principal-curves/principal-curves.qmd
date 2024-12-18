@@ -1,6 +1,6 @@
 ---
 title: Trajectory Inference for cryo-EM data using Principal Curves
-date: October 28th 2024
+date: "October 28 2024"
 author:
   - name: Forest Kobayashi
 categories:

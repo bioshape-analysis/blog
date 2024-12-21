@@ -341,10 +341,10 @@ Figure&nbsp;2: A visualization of a subsection of the MSA showing a highly conse
 </tbody>
 </table>
 <p><em>The prototype IDs and polymers used in the protocol</em></p>
-<section id="conservation" class="level4">
-<h4 class="anchored" data-anchor-id="conservation">Conservation</h4>
+<section id="sec-conservation" class="level4">
+<h4 class="anchored" data-anchor-id="sec-conservation">Conservation</h4>
 <p>To be chosen as a landmark, residues must be at least 90% conserved. This threshold is a tuneable parameter. For each of the relevant polymers, the program iterates through each position in the MSA alignment file for that polymer and selects alignment positions for which at least 90% of specimens share the same residue. This excludes positions where gaps are the most common element. The program calls the below method on every column of the MSA for each of the relevant polymers to obtain a short-list of alignment positions to be considered for landmarks.</p>
-<div id="b7a543d7" class="cell" data-execution_count="1">
+<div id="f86a9748" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_conserved(column, threshold):</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">=</span> Counter(column)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> counter.most_common(<span class="dv">1</span>)[<span class="dv">0</span>]</span>
@@ -358,7 +358,7 @@ Figure&nbsp;2: A visualization of a subsection of the MSA showing a highly conse
 <section id="distances" class="level4">
 <h4 class="anchored" data-anchor-id="distances">Distances</h4>
 <p>For each candidate conserved position, the program first locates the residue’s coordinates on the prototype specimen (see <a href="#sec-locating-landmarks" class="quarto-xref">Section&nbsp;3.5</a> for more detail). For each prototype, I have run the Mole tunnel search algorithm to extract the centerline coordinates of the tunnel and the radius at each point. Then for each candidate landmark <span class="math inline">\(p_l\)</span>, I find the nearest centerline point <span class="math inline">\(p_c\)</span> by euclidean distance, and compute the distance from <span class="math inline">\(p_l\)</span> to the sphere centered at <span class="math inline">\(p_c\)</span> with the given radius <span class="math inline">\(r_c\)</span>: <span class="math display">\[ d = ||p_l - p_c|| - r_c\]</span> If <span class="math inline">\(d\)</span> is less than the distance threshold, the candidate position is considered a landmark. See the code below for reference:</p>
-<div id="fc0d30e4" class="cell" data-execution_count="2">
+<div id="0052efbc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_closest_point(p, instance):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    coords <span class="op">=</span> get_tunnel_coordinates(instance)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    dist <span class="op">=</span> np.inf</span>
@@ -390,7 +390,7 @@ Figure&nbsp;2: A visualization of a subsection of the MSA showing a highly conse
 <li>Ensure that the residue type matches the landmark type (i.e.&nbsp;amino acids / nucleotides match), and return the mean coordinates of the atoms in the residue as the landmark coordinates.</li>
 </ol>
 <p>See the following code:</p>
-<div id="7b6f238d" class="cell" data-execution_count="3">
+<div id="670c2c90" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> locate_residues(landmark: Landmark, </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                    polymer: <span class="bu">str</span>, </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                    polymer_id: <span class="bu">str</span>, </span>
@@ -540,16 +540,8 @@ Figure&nbsp;3: Atoms versus landmarks near the tunnel, shown with the Mole model
 </section>
 <section id="limitations" class="level2">
 <h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
-<section id="alignment-efficiency" class="level4">
-<h4 class="anchored" data-anchor-id="alignment-efficiency">Alignment Efficiency</h4>
-<p>The protocol automatically runs MAFFT sequence alignment from the command line when the input <code>fasta</code> files are updated. However, running MAFFT online can be much faster. To maximize efficiency when running the protocol on many ribosomes, I suggest running the input <code>fasta</code> files through MAFFT online, and uploading the resulting alignments into the protocol directory (ensuring to match the location and naming of the original files).</p>
-</section>
-<section id="missing-landmarks" class="level4">
-<h4 class="anchored" data-anchor-id="missing-landmarks">Missing Landmarks</h4>
-<p>There remains missing landmarks on many ribosome specimens in the data, due to gaps in the experimental data or unusual specimens (e.g.&nbsp;imaged mid biogenesis). Filtering out these instances would be beneficial prior to analysis.</p>
-</section>
-<section id="distribution-of-species" class="level4">
-<h4 class="anchored" data-anchor-id="distribution-of-species">Distribution of Species</h4>
+<section id="sec-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="sec-distribution">Distribution of Species</h4>
 <p>The available data from RibosomeXYZ is not uniformally distributed across species. There is a heavy skew towards a few model species (E. coli, T. thermophilus, etc.) as shown in <a href="#fig-distribution" class="quarto-xref">Figure&nbsp;4</a>. This biases the residue conservation calculations. Analysis done on the resulting landmark data should subset appropriately to obtain a more even spread of species.</p>
 <div id="fig-distribution" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -562,12 +554,20 @@ Figure&nbsp;4: Counts of species present in the data from RibosomeXYZ
 </figure>
 </div>
 </section>
+<section id="alignment-efficiency" class="level4">
+<h4 class="anchored" data-anchor-id="alignment-efficiency">Alignment Efficiency</h4>
+<p>The protocol automatically runs MAFFT sequence alignment from the command line when the input <code>fasta</code> files are updated. However, running MAFFT online can be much faster. To maximize efficiency when running the protocol on many ribosomes, I suggest running the input <code>fasta</code> files through MAFFT online, and uploading the resulting alignments into the protocol directory (ensuring to match the location and naming of the original files).</p>
+</section>
+<section id="missing-landmarks" class="level4">
+<h4 class="anchored" data-anchor-id="missing-landmarks">Missing Landmarks</h4>
+<p>There remains missing landmarks on many ribosome specimens in the data, due to gaps in the experimental data or unusual specimens (e.g.&nbsp;imaged mid biogenesis). Filtering out these instances would be beneficial prior to analysis.</p>
+</section>
 </section>
 <section id="future-directions" class="level2">
 <h2 class="anchored" data-anchor-id="future-directions">Future Directions</h2>
-<p>When choosing landmarks, the thresholding by distance is done by comparison to the Mole tunnel model. However, this model is too simplistic to capture the complex shape of the tunnel. A more accurate model is the mesh model as described in <a href="https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/">‘3D Tessellation of Biomolecular Cavities’</a>.</p>
-<p>There are gaps in the landmarks where the mesh model shows protrusions that the Mole model does not capture (see <a href="#fig-compare" class="quarto-xref">Figure&nbsp;3</a> for a visualization). Future improvements to the protocol should be made to measure distance to the tunnel using the mesh representation as a benchmark instead of the centerline and radii.</p>
-<p><em>Visualizations produced using PyVista<span class="citation" data-cites="pyvista"><sup><a href="#ref-pyvista" role="doc-biblioref">5</a></sup></span> and PyMol<span class="citation" data-cites="PyMOL"><sup><a href="#ref-PyMOL" role="doc-biblioref">6</a></sup></span>.</em></p>
+<p>When choosing landmarks, the thresholding by distance is done by comparison to the Mole tunnel model. However, this model is too simplistic to capture the complex shape of the tunnel. A more accurate model is the mesh model as described in <a href="https://bioshape-analysis.github.io/blog/posts/ribosome-tunnel-new/">‘3D Tessellation of Biomolecular Cavities’</a>. There are gaps in the landmarks where the mesh model shows protrusions that the Mole model does not capture (see <a href="#fig-compare" class="quarto-xref">Figure&nbsp;3</a> for a visualization). Future improvements to the protocol should be made to measure distance to the tunnel using the mesh representation as a benchmark instead of the centerline and radii.</p>
+<p>Additionally, due to limitations mentioned in <a href="#sec-distribution" class="quarto-xref">Section&nbsp;5.0.1</a>, there are biases present in the conservation calculations in this protocol. There exists improved measures for conservation which take taxonomy into account<span class="citation" data-cites="malhis2019"><sup><a href="#ref-malhis2019" role="doc-biblioref">5</a></sup></span>. It would be beneficial to replace the simplistic conservation calculation presently used (see <a href="#sec-conservation" class="quarto-xref">Section&nbsp;3.4.1</a>) with such methods to more accurately reflect conservation with respect to taxonomic differences.</p>
+<p><em>Visualizations produced using PyVista<span class="citation" data-cites="pyvista"><sup><a href="#ref-pyvista" role="doc-biblioref">6</a></sup></span> and PyMol<span class="citation" data-cites="PyMOL"><sup><a href="#ref-PyMOL" role="doc-biblioref">7</a></sup></span>.</em></p>
 <section id="references" class="level4">
 
 
@@ -589,11 +589,14 @@ Figure&nbsp;4: Counts of species present in the data from RibosomeXYZ
 <div id="ref-dao2019differences" class="csl-entry" role="listitem">
 <div class="csl-left-margin">4. </div><div class="csl-right-inline">Dao Duc, K., Batra, S. S., Bhattacharya, N., Cate, J. H. &amp; Song, Y. S. Differences in the path to exit the ribosome across the three domains of life. <em>Nucleic acids research</em> <strong>47</strong>, 4198–4210 (2019).</div>
 </div>
+<div id="ref-malhis2019" class="csl-entry" role="listitem">
+<div class="csl-left-margin">5. </div><div class="csl-right-inline">Malhis, J., Nawar &amp; Gsponer, J. Improved measures for evolutionary conservation that exploit taxonomy distances. <em>Nature Communications</em> <strong>10</strong>, (2019).</div>
+</div>
 <div id="ref-pyvista" class="csl-entry" role="listitem">
-<div class="csl-left-margin">5. </div><div class="csl-right-inline">Sullivan, C. B. &amp; Kaszynski, A. <a href="https://doi.org/10.21105/joss.01450"><span>PyVista</span>: 3D plotting and mesh analysis through a streamlined interface for the visualization toolkit (<span>VTK</span>)</a>. <em>Journal of Open Source Software</em> <strong>4</strong>, 1450 (2019).</div>
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">Sullivan, C. B. &amp; Kaszynski, A. <a href="https://doi.org/10.21105/joss.01450"><span>PyVista</span>: 3D plotting and mesh analysis through a streamlined interface for the visualization toolkit (<span>VTK</span>)</a>. <em>Journal of Open Source Software</em> <strong>4</strong>, 1450 (2019).</div>
 </div>
 <div id="ref-PyMOL" class="csl-entry" role="listitem">
-<div class="csl-left-margin">6. </div><div class="csl-right-inline">Schrödinger, LLC. The <span>PyMOL</span> molecular graphics system, version&nbsp;1.8. (2015).</div>
+<div class="csl-left-margin">7. </div><div class="csl-right-inline">Schrödinger, LLC. The <span>PyMOL</span> molecular graphics system, version&nbsp;1.8. (2015).</div>
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pavel Buklemishev">
+<meta name="dcterms.date" content="2024-10-28">
+
+<title>Exploring cell shape dynamics dependency on the cell migration – bioshape-analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">bioshape-analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Exploring cell shape dynamics dependency on the cell migration</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Cell Morphology</div>
+                <div class="quarto-category">Cell Migration</div>
+                <div class="quarto-category">Differential Geometry</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pavel Buklemishev </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 28, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
+  <li><a href="#goals" id="toc-goals" class="nav-link" data-scroll-target="#goals">Goals</a>
+  <ul class="collapse">
+  <li><a href="#spatial-migration-description-tools" id="toc-spatial-migration-description-tools" class="nav-link" data-scroll-target="#spatial-migration-description-tools">Spatial migration description tools</a></li>
+  <li><a href="#shape-description-tools" id="toc-shape-description-tools" class="nav-link" data-scroll-target="#shape-description-tools">Shape description tools</a></li>
+  </ul></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a>
+  <ul class="collapse">
+  <li><a href="#numpy-array-objects-in-each-frame" id="toc-numpy-array-objects-in-each-frame" class="nav-link" data-scroll-target="#numpy-array-objects-in-each-frame">NumPy Array Objects in Each Frame</a></li>
+  <li><a href="#structure" id="toc-structure" class="nav-link" data-scroll-target="#structure">Structure</a></li>
+  </ul></li>
+  <li><a href="#dataset-example-single-cell-dynamics-through-the-time" id="toc-dataset-example-single-cell-dynamics-through-the-time" class="nav-link" data-scroll-target="#dataset-example-single-cell-dynamics-through-the-time">Dataset example: single cell dynamics through the time</a></li>
+  </ul></li>
+  <li><a href="#main-part" id="toc-main-part" class="nav-link" data-scroll-target="#main-part">Main part</a>
+  <ul class="collapse">
+  <li><a href="#plan" id="toc-plan" class="nav-link" data-scroll-target="#plan">Plan</a></li>
+  <li><a href="#cell-spatial-migration" id="toc-cell-spatial-migration" class="nav-link" data-scroll-target="#cell-spatial-migration">Cell spatial migration</a>
+  <ul class="collapse">
+  <li><a href="#modes-of-migration" id="toc-modes-of-migration" class="nav-link" data-scroll-target="#modes-of-migration">Modes of migration</a></li>
+  <li><a href="#trajectories" id="toc-trajectories" class="nav-link" data-scroll-target="#trajectories">Trajectories</a></li>
+  <li><a href="#velocity-and-angle" id="toc-velocity-and-angle" class="nav-link" data-scroll-target="#velocity-and-angle">Velocity and angle</a></li>
+  </ul></li>
+  <li><a href="#shape-analysis" id="toc-shape-analysis" class="nav-link" data-scroll-target="#shape-analysis">Shape analysis</a>
+  <ul class="collapse">
+  <li><a href="#alignment" id="toc-alignment" class="nav-link" data-scroll-target="#alignment">Alignment</a></li>
+  <li><a href="#distance-computation" id="toc-distance-computation" class="nav-link" data-scroll-target="#distance-computation">Distance Computation</a></li>
+  <li><a href="#plotting-function" id="toc-plotting-function" class="nav-link" data-scroll-target="#plotting-function">Plotting function</a></li>
+  </ul></li>
+  <li><a href="#combining-the-results-analysing-riemann-velocities-in-the-context-of-determined-events" id="toc-combining-the-results-analysing-riemann-velocities-in-the-context-of-determined-events" class="nav-link" data-scroll-target="#combining-the-results-analysing-riemann-velocities-in-the-context-of-determined-events">Combining the results: analysing Riemann velocities in the context of determined events</a></li>
+  <li><a href="#riemann-velocities-with-classified-segments" id="toc-riemann-velocities-with-classified-segments" class="nav-link" data-scroll-target="#riemann-velocities-with-classified-segments">Riemann velocities with Classified Segments</a></li>
+  </ul></li>
+  <li><a href="#conformal-mapping" id="toc-conformal-mapping" class="nav-link" data-scroll-target="#conformal-mapping">Conformal mapping</a></li>
+  <li><a href="#statistical-research" id="toc-statistical-research" class="nav-link" data-scroll-target="#statistical-research">Statistical research</a>
+  <ul class="collapse">
+  <li><a href="#parameter-statistical-research-for-0.9-confidence-level-of-trajectory-classification." id="toc-parameter-statistical-research-for-0.9-confidence-level-of-trajectory-classification." class="nav-link" data-scroll-target="#parameter-statistical-research-for-0.9-confidence-level-of-trajectory-classification.">Parameter statistical research for 0.9 confidence level of trajectory classification.</a></li>
+  <li><a href="#parameter-statistical-research-for-0.95-confidence-level-of-trajectory-classification." id="toc-parameter-statistical-research-for-0.95-confidence-level-of-trajectory-classification." class="nav-link" data-scroll-target="#parameter-statistical-research-for-0.95-confidence-level-of-trajectory-classification.">Parameter statistical research for 0.95 confidence level of trajectory classification.</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#future-plans" id="toc-future-plans" class="nav-link" data-scroll-target="#future-plans">Future plans</a>
+  <ul class="collapse">
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<hr>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p>Cell morphology is an emerging field of biological research that examines the shape, size, and internal structure of cells to describe their state and the processes occurring within them. Today, more and more scientists across the world are investigating visible cellular transformations to predict cellular phenotypes. This research has significant practical implications: understanding specific cellular features characteristic of certain diseases, such as cancer, could lead to new approaches for early detection and classification.</p>
+<p>In this work, we explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeleton structures <span class="citation" data-cites="Mogilner_Oster_1996">(<a href="#ref-Mogilner_Oster_1996" role="doc-biblioref">Mogilner and Oster 1996</a>)</span>. Current understanding suggests that actin polymerization causes protrusions at the cell’s leading edge, forming structures known as lamellipodia and filopodia. These changes impact the shape of a cell and can be evaluated numerically. We aim to characterize the motion of single cells and align it with shape changes.</p>
+</section>
+<section id="goals" class="level2">
+<h2 class="anchored" data-anchor-id="goals">Goals</h2>
+<p>Our primary goal is to characterize observed cell motion and analyze their shape dynamics. Specifically, we aim to explore bounds and correlations between cellular motility and shape variation.</p>
+<section id="spatial-migration-description-tools" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-migration-description-tools">Spatial migration description tools</h3>
+<p>To analyze cell migration, we assume that a cell moves as a point without rotation. Displacements of the cell’s mass center, velocities, and directional angles are computed from centroid coordinates at different time points. Using these metrics, we predict motion modes and migration patterns through the segment classifier framework <span class="citation" data-cites="VEGA20181018">(<a href="#ref-VEGA20181018" role="doc-biblioref">Vega et al. 2018</a>)</span>.</p>
+</section>
+<section id="shape-description-tools" class="level3">
+<h3 class="anchored" data-anchor-id="shape-description-tools">Shape description tools</h3>
+<p>To analyze changes in cell shape over time, we employ differential geometry approaches, particularly the Riemann Elastic Metric <span class="citation" data-cites="10.1007/978-3-031-38299-4_60">(<a href="#ref-10.1007/978-3-031-38299-4_60" role="doc-biblioref">Li et al. 2023</a>)</span>. This metric allows us to detect how the cell form stretches and bends: <span class="math display">\[
+g_c^{a, b}(h, k) = a^2 \int_{[0,1]} \langle D_s h, N \rangle \langle D_s k, N \rangle \, ds
++ b^2 \int_{[0,1]} \langle D_s h, T \rangle \langle D_s k, T \rangle \, ds
+\]</span></p>
+<p>We estimate the Riemann distance between two cellular boundary curves to mathematically describe shape changes over time. The algorithm is implemented using the Python Geomstats package.</p>
+<p>By setting <span class="math inline">\(a=1\)</span> and <span class="math inline">\(b = {\frac{1}{2}}\)</span>, we employ the Square Root Velocity (SRV) metric in this work.</p>
+<p>Besides, the conformal mapping framework <span class="citation" data-cites="Zhou2023.04.12.536640">(<a href="#ref-Zhou2023.04.12.536640" role="doc-biblioref">Zhou et al. 2023</a>)</span> is used to detect cell protrusions at specific time points.</p>
+</section>
+</section>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>This dataset contains real cell contours obtained via fluorescent microscopy in Professor Prasad’s lab, segmented by Clément Soubrier.</p>
+<ul>
+<li><p><strong>204 directories</strong>:<br>
+Each directory is named <code>cell_*</code>, representing an individual cell.</p></li>
+<li><p><strong>Frames</strong>:<br>
+Subdirectories inside each cell are named <code>frame_*</code>, capturing different time points for that cell.</p></li>
+</ul>
+<section id="numpy-array-objects-in-each-frame" class="level3">
+<h3 class="anchored" data-anchor-id="numpy-array-objects-in-each-frame">NumPy Array Objects in Each Frame</h3>
+<ul>
+<li><strong>centroid.npy</strong>: Stores the coordinates of the cell’s centroid.<br>
+</li>
+<li><strong>outline.npy</strong>: Contains segmented points as Cartesian coordinates.<br>
+</li>
+<li><strong>time.npy</strong>: Timestamp of the frame.</li>
+</ul>
+</section>
+<section id="structure" class="level3">
+<h3 class="anchored" data-anchor-id="structure">Structure</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> cell_i</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── frame_j</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── centroid.npy</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── outline.npy</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   └── time.npy</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── frame_k</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── centroid.npy</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── outline.npy</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   └── time.npy</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── ...</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> cell_l</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   ├── frame_m</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── centroid.npy</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   ├── outline.npy</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   │   └── time.npy</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   └── ...</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="dataset-example-single-cell-dynamics-through-the-time" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-example-single-cell-dynamics-through-the-time">Dataset example: single cell dynamics through the time</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>), layout<span class="op">=</span><span class="st">'constrained'</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">15</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>number_of_frames <span class="op">=</span> <span class="bu">sum</span>(os.path.isdir(os.path.join(<span class="ss">f"cells/cell_</span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">"</span>, entry)) <span class="cf">for</span> entry <span class="kw">in</span> os.listdir(<span class="ss">f"cells/cell_</span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">"</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab20(np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, number_of_frames))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,number_of_frames<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    time <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">/frame_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">/time.npy'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    border <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">/frame_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">/outline.npy'</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    centroid <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">/frame_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">/centroid.npy'</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> colors[i <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    ax.plot(border[:, <span class="dv">0</span>], border[:, <span class="dv">1</span>], label<span class="op">=</span>time, color<span class="op">=</span>color)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    ax.scatter(centroid[<span class="dv">0</span>], centroid[<span class="dv">1</span>], color<span class="op">=</span>color)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>plt.legend()    </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="ss">f"single_cell_</span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/single_cell_15.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>The cell form in different time moments</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="main-part" class="level1">
+<h1>Main part</h1>
+<section id="plan" class="level2">
+<h2 class="anchored" data-anchor-id="plan">Plan</h2>
+<p>The study is divided into two main parts:</p>
+<ol type="1">
+<li><p>Cell Spatial Migration:</p>
+<p>We visualize and classify the trajectories of motion for a large set of cells and analyze velocities and directional angle patterns.</p></li>
+<li><p>Shape Dynamics:</p>
+<p>We compute the Riemann distances over time and investigate characteristic events to understand cell shape behavior during migration. We also use conformal mapping to analyze protrusions and other shape features.</p></li>
+</ol>
+</section>
+<section id="cell-spatial-migration" class="level2">
+<h2 class="anchored" data-anchor-id="cell-spatial-migration">Cell spatial migration</h2>
+<p>To simplify the analysis, centroid and time data were organized into arrays.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">204</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    number_of_frames <span class="op">=</span> <span class="bu">sum</span>(os.path.isdir(os.path.join(<span class="ss">f"cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">"</span>, entry)) <span class="cf">for</span> entry <span class="kw">in</span> os.listdir(<span class="ss">f"cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">"</span>))  </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    iter_distance <span class="op">=</span> np.zeros(number_of_frames)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    iter_time <span class="op">=</span> np.zeros(number_of_frames)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    iter_centroid <span class="op">=</span> np.array([np.random.rand(<span class="dv">2</span>) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(number_of_frames)])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(number_of_frames):</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        iter_time[i] <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">/frame_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/time.npy'</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        iter_centroid[i] <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">/frame_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/centroid.npy'</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    riemann_distances.append(iter_distance)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    times.append(iter_time)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    centroids.append(iter_centroid)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>data_path <span class="op">=</span> <span class="co">########</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(data_path<span class="op">+</span><span class="st">"/times.npy"</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    np.save(f, np.array(times, dtype<span class="op">=</span><span class="bu">object</span>))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(data_path<span class="op">+</span><span class="st">"/centroid.npy"</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    np.save(f, np.array(centroids, dtype<span class="op">=</span><span class="bu">object</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="modes-of-migration" class="level3">
+<h3 class="anchored" data-anchor-id="modes-of-migration">Modes of migration</h3>
+<p>Cells exhibit different migration patterns, such as free diffusion, directed migration, and confined motion. Mean Squared Displacement (MSD) analysis was used to distinguish these modes. <span class="citation" data-cites="Modes">(<a href="#ref-Modes" role="doc-biblioref">Dieterich et al. 2008</a>)</span> <span class="citation" data-cites="MSD">(<a href="#ref-MSD" role="doc-biblioref">Rosen 2021</a>)</span>.</p>
+<p>Mean squared displacement (MSD):</p>
+<p><span class="math display">\[msd(t) = &lt;[x(t+t_0) - x(t)]^2 + [y(t+t_0) - y(t)]^2&gt; \]</span></p>
+<p>Experimentally, the MSD depends on time in a polynomial way: <span class="math display">\[ msd(t)  = C t^{\alpha}\]</span></p>
+<p>The motion types are described by the value of the parameter <span class="math inline">\(\alpha\)</span></p>
+<ul>
+<li><strong><span class="math inline">\(\alpha = 1\)</span></strong>: Free Difusion.<br>
+</li>
+<li><strong><span class="math inline">\(\alpha = 2\)</span></strong>: Directed Diffusion.<br>
+</li>
+<li><strong><span class="math inline">\(1 &lt; \alpha &lt; 2\)</span></strong>: Superdiffusion.</li>
+<li><strong><span class="math inline">\(\alpha &lt;1\)</span></strong>: Subdiffusion (anomalous diffusion, confined diffusion).</li>
+<li><strong><span class="math inline">\(\alpha \approx 0\)</span></strong>: Immobility</li>
+</ul>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/diff_types.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>Diffusion types <span class="citation" data-cites="picture">(<a href="#ref-picture" role="doc-biblioref">Kapanidis, Uphoff, and Stracy 2018</a>)</span></figcaption>
+</figure>
+</div>
+<p>Using the trajectories, we aim to determine the motion type and identify potential transitions between them.</p>
+<p>However, we do not observe superdiffusion mode in our classification part of work.</p>
+</section>
+<section id="trajectories" class="level3">
+<h3 class="anchored" data-anchor-id="trajectories">Trajectories</h3>
+<p>First, we visualize the trajectories of cells in space by using this code.</p>
+<section id="code" class="level4">
+<h4 class="anchored" data-anchor-id="code">Code</h4>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_cell_trajectory(n):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    centroids <span class="op">=</span> centr[n <span class="op">-</span> <span class="dv">1</span>]  </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    centroids <span class="op">=</span> np.array(centroids)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    x_coords <span class="op">=</span> centroids[:, <span class="dv">0</span>]  </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    y_coords <span class="op">=</span> centroids[:, <span class="dv">1</span>] </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># riemann_data = riemann[n-1] </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># riemann_data = np.array(riemann_data)  </span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    time_steps <span class="op">=</span> np.arange(<span class="bu">len</span>(x_coords))  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    plt.scatter(</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        x_coords[<span class="dv">0</span>], y_coords[<span class="dv">0</span>],  </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        c<span class="op">=</span><span class="st">'black'</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        marker<span class="op">=</span><span class="st">'o'</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        edgecolor<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        s<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">'Start Point'</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    scatter <span class="op">=</span> plt.scatter(</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        x_coords[<span class="dv">1</span>:], y_coords[<span class="dv">1</span>:],  </span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        c<span class="op">=</span>time_steps[<span class="dv">1</span>:],  <span class="co">#riemann_data[1:],        </span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'plasma'</span>,             </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        marker<span class="op">=</span><span class="st">'o'</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        edgecolor<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        s<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.7</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    plt.plot(x_coords, y_coords, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'gray'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)  <span class="co"># Линия траектории</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="ss">f"Cell Num </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(<span class="st">'X Coordinate'</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    plt.ylabel(<span class="st">'Y Coordinate'</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    plt.grid(<span class="va">True</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    cbar <span class="op">=</span> plt.colorbar(scatter)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    cbar.set_label(<span class="st">'Time Step (t)'</span>, rotation<span class="op">=</span><span class="dv">270</span>, labelpad<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="trajectory-example" class="level4">
+<h4 class="anchored" data-anchor-id="trajectory-example">Trajectory example:</h4>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/cell_traj_87.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>The cell №87 trajectory</figcaption>
+</figure>
+</div>
+<p>The trajectory for cell №87 shows potential directed motion intervals, but further analysis is required to confirm motion modes.</p>
+<p><a href="files/trajectories.pdf">All the trajectories pdf</a></p>
+</section>
+</section>
+<section id="velocity-and-angle" class="level3">
+<h3 class="anchored" data-anchor-id="velocity-and-angle">Velocity and angle</h3>
+<p>To further investigate motion patterns, we calculated the velocity and directional angle between consecutive frames.</p>
+<section id="code-1" class="level4">
+<h4 class="anchored" data-anchor-id="code-1">Code</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_angle_vel_cell(cell_num):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    velocities <span class="op">=</span> []</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    riemann_distances <span class="op">=</span> []</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    time_data <span class="op">=</span> []</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    time_data1 <span class="op">=</span> []</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    rel_angle <span class="op">=</span> []</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    num_frames <span class="op">=</span> <span class="bu">len</span>(centr[cell_num<span class="op">-</span><span class="dv">1</span>])  </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> frame <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, num_frames):</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        time_data.append(get_times(cell_num<span class="op">-</span><span class="dv">1</span>, frame))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        rel_angle.append(get_velocity_angle_rel(cell_num<span class="op">-</span><span class="dv">1</span>, frame))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> frame <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, num_frames):</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        riemann_distances.append(get_riemann_dist(cell_num<span class="op">-</span><span class="dv">1</span>, frame))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        time_data1.append(get_times(cell_num<span class="op">-</span><span class="dv">1</span>, frame))</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        velocities.append(get_abs_velocity(cell_num<span class="op">-</span><span class="dv">1</span>, frame))</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    ax.plot(time_data1, velocities, label<span class="op">=</span><span class="st">"Velocity"</span>, color<span class="op">=</span><span class="st">"green"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Time"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Velocity"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(axis<span class="op">=</span><span class="st">"both"</span>, which<span class="op">=</span><span class="st">"major"</span>, labelsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">"upper left"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    ax_angle <span class="op">=</span> ax.twinx()</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    ax_angle.plot(time_data, rel_angle, label<span class="op">=</span><span class="st">"Angle"</span>, color<span class="op">=</span><span class="st">"red"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    ax_angle.set_ylabel(<span class="st">"Angle (degrees)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    ax_angle.tick_params(axis<span class="op">=</span><span class="st">"y"</span>, labelsize<span class="op">=</span><span class="dv">8</span>, colors<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    ax_angle.legend(loc<span class="op">=</span><span class="st">"upper right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Cell </span><span class="sc">{</span>cell_num<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="velocityangle-visualization-example" class="level4">
+<h4 class="anchored" data-anchor-id="velocityangle-visualization-example">Velocity/Angle visualization example:</h4>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/angle_cell_87.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>The cell №87 velocity and angle visualization</figcaption>
+</figure>
+</div>
+<p>Velocity plots revealed segments of nearly constant speed, potentially indicating directed migration, while angle plots were often noisy and inconclusive.</p>
+<p><a href="files/angle_vel.pdf">All the velocities and angles pdf</a></p>
+</section>
+<section id="further-steps-dc-mss" class="level4">
+<h4 class="anchored" data-anchor-id="further-steps-dc-mss">Further steps: DC-MSS</h4>
+<p>Since, all the previous approaches didn’t give the complete result, we applied the segment classification framework (divide-and-conquer moment scaling spectrum(<strong>DC-MSS</strong>)) <span class="citation" data-cites="VEGA20181018">(<a href="#ref-VEGA20181018" role="doc-biblioref">Vega et al. 2018</a>)</span> which classifies trajectory segments into predefined motion types.</p>
+<p>After converting data to the framework format we can get the segmentized classified trajectory picture. This method distinguishes between free diffusion, confined motion, directed migration, and immobility, although it cannot differentiate between superdiffusion and directed motion, thus we assume that it is a single direct migration mode.</p>
+</section>
+<section id="data-preparation" class="level4">
+<h4 class="anchored" data-anchor-id="data-preparation">Data preparation</h4>
+<p>Before running the DC-MSS framework, we prepare the trajectory data:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.io <span class="im">import</span> savemat</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                                                            </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>tracks <span class="op">=</span> {}</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, trajectory <span class="kw">in</span> <span class="bu">enumerate</span>(data):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    n_frames <span class="op">=</span> trajectory.shape[<span class="dv">0</span>]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> np.zeros(n_frames <span class="op">*</span> <span class="dv">8</span>)  </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j, (x, y) <span class="kw">in</span> <span class="bu">enumerate</span>(trajectory):</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        start_idx <span class="op">=</span> j <span class="op">*</span> <span class="dv">8</span>  </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        row[start_idx] <span class="op">=</span> x </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        row[start_idx <span class="op">+</span> <span class="dv">1</span>] <span class="op">=</span> y  </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    tracks[<span class="ss">f"track_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>] <span class="op">=</span> row  </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>output_path <span class="op">=</span> <span class="st">"trajectory_data.mat"</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>savemat(output_path, {<span class="st">'tracks'</span>: tracks})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This piece of code converts trajectory data into a .mat file, compatible with MATLAB.</p>
+</section>
+<section id="running-the-dc-mss-framework-in-matlab" class="level4">
+<h4 class="anchored" data-anchor-id="running-the-dc-mss-framework-in-matlab">Running the DC-MSS Framework in MATLAB</h4>
+<p>The following MATLAB code processes the prepared data:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">loaded</span> <span class="op">=</span> <span class="va">load</span>(<span class="st">"../trajectory_data.mat"</span>)<span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">allTracks</span> <span class="op">=</span> <span class="va">loaded</span>.<span class="va">tracks</span><span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="va">probDim</span> <span class="op">=</span> <span class="fl">2</span><span class="op">;</span>       </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="va">plotRes</span> <span class="op">=</span> <span class="fl">0</span><span class="op">;</span>       </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="va">peakAlpha</span> <span class="op">=</span> <span class="fl">95</span><span class="op">;</span>  </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="va">results</span> <span class="op">=</span> <span class="va">struct</span>()<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="va">trackNames</span> <span class="op">=</span> <span class="va">fieldnames</span>(<span class="va">allTracks</span>)<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="va">i</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">length</span>(<span class="va">trackNames</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">trackName</span> <span class="op">=</span> <span class="va">trackNames</span>{<span class="va">i</span>}<span class="op">;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">tracks</span> <span class="op">=</span> <span class="va">allTracks</span>.(<span class="va">trackName</span>)<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    [<span class="va">transDiffResults</span><span class="op">,</span> <span class="va">errFlag</span>] <span class="op">=</span> <span class="va">basicTransientDiffusionAnalysisv1</span>(<span class="va">tracks</span><span class="op">,</span> <span class="va">probDim</span><span class="op">,</span> <span class="va">plotRes</span><span class="op">,</span> <span class="va">peakAlpha</span>)<span class="op">;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="va">isfield</span>(<span class="va">transDiffResults</span>.<span class="va">segmentClass</span><span class="op">,</span> <span class="ss">'momentScalingSpectrum'</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">results</span>.(<span class="va">trackName</span>).<span class="va">momentScalingSpectrum</span> <span class="op">=</span> <span class="va">transDiffResults</span>.<span class="va">segmentClass</span>.<span class="va">momentScalingSpectrum</span><span class="op">;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="va">h5FileName</span> <span class="op">=</span> <span class="ss">'time_events.h5'</span><span class="op">;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="va">exist</span>(<span class="va">h5FileName</span><span class="op">,</span> <span class="ss">'file'</span>) <span class="op">==</span> <span class="fl">2</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="va">delete</span>(<span class="va">h5FileName</span>)<span class="op">;</span> </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="va">trackNames</span> <span class="op">=</span> <span class="va">fieldnames</span>(<span class="va">results</span>)<span class="op">;</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="va">i</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">length</span>(<span class="va">trackNames</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="va">trackName</span> <span class="op">=</span> <span class="va">trackNames</span>{<span class="va">i</span>}<span class="op">;</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="va">data</span> <span class="op">=</span> <span class="va">results</span>.(<span class="va">trackName</span>).<span class="va">momentScalingSpectrum</span><span class="op">;</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="op">~</span><span class="va">isempty</span>(<span class="va">data</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">h5create</span>(<span class="va">h5FileName</span><span class="op">,</span> [<span class="ss">'/'</span><span class="op">,</span> <span class="va">trackName</span>]<span class="op">,</span> <span class="va">size</span>(<span class="va">data</span>))<span class="op">;</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">h5write</span>(<span class="va">h5FileName</span><span class="op">,</span> [<span class="ss">'/'</span><span class="op">,</span> <span class="va">trackName</span>]<span class="op">,</span> <span class="va">data</span>)<span class="op">;</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/segmented_track.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>Classified track. Cyan corresponds to the free diffusion, Magenta - directed motion</figcaption>
+</figure>
+</div>
+<p>The classified trajectory segments provide clearer insights into motion types. However, the framework has a confidence level of classification parameter <strong>peakAlpha</strong> which impacts the classification process. We haven’t choosen the suitable for us, so we will conduct the study based on two levels: 95 and 90.</p>
+</section>
+</section>
+</section>
+<section id="shape-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="shape-analysis">Shape analysis</h2>
+<p>To analyze shape dynamics, we compute Riemann distances between consecutive, aligned cell shapes. This accounts for transformations like translation, scaling, and reparametrization while penalizing rotation.</p>
+<section id="alignment" class="level3">
+<h3 class="anchored" data-anchor-id="alignment">Alignment</h3>
+<p>The alignment function (kindly provided by Wanxin Li) ensures proper alignment of cell shapes:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> align(point, base_point, rescale, rotation, reparameterization, k_sampling_points): <span class="co">#rotation set as False</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Align point and base_point via quotienting out translation, rescaling, rotation and reparameterization</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    total_space <span class="op">=</span> DiscreteCurvesStartingAtOrigin(k_sampling_points<span class="op">=</span>k_sampling_points)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Quotient out translation </span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    point <span class="op">=</span> total_space.projection(point) </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    point <span class="op">=</span> point <span class="op">-</span> gs.mean(point, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    base_point <span class="op">=</span> total_space.projection(base_point)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    base_point <span class="op">=</span> base_point <span class="op">-</span> gs.mean(base_point, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Quotient out rescaling</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rescale:</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        point <span class="op">=</span> total_space.normalize(point) </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        base_point <span class="op">=</span> total_space.normalize(base_point)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Quotient out rotation</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rotation:</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        point <span class="op">=</span> rotation_align(point, base_point, k_sampling_points)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Quotient out reparameterization</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> reparameterization:</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        aligner <span class="op">=</span> DynamicProgrammingAligner(total_space)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        total_space.fiber_bundle <span class="op">=</span> ReparametrizationBundle(total_space, aligner<span class="op">=</span>aligner)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>        point <span class="op">=</span> total_space.fiber_bundle.align(point, base_point)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> point</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="distance-computation" class="level3">
+<h3 class="anchored" data-anchor-id="distance-computation">Distance Computation</h3>
+<p>Riemann distances are computed between consequent aligned shapes:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>riemann_distances <span class="op">=</span> []</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="dv">1</span><span class="op">/</span><span class="dv">2</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>CURVES_SPACE_ELASTIC <span class="op">=</span> DiscreteCurvesStartingAtOrigin(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    ambient_dim<span class="op">=</span><span class="dv">2</span>, k_sampling_points<span class="op">=</span><span class="dv">1000</span>, equip<span class="op">=</span><span class="va">False</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>CURVES_SPACE_ELASTIC.equip_with_metric(ElasticMetric, a<span class="op">=</span>a, b<span class="op">=</span>b)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_distance(border,reference_shape):</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> CURVES_SPACE_ELASTIC.metric.dist(CURVES_SPACE_ELASTIC.projection(border), CURVES_SPACE_ELASTIC.projection(reference_shape))</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">205</span>):</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    number_of_frames <span class="op">=</span> <span class="bu">sum</span>(os.path.isdir(os.path.join(<span class="ss">f"cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">"</span>, entry)) <span class="cf">for</span> entry <span class="kw">in</span> os.listdir(<span class="ss">f"cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">"</span>))  </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    iter_distance <span class="op">=</span> np.zeros(number_of_frames)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    BASE_LINE <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">/frame_1/outline.npy'</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    BASE_LINE<span class="op">=</span> interpolate(BASE_LINE,<span class="dv">1000</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    BASE_LINE <span class="op">=</span> preprocess(BASE_LINE)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    BASE_LINE<span class="op">=</span> project_on_kendall_space(BASE_LINE)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(number_of_frames):</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        border_cell <span class="op">=</span> np.load(<span class="ss">f'cells/cell_</span><span class="sc">{</span>cell_i<span class="sc">}</span><span class="ss">/frame_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/outline.npy'</span>)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        cell_interpolation<span class="op">=</span> interpolate(border_cell,<span class="dv">1000</span>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        cell_preprocess <span class="op">=</span> preprocess(cell_interpolation)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        border_cell <span class="op">=</span> cell_preprocess</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        border_cell <span class="op">=</span> project_on_kendall_space(cell_interpolation)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        aligned_border <span class="op">=</span> align(border_cell, BASE_LINE, rescale<span class="op">=</span><span class="va">True</span>, rotation<span class="op">=</span><span class="va">False</span>, reparameterization<span class="op">=</span><span class="va">True</span>, k_sampling_points<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        iter_distance[i] <span class="op">=</span> calculate_distance(aligned_border, BASE_LINE)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        BASE_LINE <span class="op">=</span> aligned_border </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    riemann_distances.append(iter_distance)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co">### Dividing by delta t in the results.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotting-function" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-function">Plotting function</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_riemann_cell(plot_index):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    riemann_distances <span class="op">=</span> []</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    time_data <span class="op">=</span> []</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    num_frames <span class="op">=</span> <span class="bu">len</span>(centr[plot_index<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> frame <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, num_frames):</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        dist_value <span class="op">=</span> get_riemann_dist(plot_index<span class="op">-</span><span class="dv">1</span>, frame) <span class="op">/</span> (get_times(plot_index<span class="op">-</span><span class="dv">1</span>, frame) <span class="op">-</span> get_times(plot_index<span class="op">-</span><span class="dv">1</span>, frame <span class="op">-</span> <span class="dv">1</span>))</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        riemann_distances.append(dist_value)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        time_data.append(get_times(plot_index<span class="op">-</span><span class="dv">1</span>, frame))</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>))</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    plt.plot(time_data, riemann_distances, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(<span class="st">"Time"</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    plt.ylabel(<span class="st">"Riemann Velocities"</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="ss">f"Cell </span><span class="sc">{</span>plot_index<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    plt.grid(<span class="va">True</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
+<figure class="figure">
+<p><img src="img/r.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption>Riemann Velocities graph for cell №87</figcaption>
+</figure>
+</div>
+<p><a href="files/riemann_times.pdf">All the Riemann Velocities pdf</a></p>
+</section>
+</section>
+<section id="combining-the-results-analysing-riemann-velocities-in-the-context-of-determined-events" class="level2">
+<h2 class="anchored" data-anchor-id="combining-the-results-analysing-riemann-velocities-in-the-context-of-determined-events">Combining the results: analysing Riemann velocities in the context of determined events</h2>
+<p>The separate investigation of cell trajectories and cell shape variations did not yield promising results. However, we believe that analyzing classified trajectories together with Riemann velocities may reveal compelling evidence.</p>
+<p>By extracting event time points from the DC-MSS framework and overlaying them on the Riemann velocity plots, we expect to observe characteristic peaks corresponding to transitions between motion modes.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> riemann_times_with_events(cell_num):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    cell_index <span class="op">=</span> cell_num <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    riemann_distances <span class="op">=</span> []</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    time_data <span class="op">=</span> []</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    num_frames <span class="op">=</span> <span class="bu">len</span>(centr[cell_index])</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> frame <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, num_frames):</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        dt <span class="op">=</span> get_times(cell_index, frame) <span class="op">-</span> get_times(cell_index, frame <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        riemann_distances.append(get_riemann_dist(cell_index, frame) <span class="op">/</span> dt)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        time_data.append(get_times(cell_index, frame))</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> h5py.File(<span class="st">'time_events.h5'</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        track_i_data <span class="op">=</span> f[<span class="ss">f'/track_</span><span class="sc">{</span>cell_index <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">'</span>][:]</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        first_two_rows <span class="op">=</span> track_i_data[:<span class="dv">2</span>]</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        time_points <span class="op">=</span> np.intersect1d(first_two_rows[<span class="dv">0</span>, :], first_two_rows[<span class="dv">1</span>, :])</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Cell #</span><span class="sc">{</span>cell_index <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss"> Data: </span><span class="sc">{</span>first_two_rows<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Cell #</span><span class="sc">{</span>cell_index <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss"> Time Points: </span><span class="sc">{</span>time_points<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    plt.plot(time_data, riemann_distances, label<span class="op">=</span><span class="st">'Riemann velocity'</span>, color<span class="op">=</span><span class="st">'blue'</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(<span class="st">"Time"</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    plt.ylabel(<span class="st">"Riemann Velocity"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="ss">f"Cell </span><span class="sc">{</span>cell_index <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    plt.grid(<span class="va">True</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> tp <span class="kw">in</span> time_points:</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> tp <span class="op">-</span> <span class="dv">1</span> <span class="op">&lt;</span> <span class="bu">len</span>(time_data):  </span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> time_data[<span class="bu">int</span>(tp) <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>            y <span class="op">=</span> riemann_distances[<span class="bu">int</span>(tp) <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x, y, color<span class="op">=</span><span class="st">"red"</span>, label<span class="op">=</span><span class="st">"Event time"</span> <span class="cf">if</span> tp <span class="op">==</span> time_points[<span class="dv">0</span>] <span class="cf">else</span> <span class="st">""</span>)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    plt.legend()</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div style="display: flex; justify-content: space-around; align-items: center;">
+<figure style="text-align: center;" class="figure">
+<img src="img/cell87_90.png" alt="Confidence level 0.90" style="width: 100%;" class="figure-img">
+<figcaption>
+Confidence level 0.90
+</figcaption>
+</figure>
+<figure style="text-align: center;" class="figure">
+<img src="img/cell87_95.png" alt="Confidence level 0.95" style="width: 100%;" class="figure-img">
+<figcaption>
+Confidence level 0.95
+</figcaption>
+</figure>
+</div>
+<p>As seen in the images, the number of detected events varies depending on the confidence level of the DC-MSS framework. Unfortunately, we do not observe a direct link between Riemann velocity extrema and switching between time events. However, the peak at time point 49 aligns well with the observed transition in migration modes, suggesting that a connection may exist.</p>
+<p><a href="files/riemann_with_events_90.pdf">Riemann velocities and events (0.9 confidence level)</a></p>
+<p><a href="files/riemann_with_events_95.pdf">Riemann velocities and events (0.95 confidence level)</a></p>
+</section>
+<section id="riemann-velocities-with-classified-segments" class="level2">
+<h2 class="anchored" data-anchor-id="riemann-velocities-with-classified-segments">Riemann velocities with Classified Segments</h2>
+<p>As we do not observe a clear connection between events and Riemann velocities, the link might lie in specific transitions between motion modes (e.g., Free Diffusion to Directed Migration). To investigate this further, we need to visualize all motion modes on the Riemann velocity plots.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> riemann_single_cell_classification(cell_number):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    cell_index <span class="op">=</span> cell_number <span class="op">-</span> <span class="dv">1</span>  </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    riemann_distances <span class="op">=</span> []</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    time_data <span class="op">=</span> []</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    type_data <span class="op">=</span> defaultdict(<span class="bu">list</span>)  </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> h5py.File(<span class="st">'time_events_90.h5'</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        track_i_data <span class="op">=</span> f[<span class="ss">f'/track_</span><span class="sc">{</span>cell_index<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">'</span>][:]</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        first_three_rows <span class="op">=</span> track_i_data[:<span class="dv">3</span>]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        event_indices <span class="op">=</span> first_three_rows[<span class="dv">0</span>, :].astype(<span class="bu">int</span>) <span class="op">-</span> <span class="dv">1</span>  </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        interval_types <span class="op">=</span> first_three_rows[<span class="dv">2</span>, :]  <span class="co"># </span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    time_data <span class="op">=</span> [times[cell_index][idx] <span class="cf">for</span> idx <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(times[cell_index]))]  </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    riemann_distances <span class="op">=</span> [</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>        get_riemann_dist(cell_index, idx) <span class="op">/</span> (get_times(cell_index, idx) <span class="op">-</span> get_times(cell_index, idx <span class="op">-</span> <span class="dv">1</span>))</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> idx <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(times[cell_index]))</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    interval_colors <span class="op">=</span> {</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>        <span class="dv">0</span>: <span class="st">"brown"</span>,      </span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>        <span class="dv">1</span>: <span class="st">"blue"</span>,       </span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2</span>: <span class="st">"cyan"</span>,       </span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>        <span class="dv">3</span>: <span class="st">"magenta"</span>,    </span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"unclassified"</span>: <span class="st">"black"</span>  </span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> start_idx, interval_type <span class="kw">in</span> <span class="bu">enumerate</span>(interval_types):</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> event_indices[start_idx]</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>        end <span class="op">=</span> event_indices[start_idx <span class="op">+</span> <span class="dv">1</span>] <span class="cf">if</span> start_idx <span class="op">+</span> <span class="dv">1</span> <span class="op">&lt;</span> <span class="bu">len</span>(event_indices) <span class="cf">else</span> <span class="bu">len</span>(time_data) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> start <span class="op">&lt;</span> <span class="bu">len</span>(time_data) <span class="kw">and</span> end <span class="op">&lt;</span> <span class="bu">len</span>(time_data):</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>            time_segment <span class="op">=</span> time_data[start:end <span class="op">+</span> <span class="dv">1</span>]  </span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>            segment <span class="op">=</span> riemann_distances[start:end <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>            interval_type <span class="op">=</span> <span class="bu">int</span>(interval_type) <span class="cf">if</span> <span class="kw">not</span> np.isnan(interval_type) <span class="cf">else</span> <span class="st">"unclassified"</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>            color <span class="op">=</span> interval_colors.get(interval_type, <span class="st">"black"</span>)</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>            type_data[interval_type].extend(segment)</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>            ax.plot(time_segment, segment, color<span class="op">=</span>color)</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> matplotlib.lines <span class="im">import</span> Line2D</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    legend_elements <span class="op">=</span> [</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"brown"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Immobile"</span>),</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"blue"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Confined Diffusion"</span>),</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"cyan"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Free Diffusion"</span>),</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"magenta"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Directed Diffusion"</span>),</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Unclassified"</span>)</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>    ax.legend(handles<span class="op">=</span>legend_elements, loc<span class="op">=</span><span class="st">"upper right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Time"</span>)</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Riemann velocity"</span>)</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Cell </span><span class="sc">{</span>cell_number<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(axis<span class="op">=</span><span class="st">'both'</span>, which<span class="op">=</span><span class="st">'major'</span>, labelsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>    plt.savefig(<span class="ss">f"riemann_single_cell_</span><span class="sc">{</span>cell_number<span class="sc">}</span><span class="ss">_classification_90.png"</span>)</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<img src="img/riemann_single_cell_87_classification_90.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+Confidence level 0.90.
+</p>
+</div><div class="column" style="width:50%;">
+<img src="img/riemann_single_cell_87_classification_95.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+Confidence level 0.95.
+</p>
+</div>
+</div>
+<p><a href="files/riemann_with_classification_90.pdf">Riemann velocities and classified segments (0.9 confidence level)</a></p>
+<p><a href="files/riemann_with_classification_95.pdf">Riemann velocities and classified segments (0.95 confidence level)</a></p>
+<p>Based on these results, we can formulate a hypothesis: Riemann velocity peaks emerge when the motion mode switches between Directed Diffusion and Confined/Free Diffusion modes. However, with the current data, we cannot confidently confirm this correlation. Nevertheless, some examples (e.g., cells №33, 36, 41, 57, etc.) suggest that this dependency could be a promising target for future exploration.</p>
+<p>We can visualize the spatial behaviour of a cell via the motion types as well.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_cell_by_motion_type(n):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    cell_dir <span class="op">=</span> <span class="st">'cells'</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    cell_path <span class="op">=</span> os.path.join(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        cell_dir, </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">sorted</span>(os.listdir(cell_dir), key<span class="op">=</span><span class="kw">lambda</span> x: <span class="bu">int</span>(x.split(<span class="st">'_'</span>)[<span class="dv">1</span>]) <span class="cf">if</span> <span class="st">'_'</span> <span class="kw">in</span> x <span class="kw">and</span> x.split(<span class="st">'_'</span>)[<span class="dv">1</span>].isdigit() <span class="cf">else</span> <span class="dv">0</span>)[n<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    cell <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        os.listdir(cell_path), </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        key<span class="op">=</span><span class="kw">lambda</span> x: <span class="bu">int</span>(<span class="st">''</span>.join(<span class="bu">filter</span>(<span class="bu">str</span>.isdigit, x))) </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    fig <span class="op">=</span> plt.figure()</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">'3d'</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    interval_colors <span class="op">=</span> {</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>        <span class="dv">0</span>: <span class="st">"brown"</span>, </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>        <span class="dv">1</span>: <span class="st">"blue"</span>,       </span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2</span>: <span class="st">"cyan"</span>,       </span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>        <span class="dv">3</span>: <span class="st">"magenta"</span>,  </span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"unclassified"</span>: <span class="st">"black"</span>  </span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> h5py</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> h5py.File(<span class="st">'time_events_90.h5'</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>        track_i_data <span class="op">=</span> f[<span class="ss">f'/track_</span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">'</span>][:]</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>        first_three_rows <span class="op">=</span> track_i_data[:<span class="dv">3</span>]</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>        event_indices <span class="op">=</span> first_three_rows[<span class="dv">0</span>, :].astype(<span class="bu">int</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>        interval_types <span class="op">=</span> first_three_rows[<span class="dv">2</span>, :]  </span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, frame <span class="kw">in</span> <span class="bu">enumerate</span>(cell):</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>        frame_path <span class="op">=</span> os.path.join(cell_path, frame)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>        time <span class="op">=</span> np.load(os.path.join(frame_path, <span class="st">'time.npy'</span>))</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>        outline <span class="op">=</span> np.load(os.path.join(frame_path, <span class="st">'outline.npy'</span>))</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>        current_type <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> start_idx, interval_type <span class="kw">in</span> <span class="bu">enumerate</span>(interval_types):</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> i <span class="op">&gt;=</span> event_indices[start_idx] <span class="kw">and</span> (start_idx <span class="op">+</span> <span class="dv">1</span> <span class="op">==</span> <span class="bu">len</span>(event_indices) <span class="kw">or</span> i <span class="op">&lt;</span> event_indices[start_idx <span class="op">+</span> <span class="dv">1</span>]):</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>                current_type <span class="op">=</span> interval_type</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> current_type <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>            interval_type <span class="op">=</span> <span class="bu">int</span>(current_type) <span class="cf">if</span> <span class="kw">not</span> np.isnan(current_type) <span class="cf">else</span> <span class="st">"unclassified"</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>            color <span class="op">=</span> interval_colors.get(interval_type, <span class="st">"black"</span>)</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>        ax.plot3D(</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>            outline[:, <span class="dv">0</span>], </span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>            outline[:, <span class="dv">1</span>], </span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>            np.full(<span class="bu">len</span>(outline[:, <span class="dv">1</span>]), time),</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>            color<span class="op">=</span>color, </span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>            linewidth<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Frame </span><span class="sc">{</span>frame<span class="sc">}</span><span class="ss">: Time = </span><span class="sc">{</span>time<span class="sc">}</span><span class="ss">, Motion Type = </span><span class="sc">{</span>current_type<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> matplotlib.lines <span class="im">import</span> Line2D</span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>    legend_elements <span class="op">=</span> [</span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"brown"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Immobile"</span>),</span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"blue"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Confined Diffusion"</span>),</span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"cyan"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Free Diffusion"</span>),</span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"magenta"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Directed Diffusion"</span>),</span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span><span class="st">"black"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Unclassified"</span>)</span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a>    ax.legend(handles<span class="op">=</span>legend_elements, loc<span class="op">=</span><span class="st">"upper right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">'X Coordinate'</span>)</span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">'Y Coordinate'</span>)</span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>    ax.set_zlabel(<span class="st">'Time'</span>)</span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Cell </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<img src="img/cell87_3d_90.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+Confidence level 0.90.
+</p>
+</div><div class="column" style="width:50%;">
+<img src="img/cell87_3d_95.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+Confidence level 0.95.
+</p>
+</div>
+</div>
+</section>
+</section>
+<section id="conformal-mapping" class="level1">
+<h1>Conformal mapping</h1>
+<p>Conformal mapping is a powerful tool for visualizing and comparing shapes and surfaces (<span class="citation" data-cites="Zhou2023.04.12.536640">Zhou et al. (<a href="#ref-Zhou2023.04.12.536640" role="doc-biblioref">2023</a>)</span>). As a cell migrates and its protrusions grow, this framework allows us to identify specific protrusion growth events and their corresponding time points. Clement Soubrier prepared the framework for analyzing the current dataset.</p>
+<div class="columns">
+<div class="column" style="width:100%;">
+<img src="img/combined_cell_87.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+Cell analysis using conformal mapping tool
+</p>
+</div>
+</div>
+<p>In this analysis, we focus on observing shape dynamics at key time events, exploring protrusions for characteristic behaviors.</p>
+<div class="columns">
+<div class="column" style="width:100%;">
+<img src="img/combined_cell_87_1.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+t = 51
+</p>
+</div>
+</div>
+<p>From this topological representation of the cell, we observe that when the cell transitions from directed migration to a free/confined diffusion mode, a new noticeable protrusion is formed, and the entire structure of the cell membrane undergoes a significant change.</p>
+<div class="columns">
+<div class="column" style="width:100%;">
+<img src="img/combined_cell_87_2.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+t = 85
+</p>
+</div>
+</div>
+<p>At this stage, the cell increases its volume almost uniformly across the entire membrane curve.</p>
+<div class="columns">
+<div class="column" style="width:100%;">
+<img src="img/combined_cell_87_3.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%">
+<p style="text-align: center; font-size: 0.9em;">
+t = 230
+</p>
+</div>
+</div>
+<p>Topological analysis reveals how the cell transforms two protrusions into a single one while decreasing its volume.</p>
+</section>
+<section id="statistical-research" class="level1">
+<h1>Statistical research</h1>
+<p>We also conducted statistical research to measure the values of key parameters across different motion types.</p>
+<section id="parameter-statistical-research-for-0.9-confidence-level-of-trajectory-classification." class="level3">
+<h3 class="anchored" data-anchor-id="parameter-statistical-research-for-0.9-confidence-level-of-trajectory-classification.">Parameter statistical research for 0.9 confidence level of trajectory classification.</h3>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mean_riemann_distances_09.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mean_velocity_09.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mean_angle_09.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="parameter-statistical-research-for-0.95-confidence-level-of-trajectory-classification." class="level3">
+<h3 class="anchored" data-anchor-id="parameter-statistical-research-for-0.95-confidence-level-of-trajectory-classification.">Parameter statistical research for 0.95 confidence level of trajectory classification.</h3>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mean_riemann_distances_095.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mean_velocity_095.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mean_angle_095.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Both confidence level results demonstrate that cell migration modes can be characterized by the average values of these parameters. However, p-value tests indicate that additional data is required to fully support our theory.</p>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In this work, we analyzed cell movement and shape dynamics parameters, characterizing migration based on these factors. We investigated absolute velocity, directional angle of motion, and the behavior of cell trajectories over time. Cell migration modes were distinguished using a segmentation classification framework, which identified transitions between motility regimes.</p>
+<p>While we observed that Riemann velocities coincided with certain motion switch events, we found no consistent global correlation linking Riemann velocity behavior to these transitions. This lack of correlation may be due to errors in cell segmentation. To address this, we propose repeating the experiment with a resegmented dataset to improve accuracy.</p>
+<p>Nevertheless, we gained specific insights, such as peaks in Riemann velocity being associated with certain transitions and statistical correlations between Riemann velocity values and motion types. However, due to limited data, we cannot make definitive conclusions.</p>
+<p>We also completed a conformal mapping analysis of a single cell (№87), where we observed protrusion formation at specific time points. It would be valuable to extend this research to other cells to identify similar behaviors, such as the formation of multiple large protrusions or uniform cell growth.</p>
+<p>Thus, based on these conclusions, the following future plans are proposed:</p>
+</section>
+<section id="future-plans" class="level1">
+<h1>Future plans</h1>
+<ol type="1">
+<li>Increase the dataset to observe more characteristic switches from mode to mode and account for more data in statistical research.</li>
+<li>Improve segmentation.</li>
+<li>Analyze protrusion dynamics of multiple cells via conformal mapping.</li>
+<li>Look for protrusion behavior patterns (cooperative protrusion interplay during the characteristic events).</li>
+<li>Add the superdiffusion mode to the classifier.</li>
+<li>Compare the Riemann Velocity dynamics with conformal mapping method results on less motile cells.</li>
+</ol>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Modes" class="csl-entry" role="listitem">
+Dieterich, Peter, Rainer Klages, Roland Preuss, and Albrecht Schwab. 2008. <span>“Anomalous Dynamics of Cell Migration.”</span> <em>Proceedings of the National Academy of Sciences</em> 105 (2): 459–63. <a href="https://doi.org/10.1073/pnas.0707603105">https://doi.org/10.1073/pnas.0707603105</a>.
+</div>
+<div id="ref-picture" class="csl-entry" role="listitem">
+Kapanidis, Achillefs, Stephan Uphoff, and Mathew Stracy. 2018. <span>“Understanding Protein Mobility in Bacteria by Tracking Single Molecules.”</span> <em>Journal of Molecular Biology</em> 430 (May). <a href="https://doi.org/10.1016/j.jmb.2018.05.002">https://doi.org/10.1016/j.jmb.2018.05.002</a>.
+</div>
+<div id="ref-10.1007/978-3-031-38299-4_60" class="csl-entry" role="listitem">
+Li, Wanxin, Ashok Prasad, Nina Miolane, and Khanh Dao Duc. 2023. <span>“Using a&nbsp;Riemannian Elastic Metric for&nbsp;Statistical Analysis of&nbsp;Tumor Cell Shape Heterogeneity.”</span> In <em>Geometric Science of Information</em>, edited by Frank Nielsen and Frédéric Barbaresco, 583–92. Cham: Springer Nature Switzerland.
+</div>
+<div id="ref-Mogilner_Oster_1996" class="csl-entry" role="listitem">
+Mogilner, A., and G. Oster. 1996. <span>“Cell Motility Driven by Actin Polymerization.”</span> <em>Biophysical Journal</em> 71 (6): 3030–45. <a href="https://doi.org/10.1016/s0006-3495(96)79496-1">https://doi.org/10.1016/s0006-3495(96)79496-1</a>.
+</div>
+<div id="ref-MSD" class="csl-entry" role="listitem">
+Rosen, Christopher P. AND Dallon, Mary Ellen AND Grant. 2021. <span>“Mean Square Displacement for a Discrete Centroid Model of Cell Motion.”</span> <em>PLOS ONE</em> 16 (12): 1–19. <a href="https://doi.org/10.1371/journal.pone.0261021">https://doi.org/10.1371/journal.pone.0261021</a>.
+</div>
+<div id="ref-VEGA20181018" class="csl-entry" role="listitem">
+Vega, Anthony R., Spencer A. Freeman, Sergio Grinstein, and Khuloud Jaqaman. 2018. <span>“Multistep Track Segmentation and Motion Classification for Transient Mobility Analysis.”</span> <em>Biophysical Journal</em> 114 (5): 1018–25. https://doi.org/<a href="https://doi.org/10.1016/j.bpj.2018.01.012">https://doi.org/10.1016/j.bpj.2018.01.012</a>.
+</div>
+<div id="ref-Zhou2023.04.12.536640" class="csl-entry" role="listitem">
+Zhou, Felix Y., Andrew Weems, Gabriel M. Gihana, Bingying Chen, Bo-Jui Chang, Meghan Driscoll, and Gaudenz Danuser. 2023. <span>“Surface-Guided Computing to Analyze Subcellular Morphology and Membrane-Associated Signals in 3D.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2023.04.12.536640">https://doi.org/10.1101/2023.04.12.536640</a>.
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/bioshape-analysis\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

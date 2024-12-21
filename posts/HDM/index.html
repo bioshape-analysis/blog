@@ -259,7 +259,7 @@ window.Quarto = {
 x = (1 + v\cos(\frac{u}{2}))\cos(u),\quad y= (1 + v\cos(\frac{u}{2}))\sin(u),
 \]</span> for <span class="math inline">\(u\in [0,2\pi)\)</span> and <span class="math inline">\(v \in [-1,1]\)</span>.</p>
 <p>It is known as one of the most simple yet nontrivial fibre bundle. See below for a visualization:</p>
-<div id="f05f71ce" class="cell" data-execution_count="1">
+<div id="5bb1df53" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D</span>
@@ -318,7 +318,7 @@ x = (1 + v\cos(\frac{u}{2}))\cos(u),\quad y= (1 + v\cos(\frac{u}{2}))\sin(u),
 </div>
 </div>
 <p>Now we generate samples from the surface uniformly by first sample <span class="math inline">\(N_{base}\)</span> points on the `base manifold’, parameterized by the <span class="math inline">\(v\)</span> component. Then we sample <span class="math inline">\(N_{fibre}\)</span> points along each fibre:</p>
-<div id="da5cf2cf" class="cell" data-execution_count="2">
+<div id="a76b56be" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>N_fibre <span class="op">=</span> <span class="dv">20</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,N_fibre,endpoint<span class="op">=</span><span class="va">False</span>) <span class="co">#samples on each fibre</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>N_base <span class="op">=</span> <span class="dv">50</span></span>
@@ -329,7 +329,7 @@ x = (1 + v\cos(\frac{u}{2}))\cos(u),\quad y= (1 + v\cos(\frac{u}{2}))\sin(u),
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> U.shape[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here we visualize the points to see how they are distributed on the manifold:</p>
-<div id="8df489c0" class="cell" data-execution_count="3">
+<div id="8408f828" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>u, v <span class="op">=</span> np.meshgrid(U,V)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>x, y, z <span class="op">=</span> mobius_strip(u, v)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -362,7 +362,7 @@ x = (1 + v\cos(\frac{u}{2}))\cos(u),\quad y= (1 + v\cos(\frac{u}{2}))\sin(u),
 <p><strong>Horizontal diffusion kernel: </strong> For two data points <span class="math inline">\(e=(u,v)\)</span> and <span class="math inline">\(e' = (u',v')\)</span>: <span class="math display">\[
 K_{\epsilon}(e, e') = \exp( -(u - u')^2/\epsilon) \text{ if }v' = P_{uu'}v,
 \]</span> and zero otherwise. Here <span class="math inline">\(P_{uu'}\)</span> is the map which connects every point from <span class="math inline">\(v\)</span> to its image <span class="math inline">\(v'\)</span>, which, for our case, maps <span class="math inline">\(v\)</span> to itself.</p>
-<div id="b9aa9ac6" class="cell" data-execution_count="4">
+<div id="b6e82eee" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> horizontal_diffusion_kernel(U,V,eps):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> U.shape[<span class="dv">0</span>]</span>
@@ -390,7 +390,7 @@ K_{\epsilon}(e, e') = \exp( -(u - u')^2/\epsilon) \text{ if }v' = P_{uu'}v,
 <p><span class="math display">\[
 K_{\epsilon, \delta}(e,e') = \exp( -(u - u')^2/\epsilon) \exp( -(v-v')^2/\delta ).
 \]</span></p>
-<div id="6dc9c062" class="cell" data-execution_count="5">
+<div id="fa2e6ff1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> coupled_diffusion_kernel(U,V,eps,delta):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> U.shape[<span class="dv">0</span>]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    K_c <span class="op">=</span> np.zeros((N,N))</span>
@@ -415,7 +415,7 @@ K_{\epsilon, \delta}(e,e') = \exp( -(u - u')^2/\epsilon) \exp( -(v-v')^2/\delta 
 </div>
 </div>
 <p>After we created the kernel matrix, we can then proceed with the regular diffusion map by (1) Create the diffusion operator by normalizing the kernel matrix and computing its eigendecomposition, and (2) extract the diffusion coordinates by using the eigenvectors corresponding to the largest eigenvalues (excluding the trivial eigenvalue) to form the diffusion coordinates.</p>
-<div id="7c537efb" class="cell" data-execution_count="6">
+<div id="bbac4783" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> eigh</span>
@@ -469,7 +469,7 @@ K_{\epsilon, \delta}(e,e') = \exp( -(u - u')^2/\epsilon) \exp( -(v-v')^2/\delta 
 <span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now project the data points into a lower-dimensional space defined by the significant diffusion coordinates. This projection helps in visualizing and analyzing the local structure of the data.</p>
-<div id="00df7c08" class="cell" data-execution_count="7">
+<div id="4f1f5a86" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the diffusion map</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> <span class="fl">0.2</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> horizontal_diffusion_kernel(U,V,eps)</span>
@@ -486,7 +486,7 @@ K_{\epsilon, \delta}(e,e') = \exp( -(u - u')^2/\epsilon) \exp( -(v-v')^2/\delta 
 </div>
 </div>
 <p>Similarly we perform the same procedure for the coupled diffusion matrix:</p>
-<div id="723b5b4f" class="cell" data-execution_count="8">
+<div id="b09e9601" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the diffusion map</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> <span class="fl">0.2</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> <span class="fl">0.01</span></span>
@@ -510,7 +510,7 @@ K_{\epsilon, \delta}(e,e') = \exp( -(u - u')^2/\epsilon) \exp( -(v-v')^2/\delta 
 <section id="horizontal-base-diffusion-map-hbdm" class="level2">
 <h2 class="anchored" data-anchor-id="horizontal-base-diffusion-map-hbdm">Horizontal base diffusion map (HBDM)</h2>
 <p>In addition to embed all the data points, the framework also allows for embedding different objects (fibres). The new kernel is defined as the Frobenius norm of all entries in the previous kernel matrix that correspond to the two fibres:</p>
-<div id="1cb571a9" class="cell" data-execution_count="9">
+<div id="26021931" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> <span class="fl">.2</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> horizontal_diffusion_kernel(U,V,eps)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>K_base <span class="op">=</span> np.zeros( (N_base,N_base) )</span>

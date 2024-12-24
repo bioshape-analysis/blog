@@ -62,25 +62,217 @@ The key distinction is that in regression, we assume our data-collection procedu
 
 Nevertheless, on a cosmetic level, we may formulate the problems with similar-looking equations. This brings us to _regularized principal curves_.
 
-# (Penalized) Principal Curves
+# (Penalized) Principal Curves, Problem Statement
 We consider the following problem. Given:
-1) An interval $X \subseteq \mathbb{R}$,
-2) A set $\Omega \subseteq \mathbb{R}^d$,
-3) A data distribution $\mu$ on $\Omega$,
-4) A number $p \geq 1$,
-5) A functional $\mathscr C$ quantifying the "complexity" of maps $f : X\to \Omega$, and
-6) A fixed parameter $\lambda > 0$,
-We want to solve
-$$\min_{f} \int_{\Omega} (d(\omega, f))^p \ d\mu(x) + \lambda \mathscr C(f).$$
 
-## Special Case: Empirical Distributions
-Note that when $\mu$ is an empirical distribution on observed data points $\omega_1, \ldots, \omega_M$, this becomes
+1. An interval $X \subseteq \mathbb{R}$,
+2. A set $\Omega \subseteq \mathbb{R}^d$,
+3. A data distribution $\mu$ on $\Omega$ with finite
+   $p^{\rm th}$-moment,
+4. A number $p \geq 1$,
+5. A functional $\mathscr C$ quantifying the "complexity" of maps $f : X\to \Omega$, and
+6. A fixed parameter $\lambda > 0$,
+
+We want to solve
+$$\begin{equation} \inf_{f} \int_{\Omega} (d(\omega, f))^p \ d\mu(x) +
+\lambda \mathscr C(f), \label{eq:ppc} \tag{1} \end{equation}$$
+where $d$ denotes the Euclidean metric (though in fact, much of the
+theory continues to hold in the case of general metric spaces). Note
+that this is essentially the order-agnostic version of the regression
+problem above.
+
+For convenience we will use the notation
+$$\mathscr J_p(f; \mu) = \int_\Omega (d(\omega, f))^p \ d\mu(x),$$
+and
+$$J(\lambda) = \inf_f \mathscr J_p(f; \mu) + \lambda \mathscr C(f).$$
+
+
+Note that when $\mu$ is an empirical distribution on
+observed data points $\omega_1, \ldots, \omega_M$, the optimization
+problem becomes
 $$\min_{f} \frac{1}{M} \sum_{i=1}^M (d(\omega_i, f))^p+ \lambda \mathscr C(f).$$
 Further taking $p=2$ and denoting $y_i = \mathrm{argmin}_{y \in \mathrm{image}(f)} d(\omega_i, y)$, we can write it as
 $$\min_{f} \frac{1}{M} \sum_{i=1}^M \lvert \omega_i - y_i\rvert^2+ \lambda \mathscr C(f),$$
 whence we recover the relationship with regularized least squares.
+However, we stress again that the above definition of $y_i$ implicitly
+depends on the choice of $f$, hence making this optimization problem
+significantly more complex. We typically choose $\mathscr C$ to
+reflect a priori knowledge about the regularity of the process that
+generates our $\{\omega_i\}$, so that the penalty term in
+$\eqref{eq:ppc}$ encourages the optimization process to choose
+solutions that at least plausibly reflect the underlying generating
+process.
 
-# Project Proposal
-Unfortunately, I do not have any results to show yet, as so far I have mainly been adapting the numerical algorithm from [our paper (see sec. 5.3)](https://arxiv.org/pdf/2409.16541) to be compatible with the data pipeline used by Qiyu. This required a large number of algorithmic innovations, which (hopefully) I will detail in an update to this post in the future.
 
-However, broadly speaking, the idea is to replace the [motion recovery step in Qiyu's post](https://bioshape-analysis.github.io/blog/posts/RECOVAR/#motion-recovery) with these principal curves tools, which we hope will yield a significant runtime improvement.
+
+## Some Remarks on The Levers We Can Tweak
+Examining the problem statement further, one should take note of
+exactly which quantities are given vs. which are up to us to
+prescribe. Essentially, the three meaningful parameters we can play
+with are items 4, 5, and 6.
+
+- The choice of $p \geq 1$ essentially controls the extent to which we
+  care about "outlier"-detection. In particular,
+  i. supposing $\mu$ is compact, and
+  ii. rescaling so that $\mathrm{diam}(\mathrm{supp}(\mu)) = 1$,
+
+  one sees
+  $$
+  \begin{align*}
+  \lim_{p \to \infty} \mathscr J_p(f) + \lambda \mathscr{C}(f)
+    &= \inf_f \left(\sup_{\omega \in \mathrm{supp}(\mu)} d(\omega,
+      f) + \lambda \mathscr C(f)\right).
+  \end{align*}
+  $$
+  So, we see that taking $p \to \infty$ adjusts how much we care about
+  the $\mu$-average distance from $\omega$ to $f$ vs. the worst-case
+  points. One potentially undesirable consequence here is that if one
+  fixes $\lambda$ but changes $p$, in general the constraint value
+  $\mathscr C(f)$ of an optimizer might change. Thus, it is sometimes
+  necessary to hand-tune $\lambda$ in order to get "nice" outputs. It
+  is worth noting that if we fix a "budget" $\ell \geq 0$ and replace
+  the penalized problem with a "hard constraint" formulation
+  $$
+  \inf_{f \in \{\mathscr C(f) \leq \ell\}} \mathscr J_p(f),
+  $$
+  then this problem does not occur. Of course, nothing in life is ever
+  free (this is a case where we can apply the law of "conservation of
+  pain"): The hard constraint problem is generally totally
+  impractical to implement numerically, since the set $\{\mathscr C(f)
+  \leq \ell\}$ typically lacks an easy parametrization.
+
+- Speaking of $\mathscr C$, this is our main lever by which we can
+  change the qualitative behavior of the problem. For example, taking
+  $\mathscr C(f) = \mathrm{Cardinality}(\mathrm{image}(f))$ restricts
+  the class of viable $f$ to piecewise-constant functions (this
+  roughly recovers the _quantization of measures_ problem). On the
+  other hand, a degenerate constraint function like $\mathscr C(f) =
+  \mathrm{Vol}_d(\mathrm{image}(f))$ would allow very pathological
+  solutions, e.g. space-filling curves in the case $d=2$.
+
+  Note, for the most part, the existence theory for optimizers must be
+  re-proven for each new choice of $\mathscr C$ (though, in a
+  forthcoming work with my advisor Young-Heon Kim and our summer
+  research student Lucas O'Brien, we prove existence in a
+  fairly-general axiomatic context). Most analysis considers the case
+  where $\mathscr C$ is just the arclength <span style='color:
+  red;'>insert references to Kirov and Slep\v{c}ev, as well as to
+  Delattre and Fisher</span>. However, in analogy with _smoothing
+  splines_, it can be desirable to constrain the higher-order
+  regularity of $f$ as well, e.g. to smooth out noise in the data.
+  Thus in our preprint <span style='color: red;'>insert link to our
+  preprint</span> we consider the case where $\mathscr C$ is given by
+  a Sobolev $W^{k,q}$ norm (here $k \in [1,\infty)$ and $q \in
+  (1,\infty)$); essentially, we consider a $\mathscr C$ which
+  penalizes large values in the derivatives of orders $0, 1, \ldots,
+  k-1, k$.
+
+  Since Sobolev norms are typically considered primarily for
+  scalar-valued functions, it's worth explicitly defining which of the
+  trivial extensions to the vector-valued case we are using. Denoting
+  the $j^{\rm th}$ component function of $f$ by $f^{(j)}$, we define
+  $$
+    \lVert f \rVert_{W^{k,q}(X; \mathbb R^d)} \coloneqq \left(
+      \sum_{j=1}^d \lVert f^{(j)} \rVert^q_{W^{k,q}(X; \mathbb R)}
+      \right)^{1/q}.
+  $$
+  Note, one should more or less always take $q = 2$, otherwise
+  $\mathscr C$ would not be rotation-invariant. **From now on, unless
+  explicitly stated otherwise, we will interpet $\mathscr C$ to mean
+  this Sobolev norm.**
+
+- Lastly, we have the penalty parameter $\lambda$. This essentially
+  just controls the desired balance between $\mathscr J_p$ and
+  $\mathscr C$. Due to the minimization structure of the objective
+  functional, one may verify that the optimal value $J(\lambda)$ is
+  nondecreasing in $\lambda$. However, a priori, it is nontrivial to
+  try and determine what value of $\lambda$ will yield an optimizer
+  with budget $\mathscr C(f) \leq \ell$.
+
+
+# Numerical Simulation
+We now turn to the matter of establishing a numerical algorithm for
+estimating principal curves. In <span style='color: red;'>insert
+reference to our preprint</span> we sketched a fast, stable algorithm
+for the particular case where $\mu$ is the uniform measure on a
+piecewise-linear (PL) $\Omega \subseteq \mathbb R^2$. This algorithm
+posessed many stability qualities that were desirable for studying
+qualitative properties of $\eqref{eq:ppc}$; however, the restrictions
+on $\mu$ made it essentially impractical for real-world use. Thus we
+have developed an adaptation that works for general measures of the
+form
+$$\mu = \frac{1}{N} \sum_{i=1}^N \delta_{x_i},$$
+though we note that it would not be much harder to treat the case
+of $\mu = \frac{1}{N} \sum_{i=1}^N w_i \delta_{x_i}$ where $w_i \in
+\mathbb R$. In any case, this only affects the computation of
+$\mathscr J_p(f; \mu)$.
+
+The method itself is essentially a gradient descent. The two main
+pieces are, perhaps predictably,
+
+1. Estimation of $\mathscr J_p(f; \mu)$ (and its "gradient" with
+   respect to a perturbation function $\xi$, which we denote by
+   $U_\xi(f)$), and
+2. Estimation of $\mathscr C(f)$ (and, analogously to $U_\xi(f)$, the
+   corresponding "gradient" $G_\xi(f)$).
+
+To make computations tractable we must discretize $f$ into $M$ sample
+points $y_1 = f(t_1), y_2 = f(t_2), \ldots, y_M = f(t_M)$. For reasons
+that will become clear later, we require these samples to be chosen
+such that for all $i = 1, \ldots, M-1$
+$$\mathrm{arclen}(f \vert_{[t_i, t_{i+1}]}) \approx \frac{1}{M-1}
+\mathrm{arclen}(f).$$
+
+In any case, a major practical benefit of discretizing $f$ is that it
+we may restrict our attention to discretized $\xi$, which in turn will
+eventually allows us to write $U_\xi$ and $V_\xi$ as _finite_ vector
+fields. In terms of stability, this approximation creates no problems
+for $\mathscr J_p(f; \mu)$. The problems with $U_\xi$ are a bit
+trickier, but still relatively mild. By contrast, $\mathscr C$ and
+$V_\xi$ require much greater care.
+
+Let us begin with an overview of the "easy" part; the computation of
+$\mathscr J_p$.
+
+
+## Fast Computation of $\mathscr J_p(f; \mu)$.
+Since we assume $f$ has been discretized into $\{y_1, \ldots, y_M\}$
+and $\mu$ is an empirical measure in $\mathbb R^d$, we may rewrite
+$\mathscr J_p(f; \mu)$ as
+$$\mathscr J_p(f; \mu) = \frac{1}{N} \sum_{i=1}^N \min_{j=1, \ldots, M} \lvert \omega_i - y_j \rvert^p.$$
+Naively computing this quantity by looping over the $\{\omega_i\}$ and
+$\{y_j\}$ would require $O(NM)$ operations. Since our Cryo-EM datasets
+can easily have between $10^6\sim 10^8$ datapoints, this is a bit
+too slow on the CPU, so instead we have written a simple brute-force
+GPU method in Python.
+```python
+import torch
+from pykeops.torch import LazyTensor
+
+def compute_Jp(O, Y, p=2):
+    LO = LazyTensor(O[:,None,:])
+    LY = LazyTensor(Y[None,:,:])
+    J = (abs(LO - LY)**2).sum(dim=2)
+    return float(J.min(1).pow(p/2).sum() / O.size()[0])
+
+# e.g. representing 1e7 data points in 10d
+O = torch.rand(1_000_000, 10).cuda()
+# e.g. representing 100 curve sample points
+Y = torch.rand(100, 10).cuda()
+
+## On our GTX 1080 this yields output:
+# 1.12 ms ± 2.22 μs per loop
+# (mean ± std. dev. of 7 runs, 1,000 loops each)
+%timeit compute_Jp(O,Y, p=2)
+```
+which is sufficiently fast for our needs.
+
+
+
+
+
+## B-Splines
+
+## Arclength-parametrized Splines
+
+## Computing The Sobolev Gradient

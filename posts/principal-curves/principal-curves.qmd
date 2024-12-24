@@ -233,11 +233,12 @@ discretization creates no problems for $\mathscr J_p(f; \mu)$. The
 problems with $U$ are a bit trickier, but still relatively mild. By
 contrast, $\mathscr C$ and $V$ require much greater care.
 
-Let us begin with an overview of the "easy" part; the computation of
+Let us begin with an overview of the "easy" part; the computations for
 $\mathscr J_p$.
 
+## The data-fitting term $\mathscr J_p(f; \mu)$ and its gradient $U$.
 
-## Fast Computation of $\mathscr J_p(f; \mu)$.
+### Fast Computation of $\mathscr J_p(f; \mu)$.
 Since we assume $f$ has been discretized into $\{y_1, \ldots, y_M\}$
 and $\mu$ is an empirical measure in $\mathbb R^d$, we may rewrite
 $\mathscr J_p(f; \mu)$ as
@@ -288,9 +289,13 @@ Y = torch.rand(100, 10)
 %timeit cpu_Jp(O,Y)
 ```
 
+
+
 Computing the gradient $U$ is not much more complicated in
 implementation, but requires some additional formulae.
-## Computing $U$.
+
+### Computing $U = \nabla \mathscr J_p(f)$.
+
 For concision let $$y(\omega) = \argmin_{y \in Y} \lvert\omega -
 y\rvert.$$
 In <span style='color: red;'>our preprint (Cor. 4.10)</span> we
@@ -335,9 +340,104 @@ vector field (black) defined at the $\color{blue} y_j$.
 
 ![The new curve and its Voronoi cells](vorn-cartoon-panel-3.png)
 
+### The importance of (arclength)-evenly-spaced curve samples.
+Examining the cartoons above, one sees that if we do not choose our
+$\{y_j\}$ to be roughly evenly-spaced according to arclength, we are
+almost guaranteed to introduce bias into the computation of $U$. In
+particular, without roughly evenly-spaced points, points $y_j$ in
+"sparse" regions of the curve will have far more points in their
+Voronoi cells, and this can be a self-reinforcing error. For example,
+suppose that locally the data distribution is relatively concentrated
+and far from the curve.
 
-## B-Splines
+![A (locally) highly-concentrated distribution](U-bias-1.png)
 
-## Arclength-parametrized Splines
+The update steps will produce something like the following:
 
-## Computing The Sobolev Gradient
+![Computing the "barycenters"](U-bias-2.png)
+
+Drawing the new curve with its updated Voronoi cells, one sees that
+the middle $y$ point has pulled so far away from the rest that it now
+has a monopoly on _all_ the data (previously, the data was split
+between three Voronoi cells).
+
+![The updated curve.](U-bias-3.png)
+
+Since the other Voronoi cells now receive no mass, their base $y$
+points will become static and no longer update in any subsequent
+iteration, while the previously-moved $y$ point will slowly drift
+toward the barycenter of the point cloud.
+
+Resampling to ensure the base points $\{y_j\}$ are roughly
+evenly-spaced according to arclength helps to mitigate this problem,
+by inserting new sample $y$'s next to any $y_j$ that gets "too far"
+away from the rest. Thus $U$ doesn't "blow up" so much at particular
+$y_j$ points, and is rather slightly more uniform in $y$.
+
+In conjunction with the constraint terms we will discuss in a moment,
+this resampling gives relatively-nice "evenness" in the curve
+evolution.
+
+## The constraint term $\mathscr C$ and its gradient $V$.
+Computing $\mathscr C$ requires evaluation of higher-order
+derivatives. Rather than using higher-order finite-difference schemes,
+we elected to first smooth the curve points $\{y_j\}$ via
+spline-fitting and then evaluate the derivatives of these splines.
+This was done so as to also facilitate our arclength reparametrization
+algorithm. In particular, we chose to use _B-splines_, as we now
+describe.
+
+### B-Splines
+Let us begin with some preliminaries. We define the family of
+_(scalar) splines of order $k+1$ on knots $t_1 < t_2 < \cdots <
+t_{N}$_ as:
+
+> The colleciton of piecewise functions of the form
+> $$ S(t) = \begin{cases} P_1 & t \in [t_1, t_2] \\ P_2 & t \in [t_2,
+> t_3] \\ \vdots & \\ P_{N-1} & t \in [t_{N-1}, t_N], \end{cases}$$
+> where each $P_j$ is a polynomial of degree $k$, and overall $S \in
+> C^{k-1}(X; \mathbb R)$.
+
+Abbreviating the collection of knots as $T$, we shall denote this
+family by $\mathrm{Spl}_{k+1}(T; \mathbb R)$. Note that since
+trivially each $P_j \in C^{k-1}((t_j, t_{j+1}); \mathbb R)$, the
+overall $C^{k-1}$ requirement on elements of $\mathrm{Spl}_{k+1}(T;
+\mathbb R)$ can be stated equivalently as: For all $\alpha = 1,
+\ldots, k-1$ and $j = 1, \ldots, N-2$ one has $$\frac{d^\alpha
+P_j}{dt^\alpha} \bigg\vert_{t=t_{j+1}} = \frac{d^\alpha
+P_{j+1}}{dt^\alpha} \bigg\vert_{t=t_{j+1}}.$$
+
+Next, to define vector-valued splines $\mathrm{Spl}_{k+1}(T; \mathbb
+R^{d})$, we can simply require that for each $i = 1, \ldots, d$, the
+component function $S^{(i)} \in \mathrm{Spl}_{k+1}(T; \mathbb R)$.
+Note that in this way $\mathrm{Spl}_{k+1}(T; \mathbb R^d)$ trivially
+inherits vector arithmetic from $\mathbb R^d$. Viewed from this
+perspective, a _B-spline of order $k+1$ on $T$_ will be a particular
+choice of _basis_ for $\mathrm{Spl}_{k+1}(T; \mathbb R^d)$. This basis
+will be chosen in a way that yields a fast algorithm for computing an
+element of $\mathrm{Spl}_{k+1}(T; \mathbb R^d)$ interpolating the
+provided points $\{y_1, \ldots, y_N\}$
+
+
+<!-- of the points $\{f(t_1), -->
+<!-- \ldots, f(t_N)\}$. The particular family of interpolations we are -->
+<!-- interested in is those that can be expressed as piecewise polynomials of degree at most $k$. -->
+
+<!--  interpolations of a prescribed collection of points -->
+<!-- $\{f(t_1), \ldots, f(t_N)\}$ via piecewise polynomials of degree at -->
+<!-- most $k$. Note this guarantees the interpolation will have continuous -->
+<!-- derivatives of order up to $k-1$. -->
+
+<!-- Note that because we've required the spline to _interpolate_ the -->
+<!-- points $\{f(t_1), \ldots, f(t_N)\}$ -->
+
+<!-- The idea is that we will construct the basis splines by first -->
+<!-- beginning with a family of indicator functions on each interval $[t_j, -->
+<!-- t_{j+1}]$. In essence, -->
+
+
+<!-- constructed -->
+
+### Arclength-parametrized Splines
+
+### Computing The Sobolev Gradient

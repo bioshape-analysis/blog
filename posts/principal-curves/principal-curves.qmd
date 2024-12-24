@@ -6,6 +6,8 @@ author:
 categories:
   - Math 612D
 ---
+$\DeclareMathOperator*{\argmin}{\text{arg min}}$
+
 
 # Motivation for Trajectory Inference Problems
 
@@ -210,11 +212,9 @@ $\mathscr J_p(f; \mu)$.
 The method itself is essentially a gradient descent. The two main
 pieces are, perhaps predictably,
 
-1. Estimation of $\mathscr J_p(f; \mu)$ (and its "gradient" with
-   respect to a perturbation function $\xi$, which we denote by
-   $U_\xi(f)$), and
-2. Estimation of $\mathscr C(f)$ (and, analogously to $U_\xi(f)$, the
-   corresponding "gradient" $G_\xi(f)$).
+1. Estimation of $\mathscr J_p(f; \mu)$ (and its "gradient" $U$), and
+2. Estimation of $\mathscr C(f)$ (and, analogously to $U$, the
+   corresponding "gradient" $V$).
 
 To make computations tractable we must discretize $f$ into $M$ sample
 points $y_1 = f(t_1), y_2 = f(t_2), \ldots, y_M = f(t_M)$. For reasons
@@ -223,13 +223,15 @@ such that for all $i = 1, \ldots, M-1$
 $$\mathrm{arclen}(f \vert_{[t_i, t_{i+1}]}) \approx \frac{1}{M-1}
 \mathrm{arclen}(f).$$
 
-In any case, a major practical benefit of discretizing $f$ is that it
-we may restrict our attention to discretized $\xi$, which in turn will
-eventually allows us to write $U_\xi$ and $V_\xi$ as _finite_ vector
-fields. In terms of stability, this approximation creates no problems
-for $\mathscr J_p(f; \mu)$. The problems with $U_\xi$ are a bit
-trickier, but still relatively mild. By contrast, $\mathscr C$ and
-$V_\xi$ require much greater care.
+In any case, a major practical benefit of discretizing $f$ is that
+when computing the first variations of $\mathscr J_p$ and $\mathscr C$
+we may restrict our attention to discretized perturbation functions
+$\xi$, which in turn will eventually allows us to write $U$ and $V$ as
+_finite_ vector fields. This allows us to compute $U$ explicitly, and
+to efficiently approximate $V$. In terms of stability, the
+discretization creates no problems for $\mathscr J_p(f; \mu)$. The
+problems with $U$ are a bit trickier, but still relatively mild. By
+contrast, $\mathscr C$ and $V$ require much greater care.
 
 Let us begin with an overview of the "easy" part; the computation of
 $\mathscr J_p$.
@@ -265,10 +267,73 @@ Y = torch.rand(100, 10).cuda()
 # (mean ± std. dev. of 7 runs, 1,000 loops each)
 %timeit compute_Jp(O,Y, p=2)
 ```
-which is sufficiently fast for our needs.
+for the sake of illustration, observe the runtime difference with the
+analogous CPU-based method:
+```python
+def cpu_Jp(O, Y, p=2):
+    LO = O[:,None,:]
+    LY = Y[None,:,:]
+    J = ((LO - LY)**2).sum(dim=2)
+    if p == 2:
+        return float(J.min(1).values.sum()/O.size()[0])
+    else:
+        return float(J.min(1).values.pow(p/2).sum()/O.size()[0])
 
+O = torch.rand(1_000_000, 10)
+Y = torch.rand(100, 10)
+## On our i7 4790k this yields output:
+# 1.5 s ± 30.5 ms per loop
+# (mean ± std. dev. of 7 runs, 1 loop each)
+## ~1000x slower!
+%timeit cpu_Jp(O,Y)
+```
 
+Computing the gradient $U$ is not much more complicated in
+implementation, but requires some additional formulae.
+## Computing $U$.
+For concision let $$y(\omega) = \argmin_{y \in Y} \lvert\omega -
+y\rvert.$$
+In <span style='color: red;'>our preprint (Cor. 4.10)</span> we
+essentially showed that given $f \in C(X; \Omega)$ and $\xi \in C(X;
+\mathbb R^d)$, modulo some technical details one has
+$$
+\begin{equation}
+\lim_{\varepsilon \to 0} \frac{\mathscr J_p(f + \varepsilon \xi) -
+\mathscr J_p(f)}{\varepsilon} = \int_\Omega (\omega - y(\omega))
+\lvert \omega - y(\omega) \rvert^{p-2} \cdot \xi(y(\omega)) \
+d\mu(\omega). \tag{2} \label{eq:first-var}
+\end{equation}
+$$
+An analogous formula for the discretized case is found in <span
+style='color: red;'>(Prop. 5.5)</span>. In this case, one may show
+that the difference quotient $\eqref{eq:first-var}$ is minimized when
+$\xi(y_j)$ is defined to be
+$$
+\xi(y_j) = \frac{1}{M} \sum_{\{\omega_i \mid y(\omega_i) = y_j\}}
+(\omega_i - y_j) \lvert\omega_i - y_j\rvert^{p-2}.
+$$
+The idea is that $\xi(y_j)$ essentially encodes the $(p-1)$-barycenter
+of the Voronoi cell $\{\omega_i \mid y(\omega_i) = y_j\}$, so that
+$y_j \mapsto y_j + \xi(y_j)$ moves the curve "closer" to the data.
 
+The cartoon illustration is as follows (figures copied from our
+soon-to-be-released preprint <span style='color: red;'>insert
+reference to Andrew project</span>). First, we compute the Voronoi
+cells (denoted by the dotted lines) assigning each $\color{red}
+\omega_i$ (red points) to closest $\color{blue} y_j$ (large blue points):
+
+![Computing the Voronoi cells](vorn-cartoon-panel-0.png)
+
+Then, we compute all the displacement vectors $(\omega_i - y_j)$:
+
+![Computing the "barycenter" field $\xi$](vorn-cartoon-panel-1.png)
+
+Summing them and normalizing by the total points in $\mu$ yields a
+vector field (black) defined at the $\color{blue} y_j$.
+
+![Updating according to $\xi$](vorn-cartoon-panel-2.png)
+
+![The new curve and its Voronoi cells](vorn-cartoon-panel-3.png)
 
 
 ## B-Splines

@@ -22,7 +22,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -188,11 +242,30 @@ window.Quarto = {
   <li><a href="#this-is-not-regression" id="toc-this-is-not-regression" class="nav-link" data-scroll-target="#this-is-not-regression">This Is Not Regression!</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#penalized-principal-curves" id="toc-penalized-principal-curves" class="nav-link" data-scroll-target="#penalized-principal-curves">(Penalized) Principal Curves</a>
+  <li><a href="#penalized-principal-curves-problem-statement" id="toc-penalized-principal-curves-problem-statement" class="nav-link" data-scroll-target="#penalized-principal-curves-problem-statement">(Penalized) Principal Curves, Problem Statement</a>
   <ul class="collapse">
-  <li><a href="#special-case-empirical-distributions" id="toc-special-case-empirical-distributions" class="nav-link" data-scroll-target="#special-case-empirical-distributions">Special Case: Empirical Distributions</a></li>
+  <li><a href="#some-remarks-on-the-levers-we-can-tweak" id="toc-some-remarks-on-the-levers-we-can-tweak" class="nav-link" data-scroll-target="#some-remarks-on-the-levers-we-can-tweak">Some Remarks on The Levers We Can Tweak</a></li>
   </ul></li>
-  <li><a href="#project-proposal" id="toc-project-proposal" class="nav-link" data-scroll-target="#project-proposal">Project Proposal</a></li>
+  <li><a href="#numerical-simulation" id="toc-numerical-simulation" class="nav-link" data-scroll-target="#numerical-simulation">Numerical Simulation</a>
+  <ul class="collapse">
+  <li><a href="#the-data-fitting-term-mathscr-j_pf-mu-and-its-gradient-u." id="toc-the-data-fitting-term-mathscr-j_pf-mu-and-its-gradient-u." class="nav-link" data-scroll-target="#the-data-fitting-term-mathscr-j_pf-mu-and-its-gradient-u.">The data-fitting term <span class="math inline">\(\mathscr J_p(f; \mu)\)</span> and its gradient <span class="math inline">\(U\)</span>.</a>
+  <ul class="collapse">
+  <li><a href="#fast-computation-of-mathscr-j_pf-mu." id="toc-fast-computation-of-mathscr-j_pf-mu." class="nav-link" data-scroll-target="#fast-computation-of-mathscr-j_pf-mu.">Fast Computation of <span class="math inline">\(\mathscr J_p(f; \mu)\)</span>.</a></li>
+  <li><a href="#computing-u-nabla-mathscr-j_pf." id="toc-computing-u-nabla-mathscr-j_pf." class="nav-link" data-scroll-target="#computing-u-nabla-mathscr-j_pf.">Computing <span class="math inline">\(U = \nabla \mathscr J_p(f)\)</span>.</a></li>
+  <li><a href="#the-importance-of-arclength-evenly-spaced-curve-samples." id="toc-the-importance-of-arclength-evenly-spaced-curve-samples." class="nav-link" data-scroll-target="#the-importance-of-arclength-evenly-spaced-curve-samples.">The importance of (arclength)-evenly-spaced curve samples.</a></li>
+  </ul></li>
+  <li><a href="#a-word-on-spline-parametrization" id="toc-a-word-on-spline-parametrization" class="nav-link" data-scroll-target="#a-word-on-spline-parametrization">A word on Spline Parametrization</a>
+  <ul class="collapse">
+  <li><a href="#b-splines" id="toc-b-splines" class="nav-link" data-scroll-target="#b-splines">B-Splines</a></li>
+  <li><a href="#obtaining-an-approximate-arclength-parametrization" id="toc-obtaining-an-approximate-arclength-parametrization" class="nav-link" data-scroll-target="#obtaining-an-approximate-arclength-parametrization">Obtaining an (approximate) arclength parametrization</a></li>
+  </ul></li>
+  <li><a href="#the-constraint-term-mathscr-c-and-its-gradient-v." id="toc-the-constraint-term-mathscr-c-and-its-gradient-v." class="nav-link" data-scroll-target="#the-constraint-term-mathscr-c-and-its-gradient-v.">The constraint term <span class="math inline">\(\mathscr C\)</span> and its gradient <span class="math inline">\(V\)</span>.</a>
+  <ul class="collapse">
+  <li><a href="#computing-the-sobolev-cost-and-sobolev-gradient" id="toc-computing-the-sobolev-cost-and-sobolev-gradient" class="nav-link" data-scroll-target="#computing-the-sobolev-cost-and-sobolev-gradient">Computing the Sobolev Cost and Sobolev Gradient</a></li>
+  </ul></li>
+  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together">Putting it all together…</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   </ul>
 </nav>
     </div>
@@ -203,6 +276,7 @@ window.Quarto = {
 
 
 
+<p><span class="math inline">\(\DeclareMathOperator*{\argmin}{\text{arg min}}\)</span></p>
 <section id="motivation-for-trajectory-inference-problems" class="level1">
 <h1>Motivation for Trajectory Inference Problems</h1>
 <section id="example-a-hexagonal-billiards-table" class="level2">
@@ -268,23 +342,514 @@ window.Quarto = {
 </section>
 </section>
 </section>
-<section id="penalized-principal-curves" class="level1">
-<h1>(Penalized) Principal Curves</h1>
-<p>We consider the following problem. Given: 1) An interval <span class="math inline">\(X \subseteq \mathbb{R}\)</span>, 2) A set <span class="math inline">\(\Omega \subseteq \mathbb{R}^d\)</span>, 3) A data distribution <span class="math inline">\(\mu\)</span> on <span class="math inline">\(\Omega\)</span>, 4) A number <span class="math inline">\(p \geq 1\)</span>, 5) A functional <span class="math inline">\(\mathscr C\)</span> quantifying the “complexity” of maps <span class="math inline">\(f : X\to \Omega\)</span>, and 6) A fixed parameter <span class="math inline">\(\lambda &gt; 0\)</span>, We want to solve <span class="math display">\[\min_{f} \int_{\Omega} (d(\omega, f))^p \ d\mu(x) + \lambda \mathscr C(f).\]</span></p>
-<section id="special-case-empirical-distributions" class="level2">
-<h2 class="anchored" data-anchor-id="special-case-empirical-distributions">Special Case: Empirical Distributions</h2>
-<p>Note that when <span class="math inline">\(\mu\)</span> is an empirical distribution on observed data points <span class="math inline">\(\omega_1, \ldots, \omega_M\)</span>, this becomes <span class="math display">\[\min_{f} \frac{1}{M} \sum_{i=1}^M (d(\omega_i, f))^p+ \lambda \mathscr C(f).\]</span> Further taking <span class="math inline">\(p=2\)</span> and denoting <span class="math inline">\(y_i = \mathrm{argmin}_{y \in \mathrm{image}(f)} d(\omega_i, y)\)</span>, we can write it as <span class="math display">\[\min_{f} \frac{1}{M} \sum_{i=1}^M \lvert \omega_i - y_i\rvert^2+ \lambda \mathscr C(f),\]</span> whence we recover the relationship with regularized least squares.</p>
+<section id="penalized-principal-curves-problem-statement" class="level1">
+<h1>(Penalized) Principal Curves, Problem Statement</h1>
+<p>We consider the following problem. Given:</p>
+<ol type="1">
+<li>An interval <span class="math inline">\(X \subseteq \mathbb{R}\)</span>,</li>
+<li>A set <span class="math inline">\(\Omega \subseteq \mathbb{R}^d\)</span>,</li>
+<li>A data distribution <span class="math inline">\(\mu\)</span> on <span class="math inline">\(\Omega\)</span> with finite <span class="math inline">\(p^{\rm th}\)</span>-moment,</li>
+<li>A number <span class="math inline">\(p \geq 1\)</span>,</li>
+<li>A functional <span class="math inline">\(\mathscr C\)</span> quantifying the “complexity” of maps <span class="math inline">\(f : X\to \Omega\)</span>, and</li>
+<li>A fixed parameter <span class="math inline">\(\lambda &gt; 0\)</span>,</li>
+</ol>
+<p>We want to solve <span class="math display">\[\begin{equation} \inf_{f} \int_{\Omega} (d(\omega, f))^p \ d\mu(x) +
+\lambda \mathscr C(f), \label{eq:ppc} \tag{1} \end{equation}\]</span> where <span class="math inline">\(d\)</span> denotes the Euclidean metric (though in fact, much of the theory continues to hold in the case of general metric spaces). Note that this is essentially the order-agnostic version of the regression problem above.</p>
+<p>For convenience we will use the notation <span class="math display">\[\mathscr J_p(f; \mu) = \int_\Omega (d(\omega, f))^p \ d\mu(x),\]</span> and <span class="math display">\[J(\lambda) = \inf_f \mathscr J_p(f; \mu) + \lambda \mathscr C(f).\]</span></p>
+<p>Note that when <span class="math inline">\(\mu\)</span> is an empirical distribution on observed data points <span class="math inline">\(\omega_1, \ldots, \omega_M\)</span>, the optimization problem becomes <span class="math display">\[\min_{f} \frac{1}{M} \sum_{i=1}^M (d(\omega_i, f))^p+ \lambda \mathscr C(f).\]</span> Further taking <span class="math inline">\(p=2\)</span> and denoting <span class="math inline">\(y_i = \mathrm{argmin}_{y \in \mathrm{image}(f)} d(\omega_i, y)\)</span>, we can write it as <span class="math display">\[\min_{f} \frac{1}{M} \sum_{i=1}^M \lvert \omega_i - y_i\rvert^2+ \lambda \mathscr C(f),\]</span> whence we recover the relationship with regularized least squares. However, we stress again that the above definition of <span class="math inline">\(y_i\)</span> implicitly depends on the choice of <span class="math inline">\(f\)</span>, hence making this optimization problem significantly more complex. We typically choose <span class="math inline">\(\mathscr C\)</span> to reflect a priori knowledge about the regularity of the process that generates our <span class="math inline">\(\{\omega_i\}\)</span>, so that the penalty term in <span class="math inline">\(\eqref{eq:ppc}\)</span> encourages the optimization process to choose solutions that at least plausibly reflect the underlying generating process.</p>
+<section id="some-remarks-on-the-levers-we-can-tweak" class="level2">
+<h2 class="anchored" data-anchor-id="some-remarks-on-the-levers-we-can-tweak">Some Remarks on The Levers We Can Tweak</h2>
+<p>Examining the problem statement further, one should take note of exactly which quantities are given vs.&nbsp;which are up to us to prescribe. Essentially, the three meaningful parameters we can play with are items 4, 5, and 6.</p>
+<ul>
+<li><p>The choice of <span class="math inline">\(p \geq 1\)</span> essentially controls the extent to which we care about “outlier”-detection. In particular,</p>
+<ol type="i">
+<li>supposing <span class="math inline">\(\mu\)</span> is compact, and</li>
+<li>rescaling so that <span class="math inline">\(\mathrm{diam}(\mathrm{supp}(\mu)) = 1\)</span>,</li>
+</ol>
+<p>one sees <span class="math display">\[
+\begin{align*}
+\lim_{p \to \infty} \mathscr J_p(f) + \lambda \mathscr{C}(f)
+  &amp;= \inf_f \left(\sup_{\omega \in \mathrm{supp}(\mu)} d(\omega,
+    f) + \lambda \mathscr C(f)\right).
+\end{align*}
+\]</span> So, we see that taking <span class="math inline">\(p \to \infty\)</span> adjusts how much we care about the <span class="math inline">\(\mu\)</span>-average distance from <span class="math inline">\(\omega\)</span> to <span class="math inline">\(f\)</span> vs.&nbsp;the worst-case points. One potentially undesirable consequence here is that if one fixes <span class="math inline">\(\lambda\)</span> but changes <span class="math inline">\(p\)</span>, in general the constraint value <span class="math inline">\(\mathscr C(f)\)</span> of an optimizer might change. Thus, it is sometimes necessary to hand-tune <span class="math inline">\(\lambda\)</span> in order to get “nice” outputs. It is worth noting that if we fix a “budget” <span class="math inline">\(\ell \geq 0\)</span> and replace the penalized problem with a “hard constraint” formulation <span class="math display">\[
+\inf_{f \in \{\mathscr C(f) \leq \ell\}} \mathscr J_p(f),
+\]</span> then this problem does not occur. Of course, nothing in life is ever free (this is a case where we can apply the law of “conservation of pain”): The hard constraint problem is generally totally impractical to implement numerically, since the set <span class="math inline">\(\{\mathscr C(f)
+\leq \ell\}\)</span> typically lacks an easy parametrization.</p></li>
+<li><p>Speaking of <span class="math inline">\(\mathscr C\)</span>, this is our main lever by which we can change the qualitative behavior of the problem. For example, taking <span class="math inline">\(\mathscr C(f) = \mathrm{Cardinality}(\mathrm{image}(f))\)</span> restricts the class of viable <span class="math inline">\(f\)</span> to piecewise-constant functions (this roughly recovers the <em>quantization of measures</em> problem). On the other hand, a degenerate constraint function like <span class="math inline">\(\mathscr C(f) =
+\mathrm{Vol}_d(\mathrm{image}(f))\)</span> would allow very pathological solutions, e.g.&nbsp;space-filling curves in the case <span class="math inline">\(d=2\)</span>.</p>
+<p>Note, for the most part, the existence theory for optimizers must be re-proven for each new choice of <span class="math inline">\(\mathscr C\)</span> (though, in a forthcoming work <span class="citation" data-cites="obrien">(<a href="#ref-obrien" role="doc-biblioref">O’Brien, Kobayashi, and Kim 2024</a>)</span>, we prove existence in a fairly-general axiomatic context). Most analysis considers the case where <span class="math inline">\(\mathscr
+C\)</span> is just the arclength <span class="citation" data-cites="kirov delattre">(<a href="#ref-kirov" role="doc-biblioref">Kirov and Slepčev 2017</a>; <a href="#ref-delattre" role="doc-biblioref">Delattre and Fischer 2020</a>)</span>. However, in analogy with <em>smoothing splines</em>, it can be desirable to constrain the higher-order regularity of <span class="math inline">\(f\)</span> as well, e.g.&nbsp;to smooth out noise in the data. Thus in our preprint <span class="citation" data-cites="kobayashi">(<a href="#ref-kobayashi" role="doc-biblioref">Kobayashi, Hayase, and Kim 2024</a>)</span> we consider the case where <span class="math inline">\(\mathscr C\)</span> is given by a Sobolev <span class="math inline">\(W^{k,q}\)</span> norm (here <span class="math inline">\(k \in
+[1,\infty)\)</span> and <span class="math inline">\(q \in (1,\infty)\)</span>); essentially, we consider a <span class="math inline">\(\mathscr C\)</span> which penalizes large values in the derivatives of orders <span class="math inline">\(0, 1, \ldots, k-1, k\)</span>.</p>
+<p>Since Sobolev norms are typically considered primarily for scalar-valued functions, it’s worth explicitly defining which of the trivial extensions to the vector-valued case we are using. Denoting the <span class="math inline">\(j^{\rm th}\)</span> component function of <span class="math inline">\(f\)</span> by <span class="math inline">\(f^{(j)}\)</span>, we define <span class="math display">\[
+  \lVert f \rVert_{W^{k,q}(X; \mathbb R^d)} \coloneqq \left(
+    \sum_{j=1}^d \lVert f^{(j)} \rVert^q_{W^{k,q}(X; \mathbb R)}
+    \right)^{1/q}.
+\]</span> Note, one should more or less always take <span class="math inline">\(q = 2\)</span>, otherwise <span class="math inline">\(\mathscr C\)</span> would not be rotation-invariant. <strong>From now on, unless explicitly stated otherwise, we will interpet <span class="math inline">\(\mathscr C\)</span> to mean this Sobolev norm.</strong></p></li>
+<li><p>Lastly, we have the penalty parameter <span class="math inline">\(\lambda\)</span>. This essentially just controls the desired balance between <span class="math inline">\(\mathscr J_p\)</span> and <span class="math inline">\(\mathscr C\)</span>. Due to the minimization structure of the objective functional, one may verify that the optimal value <span class="math inline">\(J(\lambda)\)</span> is nondecreasing in <span class="math inline">\(\lambda\)</span>. However, a priori, it is nontrivial to try and determine what value of <span class="math inline">\(\lambda\)</span> will yield an optimizer with budget <span class="math inline">\(\mathscr C(f) \leq \ell\)</span>.</p></li>
+</ul>
 </section>
 </section>
-<section id="project-proposal" class="level1">
-<h1>Project Proposal</h1>
-<p>Unfortunately, I do not have any results to show yet, as so far I have mainly been adapting the numerical algorithm from <a href="https://arxiv.org/pdf/2409.16541">our paper (see sec.&nbsp;5.3)</a> to be compatible with the data pipeline used by Qiyu. This required a large number of algorithmic innovations, which (hopefully) I will detail in an update to this post in the future.</p>
-<p>However, broadly speaking, the idea is to replace the <a href="https://bioshape-analysis.github.io/blog/posts/RECOVAR/#motion-recovery">motion recovery step in Qiyu’s post</a> with these principal curves tools, which we hope will yield a significant runtime improvement.</p>
+<section id="numerical-simulation" class="level1">
+<h1>Numerical Simulation</h1>
+<p>We now turn to the matter of establishing a numerical algorithm for estimating principal curves. In <span class="citation" data-cites="kobayashi">(<a href="#ref-kobayashi" role="doc-biblioref">Kobayashi, Hayase, and Kim 2024</a>)</span> we sketched a fast, stable algorithm for the particular case where <span class="math inline">\(\mu\)</span> is the uniform measure on a piecewise-linear (PL) <span class="math inline">\(\Omega \subseteq \mathbb R^2\)</span>. This algorithm posessed many stability qualities that were desirable for studying qualitative properties of <span class="math inline">\(\eqref{eq:ppc}\)</span>; however, the restrictions on <span class="math inline">\(\mu\)</span> made it essentially impractical for real-world use. Thus we have developed an adaptation that works for general measures of the form <span class="math display">\[\mu = \frac{1}{N} \sum_{i=1}^N \delta_{x_i},\]</span> though we note that it would not be much harder to treat the case of <span class="math inline">\(\mu = \frac{1}{N} \sum_{i=1}^N w_i \delta_{x_i}\)</span> where <span class="math inline">\(w_i \in
+\mathbb R\)</span>. In any case, this only affects the computation of <span class="math inline">\(\mathscr J_p(f; \mu)\)</span>.</p>
+<p>The method itself is essentially a gradient descent. The two main pieces are, perhaps predictably,</p>
+<ol type="1">
+<li>Estimation of <span class="math inline">\(\mathscr J_p(f; \mu)\)</span> (and its “gradient” <span class="math inline">\(U\)</span>), and</li>
+<li>Estimation of <span class="math inline">\(\mathscr C(f)\)</span> (and, analogously to <span class="math inline">\(U\)</span>, the corresponding “gradient” <span class="math inline">\(V\)</span>).</li>
+</ol>
+<p>To make computations tractable we must discretize <span class="math inline">\(f\)</span> into <span class="math inline">\(M\)</span> sample points <span class="math inline">\(y_1 = f(t_1), y_2 = f(t_2), \ldots, y_M = f(t_M)\)</span>. For reasons that will become clear later, we require these samples to be chosen such that for all <span class="math inline">\(i = 1, \ldots, M-1\)</span> <span class="math display">\[\mathrm{arclen}(f \vert_{[t_i, t_{i+1}]}) \approx \frac{1}{M-1}
+\mathrm{arclen}(f).\tag{2} \label{eq:arclen-even}\]</span></p>
+<p>In any case, a major practical benefit of discretizing <span class="math inline">\(f\)</span> is that when computing the first variations of <span class="math inline">\(\mathscr J_p\)</span> and <span class="math inline">\(\mathscr C\)</span> we may restrict our attention to discretized perturbation functions <span class="math inline">\(\xi\)</span>, which in turn will eventually allows us to write <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span> as <em>finite</em> vector fields. This allows us to compute <span class="math inline">\(U\)</span> explicitly, and to efficiently approximate <span class="math inline">\(V\)</span>. In terms of stability, the discretization creates no problems for <span class="math inline">\(\mathscr J_p(f; \mu)\)</span>. The problems with <span class="math inline">\(U\)</span> are a bit trickier, but still relatively mild. By contrast, <span class="math inline">\(\mathscr C\)</span> and <span class="math inline">\(V\)</span> require much greater care.</p>
+<p>Let us begin with an overview of the “easy” part; the computations for <span class="math inline">\(\mathscr J_p\)</span>.</p>
+<section id="the-data-fitting-term-mathscr-j_pf-mu-and-its-gradient-u." class="level2">
+<h2 class="anchored" data-anchor-id="the-data-fitting-term-mathscr-j_pf-mu-and-its-gradient-u.">The data-fitting term <span class="math inline">\(\mathscr J_p(f; \mu)\)</span> and its gradient <span class="math inline">\(U\)</span>.</h2>
+<section id="fast-computation-of-mathscr-j_pf-mu." class="level3">
+<h3 class="anchored" data-anchor-id="fast-computation-of-mathscr-j_pf-mu.">Fast Computation of <span class="math inline">\(\mathscr J_p(f; \mu)\)</span>.</h3>
+<p>Since we assume <span class="math inline">\(f\)</span> has been discretized into <span class="math inline">\(\{y_1, \ldots, y_M\}\)</span> and <span class="math inline">\(\mu\)</span> is an empirical measure in <span class="math inline">\(\mathbb R^d\)</span>, we may rewrite <span class="math inline">\(\mathscr J_p(f; \mu)\)</span> as <span class="math display">\[\mathscr J_p(f; \mu) = \frac{1}{N} \sum_{i=1}^N \min_{j=1, \ldots, M} \lvert \omega_i - y_j \rvert^p.\]</span> Naively computing this quantity by looping over the <span class="math inline">\(\{\omega_i\}\)</span> and <span class="math inline">\(\{y_j\}\)</span> would require <span class="math inline">\(O(NM)\)</span> operations. Since our Cryo-EM datasets can easily have between <span class="math inline">\(10^6\sim 10^8\)</span> datapoints, this is a bit too slow on the CPU, so instead we have written a simple brute-force GPU method in Python.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pykeops.torch <span class="im">import</span> LazyTensor</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_Jp(O, Y, p<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    LO <span class="op">=</span> LazyTensor(O[:,<span class="va">None</span>,:])</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    LY <span class="op">=</span> LazyTensor(Y[<span class="va">None</span>,:,:])</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    J <span class="op">=</span> (<span class="bu">abs</span>(LO <span class="op">-</span> LY)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>(dim<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(J.<span class="bu">min</span>(<span class="dv">1</span>).<span class="bu">pow</span>(p<span class="op">/</span><span class="dv">2</span>).<span class="bu">sum</span>() <span class="op">/</span> O.size()[<span class="dv">0</span>])</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g. representing 1e7 data points in 10d</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>O <span class="op">=</span> torch.rand(<span class="dv">1_000_000</span>, <span class="dv">10</span>).cuda()</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g. representing 100 curve sample points</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> torch.rand(<span class="dv">100</span>, <span class="dv">10</span>).cuda()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">## On our GTX 1080 this yields output:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 1.12 ms ± 2.22 μs per loop</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># (mean ± std. dev. of 7 runs, 1,000 loops each)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>timeit compute_Jp(O,Y, p<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>for the sake of illustration, observe the runtime difference with the analogous CPU-based method:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cpu_Jp(O, Y, p<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    LO <span class="op">=</span> O[:,<span class="va">None</span>,:]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    LY <span class="op">=</span> Y[<span class="va">None</span>,:,:]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    J <span class="op">=</span> ((LO <span class="op">-</span> LY)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>(dim<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> p <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">float</span>(J.<span class="bu">min</span>(<span class="dv">1</span>).values.<span class="bu">sum</span>()<span class="op">/</span>O.size()[<span class="dv">0</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">float</span>(J.<span class="bu">min</span>(<span class="dv">1</span>).values.<span class="bu">pow</span>(p<span class="op">/</span><span class="dv">2</span>).<span class="bu">sum</span>()<span class="op">/</span>O.size()[<span class="dv">0</span>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>O <span class="op">=</span> torch.rand(<span class="dv">1_000_000</span>, <span class="dv">10</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> torch.rand(<span class="dv">100</span>, <span class="dv">10</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">## On our i7 4790k this yields output:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 1.5 s ± 30.5 ms per loop</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># (mean ± std. dev. of 7 runs, 1 loop each)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">## ~1000x slower!</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>timeit cpu_Jp(O,Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Computing the gradient <span class="math inline">\(U\)</span> is not much more complicated in implementation, but requires some additional formulae.</p>
+</section>
+<section id="computing-u-nabla-mathscr-j_pf." class="level3">
+<h3 class="anchored" data-anchor-id="computing-u-nabla-mathscr-j_pf.">Computing <span class="math inline">\(U = \nabla \mathscr J_p(f)\)</span>.</h3>
+<p>For concision let <span class="math display">\[y(\omega) = \argmin_{y \in Y} \lvert\omega -
+y\rvert.\]</span> In Cor. 410 of <span class="citation" data-cites="kobayashi">(<a href="#ref-kobayashi" role="doc-biblioref">Kobayashi, Hayase, and Kim 2024</a>)</span> we essentially showed that given <span class="math inline">\(f \in
+C(X; \Omega)\)</span> and <span class="math inline">\(\xi \in C(X; \mathbb R^d)\)</span>, modulo some technical details one has <span class="math display">\[
+\begin{equation}
+\lim_{\varepsilon \to 0} \frac{\mathscr J_p(f + \varepsilon \xi) -
+\mathscr J_p(f)}{\varepsilon} = \int_\Omega (\omega - y(\omega))
+\lvert \omega - y(\omega) \rvert^{p-2} \cdot \xi(y(\omega)) \
+d\mu(\omega). \tag{3} \label{eq:first-var}
+\end{equation}
+\]</span> An analogous formula for the discretized case is found in Prop. 5.5 of <span class="citation" data-cites="kobayashi">(<a href="#ref-kobayashi" role="doc-biblioref">Kobayashi, Hayase, and Kim 2024</a>)</span>. In this case, one may show that the difference quotient <span class="math inline">\(\eqref{eq:first-var}\)</span> is minimized when <span class="math inline">\(\xi(y_j)\)</span> is defined to be <span class="math display">\[
+\xi(y_j) = \frac{1}{M} \sum_{\{\omega_i \mid y(\omega_i) = y_j\}}
+(\omega_i - y_j) \lvert\omega_i - y_j\rvert^{p-2}.
+\]</span> The idea is that <span class="math inline">\(\xi(y_j)\)</span> essentially encodes the <span class="math inline">\((p-1)\)</span>-barycenter of the Voronoi cell <span class="math inline">\(\{\omega_i \mid y(\omega_i) = y_j\}\)</span>, so that <span class="math inline">\(y_j \mapsto y_j + \xi(y_j)\)</span> moves the curve “closer” to the data.</p>
+<p>The cartoon illustration is as follows (figures copied from our soon-to-be-released preprint <span class="citation" data-cites="warren">(<a href="#ref-warren" role="doc-biblioref">Warren et al. 2024</a>)</span>). First, we compute the Voronoi cells (denoted by the dotted lines) assigning each <span class="math inline">\(\color{red}
+\omega_i\)</span> (red points) to closest <span class="math inline">\(\color{blue} y_j\)</span> (large blue points):</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="vorn-cartoon-panel-0.png" class="img-fluid figure-img"></p>
+<figcaption>Computing the Voronoi cells</figcaption>
+</figure>
+</div>
+<p>Then, we compute all the displacement vectors <span class="math inline">\((\omega_i - y_j)\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="vorn-cartoon-panel-1.png" class="img-fluid figure-img"></p>
+<figcaption>Computing the “barycenter” field <span class="math inline">\(\xi\)</span></figcaption>
+</figure>
+</div>
+<p>Summing them and normalizing by the total points in <span class="math inline">\(\mu\)</span> yields a vector field (black) defined at the <span class="math inline">\(\color{blue} y_j\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="vorn-cartoon-panel-2.png" class="img-fluid figure-img"></p>
+<figcaption>Updating according to <span class="math inline">\(\xi\)</span></figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="vorn-cartoon-panel-3.png" class="img-fluid figure-img"></p>
+<figcaption>The new curve and its Voronoi cells</figcaption>
+</figure>
+</div>
+</section>
+<section id="the-importance-of-arclength-evenly-spaced-curve-samples." class="level3">
+<h3 class="anchored" data-anchor-id="the-importance-of-arclength-evenly-spaced-curve-samples.">The importance of (arclength)-evenly-spaced curve samples.</h3>
+<p>Examining the cartoons above, one sees that if we do not choose our <span class="math inline">\(\{y_j\}\)</span> to be roughly evenly-spaced according to arclength, we are almost guaranteed to introduce bias into the computation of <span class="math inline">\(U\)</span>. In particular, without roughly evenly-spaced points, points <span class="math inline">\(y_j\)</span> in “sparse” regions of the curve will have far more points in their Voronoi cells, and this can be a self-reinforcing error. For example, suppose that locally the data distribution is relatively concentrated and far from the curve.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="U-bias-1.png" class="img-fluid figure-img"></p>
+<figcaption>A (locally) highly-concentrated distribution</figcaption>
+</figure>
+</div>
+<p>The update steps will produce something like the following:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="U-bias-2.png" class="img-fluid figure-img"></p>
+<figcaption>Computing the “barycenters”</figcaption>
+</figure>
+</div>
+<p>Drawing the new curve with its updated Voronoi cells, one sees that the middle <span class="math inline">\(y\)</span> point has pulled so far away from the rest that it now has a monopoly on <em>all</em> the data (previously, the data was split between three Voronoi cells).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="U-bias-3.png" class="img-fluid figure-img"></p>
+<figcaption>The updated curve.</figcaption>
+</figure>
+</div>
+<p>Since the other Voronoi cells now receive no mass, their base <span class="math inline">\(y\)</span> points will become static and no longer update in any subsequent iteration, while the previously-moved <span class="math inline">\(y\)</span> point will slowly drift toward the barycenter of the point cloud.</p>
+<p>Resampling to ensure the base points <span class="math inline">\(\{y_j\}\)</span> are roughly evenly-spaced according to arclength helps to mitigate this problem, by inserting new sample <span class="math inline">\(y\)</span>’s next to any <span class="math inline">\(y_j\)</span> that gets “too far” away from the rest. Thus <span class="math inline">\(U\)</span> doesn’t “blow up” so much at particular <span class="math inline">\(y_j\)</span> points, and is rather slightly more uniform in <span class="math inline">\(y\)</span>.</p>
+<p>In conjunction with the constraint terms we will discuss in a moment, this resampling gives relatively-nice “evenness” in the curve evolution.</p>
+</section>
+</section>
+<section id="a-word-on-spline-parametrization" class="level2">
+<h2 class="anchored" data-anchor-id="a-word-on-spline-parametrization">A word on Spline Parametrization</h2>
+<p>Computing <span class="math inline">\(\mathscr C\)</span> requires evaluation of higher-order derivatives. Rather than using higher-order finite-difference schemes, we elected to first smooth the curve points <span class="math inline">\(\{y_j\}\)</span> via spline-fitting and then evaluate the derivatives of these splines. This was done so as to also facilitate our arclength reparametrization algorithm. In particular, we chose to use <em>B-splines</em>, as we now describe.</p>
+<section id="b-splines" class="level3">
+<h3 class="anchored" data-anchor-id="b-splines">B-Splines</h3>
+<p>Let us begin with some preliminaries. We define the family of <em>(scalar) splines of order <span class="math inline">\(k+1\)</span> on knots <span class="math inline">\(t_1 &lt; t_2 &lt; \cdots &lt;
+t_{N}\)</span></em> as:</p>
+<blockquote class="blockquote">
+<p>The colleciton of piecewise functions of the form <span class="math display">\[ S(t) = \begin{cases} P_1 &amp; t \in [t_1, t_2] \\ P_2 &amp; t \in [t_2,
+t_3] \\ \vdots &amp; \\ P_{N-1} &amp; t \in [t_{N-1}, t_N], \end{cases}\]</span> where each <span class="math inline">\(P_j\)</span> is a polynomial of degree <span class="math inline">\(k\)</span>, and overall <span class="math inline">\(S \in
+C^{k-1}(X; \mathbb R)\)</span>.</p>
+</blockquote>
+<p>Abbreviating the collection of knots as <span class="math inline">\(T\)</span>, we shall denote this family by <span class="math inline">\(\mathrm{Spl}_{k+1}(T; \mathbb R)\)</span>. Note that since trivially each <span class="math inline">\(P_j \in C^{k-1}((t_j, t_{j+1}); \mathbb R)\)</span>, the overall <span class="math inline">\(C^{k-1}\)</span> requirement on elements of <span class="math inline">\(\mathrm{Spl}_{k+1}(T;
+\mathbb R)\)</span> can be stated equivalently as: For all <span class="math inline">\(\alpha = 1,
+\ldots, k-1\)</span> and <span class="math inline">\(j = 1, \ldots, N-2\)</span> one has <span class="math display">\[\frac{d^\alpha
+P_j}{dt^\alpha} \bigg\vert_{t=t_{j+1}} = \frac{d^\alpha
+P_{j+1}}{dt^\alpha} \bigg\vert_{t=t_{j+1}}.\]</span></p>
+<p>Next, to define vector-valued splines <span class="math inline">\(\mathrm{Spl}_{k+1}(T; \mathbb
+R^{d})\)</span>, we can simply require that for each <span class="math inline">\(i = 1, \ldots, d\)</span>, the component function <span class="math inline">\(S^{(i)} \in \mathrm{Spl}_{k+1}(T; \mathbb R)\)</span>. Note that in this way <span class="math inline">\(\mathrm{Spl}_{k+1}(T; \mathbb R^d)\)</span> trivially inherits vector arithmetic from <span class="math inline">\(\mathbb R^d\)</span>. Viewed from this perspective, a <em>B-spline of order <span class="math inline">\(k+1\)</span> on <span class="math inline">\(T\)</span></em> will be a particular choice of <em>basis</em> for <span class="math inline">\(\mathrm{Spl}_{k+1}(T; \mathbb R^d)\)</span>. This basis will be chosen in a way that yields a fast algorithm for computing an element of <span class="math inline">\(\mathrm{Spl}_{k+1}(T; \mathbb R^d)\)</span> that interpolates a given sequence of points <span class="math inline">\(\{y_1, \ldots, y_N\}\)</span>.</p>
+<p>The construction is recursive; to simplify some of the casework at the endpoints, we shall for now append <span class="math inline">\(k\)</span> “auxiliary” knots that have no important meaning on either side of <span class="math inline">\(T\)</span>, i.e. <span class="math display">\[T = \cdots &lt; t_{-1} &lt; t_0 &lt; t_1 &lt; \cdots &lt; t_{k-1} &lt; t_k &lt; t_{k+1} \cdots.\]</span> With this we first consider the <span class="math inline">\(k=0\)</span> case, and will then define the <span class="math inline">\(k=i+1^{\rm st}\)</span> basis via a recursive formula in terms of elements of the <span class="math inline">\(k=i^{\rm th}\)</span> basis. Again, for the time being we will simply consider the scalar spline case, as the vector-valued case is no more complicated.</p>
+<section id="base-case-k0" class="level4">
+<h4 class="anchored" data-anchor-id="base-case-k0"><em>(Base case: <span class="math inline">\(k=0\)</span>)</em></h4>
+<p>Since in the <span class="math inline">\(k=0\)</span> case our regularity requirement degenerates to “<span class="math inline">\(S
+\in C^{-1}\)</span>” (whatever that means), we may simply define the basis functions <span class="math inline">\(B_{j,0}\)</span> to be the characteristic functions <span class="math display">\[
+B_{j,0}(t) = \chi_{[t_j, t_{j+1})},
+\]</span> In this case it’s easy to construct the interpolating “spline” — one simply has the piecewise-constant function <span class="math display">\[
+S(t) = \sum_{j=1}^{N} y_j B_{j,0}(t).
+\]</span></p>
+</section>
+<section id="recursive-case-k-1" class="level4">
+<h4 class="anchored" data-anchor-id="recursive-case-k-1"><em>(Recursive case: <span class="math inline">\(k &gt; 1\)</span>)</em></h4>
+<p>Before we give the formula, we note to the reader that each time we increment <code>k += 1</code>, the support of our basis functions <span class="math inline">\(B_{j, k+1}\)</span> will increase to include one additional adjacent knot interval. Some intuition about why this might make sense are as follows:</p>
+<ul>
+<li><p>Consider a particular fixed <span class="math inline">\(t_j\)</span> and imagine iteratively building out the spline <span class="math inline">\(S(t)\)</span> on either side, starting with a simple <span class="math inline">\(k=1\)</span> interpolation. In this case the <span class="math inline">\(C^{k-1}\)</span> restriction just requires <span class="math inline">\(S(t)\)</span> to be continuous, yielding a simple piecewise-linear interpolation.</p>
+<p>Now, suppose we add one order of regularity, and, say, prescribe the derivative at <span class="math inline">\(t_j\)</span> to be <span class="math inline">\(\frac{d}{dt} S(t_j) = C_{j,1} \in \mathbb
+R\)</span> with no other restrictions. Observe that since <span class="math inline">\(S(t)\)</span> is piecewise quadratic, the second derivative is piecewise constant; denote its value on <span class="math inline">\([t_j, t_{j+1})\)</span> by <span class="math inline">\(C_{j,2}\)</span>. Then observe both <span class="math inline">\(S(t_{j+1})\)</span> and <span class="math inline">\(\frac{d}{dt} S \Big\vert_{t=t_{j+1}}\)</span> are uniquely determined by the choice of <span class="math inline">\(C_2\)</span>. So, we see that in some sense, the data <span class="math inline">\(S(t_j)\)</span>, <span class="math inline">\(\frac{d}{dt} S \Big \vert_{t=t_j}\)</span>, and <span class="math inline">\(\frac{d^2}{dt^2} S \Big\vert_{t=t_j}\)</span> we prescribed at <span class="math inline">\(t_j\)</span> has propagated to a restriction on the data <span class="math inline">\(S(t_{j+1})\)</span> and <span class="math inline">\(\frac{d}{dt} \Big \vert_{t=t_{j+1}}\)</span> at <span class="math inline">\(t_{j+1}\)</span>. However, without further prescribing <span class="math inline">\(C_{j+1,2}\)</span>, we can say nothing about the data at <span class="math inline">\(t_{j+2}\)</span> other than the interpolation requirement <span class="math inline">\(S(t_{j+2}) =
+y_{j+2}\)</span>.</p>
+<p>Repeating the analogous argument for higher <span class="math inline">\(k\)</span>, one sees that in general, prescribing data of order <span class="math inline">\(0, \ldots, k\)</span> at <span class="math inline">\(t_j\)</span> restricts the data of order <span class="math inline">\(0, \ldots, k-1\)</span> at <span class="math inline">\(t_{j+1}\)</span>, the data of order <span class="math inline">\(0, \ldots, k-2\)</span> at <span class="math inline">\(t_{j+2}\)</span>, and so on and so forth. Thus, it seems tentatively reasonable that our basis functions could have supports that grow with <span class="math inline">\(k\)</span>, loosely reflecting how at least some of the information from the data at <span class="math inline">\(t_j\)</span> “propagates” up to <span class="math inline">\(t_{j+k-1}\)</span>.</p></li>
+<li><p>Thinking about the perspective above a little further, it is easy to get confused. Somehow, something doesn’t seem right about being able to specify full-order data at <span class="math inline">\(t_{j}\)</span>, then <em>either</em> specifying one additional piece of data at <span class="math inline">\(t_{j+1}\)</span> <em>or</em> specifying two pieces at <span class="math inline">\(t_{j+2}\)</span>. But in theory, we should be specifying the same amount of data at every <span class="math inline">\(t_j\)</span>: The coefficients on our basis functions.</p>
+<p>Yes, indeed we should! And that’s what we’ll actually do in the end. The trick is that instead of prescribing the full-order polynomial data on the piece <span class="math inline">\([t_{j}, t_{j+1})\)</span>, we can define our basis elements such that for each <span class="math inline">\(j\)</span>, the <span class="math inline">\(k+1\)</span> basis elements <span class="math display">\[B_{j-k,k}, B_{j-k+1,k}, \ldots, B_{j,k}\]</span> form a smooth partition of unity on <span class="math inline">\([t_j, t_{j+1})\)</span>; that is, for all <span class="math inline">\(t \in [t_j,
+t_{j+1})\)</span>, <span class="math display">\[\sum_{j'=j-k}^{j} B_{j',k}(t) = 1.\]</span> Thus, each of the basis elements will indirectly encode the “diffusion” of information across <span class="math inline">\(k+1\)</span> intervals.</p></li>
+</ul>
+<p>The particular recursion we use is the so-called <em>Cox-de Boor</em> formula: <span class="math display">\[B_{j,k}(t) = \frac{t - t_j}{t_{j+k} - t_j} B_{j, k-1}(t) +
+\frac{t_{j+k+1} - t}{t_{j+k+1} - t_{j+1}} B_{j+1, k-1}(t). \tag{4}
+\label{eq:cox-de-boor}\]</span></p>
+<p>Combining the <span class="math inline">\(k=0\)</span> and <span class="math inline">\(k&gt;0\)</span> cases, one may verify that this indeed forms a basis for <span class="math inline">\(\mathrm{Spl}_{k+1}(T; \mathbb R)\)</span>, and hence its <span class="math inline">\(d\)</span>-fold direct sum gives a basis for <span class="math inline">\(\mathrm{Spl}(T; \mathbb R^d)\)</span>. One may then show (see, e.g.&nbsp;equation 1.35 of <a href="https://personal.math.vt.edu/embree/math5466/lecture10.pdf">these notes</a>) that given the interpolation points <span class="math inline">\(\{y_j\}\)</span>, the basis coefficients of the spline interpolating the <span class="math inline">\(\{y_j\}\)</span> can be obtained by inverting a banded matrix of bandwidth <span class="math inline">\(k\)</span>, which can be done efficiently.</p>
+</section>
+</section>
+<section id="obtaining-an-approximate-arclength-parametrization" class="level3">
+<h3 class="anchored" data-anchor-id="obtaining-an-approximate-arclength-parametrization">Obtaining an (approximate) arclength parametrization</h3>
+<p>Next, given a spline <span class="math inline">\(S(t)\)</span> derived through the process above, let us discuss how we obtain an (approximate) arclength reparametrization of <span class="math inline">\(S\)</span>. Essentially we follow the ideas of <a href="http://www.circuitwizard.de/metapost/arclength.pdf">this monograph</a>. For simplicity, suppose the domain <span class="math inline">\(X = [0,1]\)</span>. Then the basic idea is that we may write <span class="math display">\[\mathrm{arclen}(S) = \int_{0}^{1}
+\sqrt{\sum_{i=1}^d (\dot S^{(i)}(t))^2} \ dt.\]</span> Let us examine the summation <span class="math inline">\(\sum_{i=1}^d (\dot S^{(i)}(t))^2\)</span> a bit more carefully at some fixed <span class="math inline">\(t_0\)</span>. Provided <span class="math inline">\(k \geq 4\)</span>, each <span class="math inline">\(S^{(i)}(t_0)\)</span> will be a cubic expression in <span class="math inline">\(t_0\)</span>, whence <span class="math inline">\(\dot S^{(i)}(t_0)\)</span> will be quadratic in <span class="math inline">\(t_0\)</span>, and so <span class="math inline">\(\sum_{i=1}^d (\dot S^{(i)}(t_0))^2\)</span> will be a sum of quartics in <span class="math inline">\(t_0\)</span>.</p>
+<p>Observe that we typically expect this expression to have no real roots: In order for this to happen, we would need all <span class="math inline">\(\dot S^{(i)}(t_0) = 0\)</span>, which should (?) only occur in degenerate cases.</p>
+<p>In any case, as in <a href="http://www.circuitwizard.de/metapost/arclength.pdf">the above linked monograph</a>, if we could factor the quartic into four linear factors, then the integral could be approximated via numerical evaluation of certain other known functions given by a table of elliptic integral solutions. Hence, we employ a fast numerical root-solving routine, which allows us to efficiently evaluate <span class="math display">\[\mathrm{arclen}(S \vert_{[0,t_0]}) = \int_0^{t_0} \lvert \dot S(t)
+\rvert \ dt.\]</span> With this, <span class="math inline">\(\mathrm{arclen}(S)\)</span> may be efficiently computed, and so we m may efficiently compute <span class="math inline">\(\frac{1}{M-1} \mathrm{arclen}(S)\)</span> (see <span class="math inline">\(\eqref{eq:arclen-even}\)</span>) without the use of quadrature.</p>
+<p>Finally, we obtain the proper choice of the knots <span class="math inline">\(\{t_1, \ldots,
+t_N\}\)</span> by applying a fast Root-finding method to find where <span class="math inline">\(\mathrm{arclen}(S\vert_{[0,t]}) \approx \frac{j-1}{N-1}
+\mathrm{arclen}(S)\)</span>, and refitting a spline on the new interpolation points <span class="math inline">\(\{S(t_1), S(t_2), \ldots, S(t_{N})\}\)</span>.</p>
+<p>Finally, we may discuss the computation of the constraint terms.</p>
+</section>
+</section>
+<section id="the-constraint-term-mathscr-c-and-its-gradient-v." class="level2">
+<h2 class="anchored" data-anchor-id="the-constraint-term-mathscr-c-and-its-gradient-v.">The constraint term <span class="math inline">\(\mathscr C\)</span> and its gradient <span class="math inline">\(V\)</span>.</h2>
+<p>Note that compactly-supported scalar functions with bounded, piecewise-continuous <span class="math inline">\(k^{\rm th}\)</span>-order derivatives are automatically <span class="math inline">\(W^{k,q}\)</span> functions. So, in particular, if we fit a <span class="math inline">\(k+1\)</span>-order (note the confusing terminology re: “spline order”) spline <span class="math inline">\(f\)</span> to the arclen-evenly-spaced interpolation points <span class="math inline">\(\{S(t_1), S(t_2), \ldots,
+S(t_N)\}\)</span> obtained in the previous section, its constraint value will be finite. Then, via a complicated (but numerically quite efficient) algorithm below, we can estimate <span class="math inline">\(\lVert f \rVert_{W^{k,q}(X;
+\Omega)}\)</span> by aggregating and evaluating the derivatives of each order at the knots <span class="math inline">\(t_1, \ldots, t_N\)</span>.</p>
+<section id="computing-the-sobolev-cost-and-sobolev-gradient" class="level3">
+<h3 class="anchored" data-anchor-id="computing-the-sobolev-cost-and-sobolev-gradient">Computing the Sobolev Cost and Sobolev Gradient</h3>
+<p>As this post is quite long and technical already and I will for now just add the <code>Julia</code> code below here and postpone a more detailed explanation of the computations for the work we are writing on this now. The interested reader can reference the partial explanations given in the documentation.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">BSplineKit</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StructArrays</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Statistics</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">BandedMatrices</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Base.Threads</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute just \mathscr{C}</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sobolev_cost</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        points<span class="op">::</span><span class="dt">Matrix{&lt;:Real}</span>;</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        order<span class="op">::</span><span class="dt">Val{Order}</span>=<span class="fu">Val</span>(<span class="fl">4</span>),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        k<span class="op">=</span><span class="fl">3</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        q<span class="op">=</span><span class="fl">2</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        costs<span class="op">=</span><span class="fu">ones</span>(k<span class="op">+</span><span class="fl">1</span>), <span class="co"># use to reweight contributions from derivatives of each order</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        num_samples<span class="op">=</span><span class="fu">size</span>(points, <span class="fl">1</span>)<span class="op">+</span><span class="fl">1</span>, <span class="co"># changed size index to 1</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        bcs <span class="op">=</span> <span class="fu">Tuple</span>(<span class="fu">Derivative</span>.(<span class="fl">2</span><span class="op">:</span><span class="fu">max</span>(<span class="fl">2</span>, k<span class="op">÷</span><span class="fl">2</span>))) <span class="co"># BCs: derivs 2 to floor(k/2) zero</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">where</span> {Order}</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    Order<span class="op">::</span><span class="dt">Int</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Set constants</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    spl_order <span class="op">=</span> <span class="fu">BSplineOrder</span><span class="dt">{Order}</span>()</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    N,d <span class="op">=</span> <span class="fu">size</span>(points)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> <span class="fu">LinRange</span>(<span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fu">size</span>(points, <span class="fl">1</span>))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    samples <span class="op">=</span> <span class="fu">LinRange</span>(<span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, num_samples)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the BSpline basis functions</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> <span class="fu">BSplineBasis</span>(spl_order, x)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add the natural boundary conditions (should be passed in as a</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># kwarg). Need to not overwrite default augment=true; otherwise we</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clip off the edges of the domain in this step.</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> <span class="fu">RecombinedBSplineBasis</span>(B, bcs)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get a collection of (internal BSplineKit) differential operators</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># that we can use to differentiate our bsplines</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    diffs<span class="op">::</span><span class="dt">Vector{Derivative} </span><span class="op">=</span> <span class="fu">Derivative</span>.(<span class="fl">0</span><span class="op">:</span>k)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The inner loop evaluates all derivatives of bspline at each</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sample. It automatically filters to only compute things for</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># those B-splines which are nonzero at the given sample (since in</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># general the bsplines are defined piecewise to have compact</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># support)</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dbasis is a collection of vectors of tuples. We have one vector</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># for each sample in samples. Each vector consists of k+1 tuples.</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The first entry in each tuple is an index which tells us which</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># basis function is computed. The second entry of the tuple is</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># itself a tuple of k+1 values, which tell us the values of the</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># derivatives of each order of that basis function at sample.</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    Dbasis <span class="op">=</span> [<span class="fu">B</span>.(sample, diffs) for sample <span class="kw">in</span> samples]</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This gets all of the indices ("which BSpline is supported at</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># point sample")</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> <span class="fu">first</span>.(<span class="fu">first</span>.(Dbasis))</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the collocation matrices for each order of differentiation.</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Note that we make this explicit call to collocation_points</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># because it very slightly perturbs the endpoints (otherwise,</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># because we used RecombinedBSplineBasis, the collocation matrix</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># might not be invertible.)</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    colloc_pts <span class="op">=</span> <span class="fu">collocation_points</span>(B)</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># collocation matrix</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> <span class="fu">collocation_matrix</span>(B, colloc_pts)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gross hack to transpose a CollocationMatrix</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    MF, MtF <span class="op">=</span> <span class="fu">lu</span>(M), <span class="fu">lu!</span>(<span class="fu">CollocationMatrix</span>(<span class="fu">BandedMatrix</span>(<span class="fu">BandedMatrix</span>(M)<span class="ch">')))</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># From the docs: Given B-spline coefficents uⱼ, one can recover</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the values (or derivatives) of the spline at the collocation</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="co"># points by v = C * u. Conversely, if one knows vᵢ, one may obtain</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="co"># u by u = C \ v. (Note here MF plays the role of C).</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    <span class="co"># So, this vector represents the coefficients of stuff at each of</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the input data points.</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Basically, we're writing the interpolating spline as a linear</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>    <span class="co"># combination of basis splines, and this computation here gets the</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>    <span class="co"># coefficients of the linear combination along *each* dimension</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (since each component function of our interpolating spline is a</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    <span class="co"># spline)</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> <span class="fu">reduce</span>(hcat, [MF <span class="op">\</span> points[<span class="op">:</span>, j] for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>d])<span class="ch">'</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initialize empty array to put derivative computations in</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> <span class="fu">Array</span><span class="dt">{Float64}</span>(<span class="cn">undef</span>, (num_samples, k<span class="op">+</span><span class="fl">1</span>, d))</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Multithread to treat each component function in parallel</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@threads</span> <span class="cf">for</span> ind <span class="kw">in</span> <span class="fu">collect</span>(<span class="fu">eachindex</span>(I))</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>        i, ibasis <span class="op">=</span> I[ind], Dbasis[ind]</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>k<span class="op">+</span><span class="fl">1</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> l <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>d</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Since we're using natural boundary conditions, it's</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>                <span class="co"># possible that fewer than k+1 splines will be nonzero</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>                <span class="co"># for the first few indices. So we just handle this by</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>                <span class="co"># casework.</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>                <span class="co">#</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>                <span class="co"># In any case, the dot product aggregates all of the</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>                <span class="co"># relevant bspline derivatives</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>                <span class="co">#</span></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>                blen <span class="op">=</span> <span class="fu">length</span>(<span class="fu">last</span>(ibasis[j]))</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> i <span class="op">&lt;</span> blen</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>                    D[ind,j,l] <span class="op">=</span> <span class="fu">dot</span>(C[l, i<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>begin], <span class="fu">last</span>(ibasis[j])[<span class="fl">1</span><span class="op">:</span>i])</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elseif</span> N <span class="op">&lt;</span> i</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>                    diff <span class="op">=</span> N <span class="op">-</span> (i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>)</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>                    D[ind,j,l] <span class="op">=</span> <span class="fu">dot</span>(C[l, N<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>], <span class="fu">last</span>(ibasis[j])[diff<span class="op">:</span><span class="kw">end</span>])</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>                    D[ind,j,l] <span class="op">=</span> <span class="fu">dot</span>(C[l, i<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>], <span class="fu">last</span>(ibasis[j]))</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>                <span class="cf">end</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>    <span class="co"># eachslice over dims (1,2) aggregates all the derivatives for</span></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   dim 1: a given sample index</span></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   dim 2: a given order of differentiation</span></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>    <span class="co"># So, by computing the norm, we get the combined contribution of</span></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>    <span class="co"># this sample point to the Sobolev budget across all component</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>    <span class="co"># splines (i.e., aggregate contribution across dimensions)</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>    Dnorms <span class="op">=</span> <span class="fu">norm</span>.(<span class="fu">eachslice</span>(D, dims<span class="op">=</span>(<span class="fl">1</span>,<span class="fl">2</span>)))</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>    cost <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">mean</span>(<span class="fu">selectdim</span>(Dnorms, <span class="fl">2</span>, i) <span class="op">.^</span> q) <span class="op">*</span> c <span class="cf">for</span> (i, c) <span class="kw">in</span> <span class="fu">enumerate</span>(costs))</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cost</span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute \mathscr{C} *and* $V$</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sobolev_grad</span>(</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>        points<span class="op">::</span><span class="dt">Matrix{&lt;:Real}</span>;</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>        order<span class="op">::</span><span class="dt">Val{Order}</span>=<span class="fu">Val</span>(<span class="fl">4</span>),</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>        k<span class="op">=</span><span class="fl">3</span>,</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>        q<span class="op">=</span><span class="fl">2</span>,</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>        costs<span class="op">=</span><span class="fu">ones</span>(k<span class="op">+</span><span class="fl">1</span>), <span class="co"># use to reweight contributions from derivatives of each order</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>        num_samples<span class="op">=</span><span class="fu">size</span>(points, <span class="fl">1</span>)<span class="op">+</span><span class="fl">1</span>, <span class="co"># changed size index to 1</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>        bcs <span class="op">=</span> <span class="fu">Tuple</span>(<span class="fu">Derivative</span>.(<span class="fl">2</span><span class="op">:</span><span class="fu">max</span>(<span class="fl">2</span>, k<span class="op">÷</span><span class="fl">2</span>)))</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">where</span> {Order}</span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>    Order<span class="op">::</span><span class="dt">Int</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>    <span class="co">##### </span><span class="re">BEGIN</span><span class="co">{stuff that's the same as in sobolev_cost()}</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>    spl_order <span class="op">=</span> <span class="fu">BSplineOrder</span><span class="dt">{Order}</span>()</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>    N,d <span class="op">=</span> <span class="fu">size</span>(points)</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> <span class="fu">LinRange</span>(<span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fu">size</span>(points, <span class="fl">1</span>))</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>    samples <span class="op">=</span> <span class="fu">LinRange</span>(<span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, num_samples)</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> <span class="fu">BSplineBasis</span>(spl_order, x)</span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> <span class="fu">RecombinedBSplineBasis</span>(B, bcs)</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>    diffs<span class="op">::</span><span class="dt">Vector{Derivative} </span><span class="op">=</span> <span class="fu">Derivative</span>.(<span class="fl">0</span><span class="op">:</span>k)</span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>    Dbasis <span class="op">=</span> [<span class="fu">B</span>.(sample, diffs) for sample <span class="kw">in</span> samples]</span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> <span class="fu">first</span>.(<span class="fu">first</span>.(Dbasis))</span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>    colloc_pts <span class="op">=</span> <span class="fu">collocation_points</span>(B)</span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> <span class="fu">collocation_matrix</span>(B, colloc_pts)</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>    MF, MtF <span class="op">=</span> <span class="fu">lu</span>(M), <span class="fu">lu!</span>(<span class="fu">CollocationMatrix</span>(<span class="fu">BandedMatrix</span>(<span class="fu">BandedMatrix</span>(M)<span class="ch">')))</span></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> <span class="fu">reduce</span>(hcat, [MF <span class="op">\</span> points[<span class="op">:</span>, j] for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>d])<span class="ch">'</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> <span class="fu">Array</span><span class="dt">{Float64}</span>(<span class="cn">undef</span>, (num_samples, k<span class="op">+</span><span class="fl">1</span>, d))</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>    <span class="co"># For each component function</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@threads</span> <span class="cf">for</span> ind <span class="kw">in</span> <span class="fu">collect</span>(<span class="fu">eachindex</span>(I))</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>        i, ibasis <span class="op">=</span> I[ind], Dbasis[ind]</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>k<span class="op">+</span><span class="fl">1</span></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> l <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>d</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>                blen <span class="op">=</span> <span class="fu">length</span>(<span class="fu">last</span>(ibasis[j]))</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> i <span class="op">&lt;</span> blen</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>                    D[ind,j,l] <span class="op">=</span> <span class="fu">dot</span>(C[l, i<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>begin], <span class="fu">last</span>(ibasis[j])[<span class="fl">1</span><span class="op">:</span>i])</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elseif</span> N <span class="op">&lt;</span> i</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>                    diff <span class="op">=</span> N <span class="op">-</span> (i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>)</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>                    D[ind,j,l] <span class="op">=</span> <span class="fu">dot</span>(C[l, N<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>], <span class="fu">last</span>(ibasis[j])[diff<span class="op">:</span><span class="kw">end</span>])</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>                    D[ind,j,l] <span class="op">=</span> <span class="fu">dot</span>(C[l, i<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>], <span class="fu">last</span>(ibasis[j]))</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>                <span class="cf">end</span></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>    cost <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">mean</span>(<span class="fu">selectdim</span>(Dnorms, <span class="fl">2</span>, i) <span class="op">.^</span> q) <span class="op">*</span> c <span class="cf">for</span> (i, c) <span class="kw">in</span> <span class="fu">enumerate</span>(costs))</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>    <span class="co">##### </span><span class="re">END</span><span class="co">{stuff that's the same as in sobolev_cost()}</span></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>    <span class="co"># First, we differentiate D in the entries. Then in a moment we</span></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>    <span class="co"># will backprop through the chain rule to find the gradient of D</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>    <span class="co"># depending on the actual positions of the points themselves.</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We reshape costs (basically just adding fake dimensions to match</span></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>    <span class="co"># dims 1 (samples) and 3 (axis) in D). The shape will end up being</span></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                          1 × k+1 × 1.</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Then we normalize by length(samples).</span></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>    ∂D <span class="op">=</span> q <span class="op">*</span> Dnorms <span class="op">.^</span> (q<span class="op">-</span><span class="fl">2</span>) <span class="op">.*</span> D <span class="op">.*</span> (<span class="fu">reshape</span>(costs, <span class="fl">1</span>, <span class="op">:</span>, <span class="fl">1</span>) <span class="op">/</span> <span class="fu">length</span>(samples))</span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initialize a matrix storing how the coefficients in the BSpline</span></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>    <span class="co"># basis depend on the input points.</span></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>    ∂C <span class="op">=</span> <span class="fu">zero</span>(C)</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>    <span class="co"># eachslice(∂D, dims=1) slices ∂D in such a way that each element</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>    <span class="co"># of the iterator contains the information about the contribution</span></span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>    <span class="co"># to the Sobolev norm derivative from a given sample point.</span></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a>    <span class="co"># In particular, we get the contributions for *each* order of</span></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>    <span class="co"># differentiation and *each* component function.</span></span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@threads</span> <span class="cf">for</span> (i, ibasis, ∂d) <span class="kw">in</span> <span class="fu">collect</span>(<span class="fu">zip</span>(I, Dbasis, <span class="fu">eachslice</span>(∂D, dims<span class="op">=</span><span class="fl">1</span>)))</span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>k<span class="op">+</span><span class="fl">1</span></span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> l <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>d</span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a>                blen <span class="op">=</span> <span class="fu">length</span>(<span class="fu">last</span>(ibasis[j]))</span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> i <span class="op">&lt;</span> blen</span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a>                    ∂C[l, i<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>begin] <span class="op">.+=</span> (<span class="fu">last</span>(ibasis[j])[<span class="fl">1</span><span class="op">:</span>i] <span class="op">.*</span> ∂d[j,l])</span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elseif</span> N <span class="op">&lt;</span> i</span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>                    diff <span class="op">=</span> N <span class="op">-</span> (i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>)</span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a>                    ∂C[l, N<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>] <span class="op">.+=</span> (<span class="fu">last</span>(ibasis[j])[diff<span class="op">:</span><span class="kw">end</span>] <span class="op">.*</span> ∂d[j,l])</span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a>                    ∂C[l, i<span class="op">:-</span><span class="fl">1</span><span class="op">:</span>i<span class="op">-</span>blen<span class="op">+</span><span class="fl">1</span>] <span class="op">.+=</span> <span class="fu">last</span>(ibasis[j]) <span class="op">.*</span> ∂d[j, l]</span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a>                <span class="cf">end</span></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a>    ∂points <span class="op">=</span> <span class="fu">reduce</span>(hcat, [MtF <span class="op">\</span> ∂C[j, <span class="op">:</span>] for j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>d])</span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cost, ∂points</span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="putting-it-all-together" class="level2">
+<h2 class="anchored" data-anchor-id="putting-it-all-together">Putting it all together…</h2>
+<p>The last major piece of the puzzle is that the <span class="math inline">\(V\)</span> we get as output from the above is, generally, very poorly-behaved. In particular, it is very easy to obtain configurations where the higher-order-derivative gradient contributions in <span class="math inline">\(V\)</span> explode, yielding <em>massive</em> <span class="math inline">\(|V|\)</span>, such that the update <span class="math inline">\(y_j \mapsto y_j + \lambda V\)</span> is actually highly suboptimal. The problem is that while <span class="math inline">\(V\)</span> might give the gradient at <span class="math inline">\(y_j\)</span>, if we take an <em>infinitesimal</em> step along <span class="math inline">\(V\)</span>, the new <span class="math inline">\(V\)</span> after that step might be much smaller. Exactly how much to reweight <span class="math inline">\(V\)</span> at each step is hard to predict a priori, hence we instead perform a golden section <a href="https://en.wikipedia.org/wiki/Line_search#Zero-order_methods">line search</a>. Thus, our bare-bones overall algorithm is as follows (note, our actual implementation has a few fancy extra tidbits to determine good initializations, etc):</p>
+<ol type="1">
+<li>Initialize with data points <span class="math inline">\(\{w_i\}\)</span> and curve samples <span class="math inline">\(\{y_j\}\)</span> (arclen-evenly-spaced).</li>
+<li>Compute the objective gradient <span class="math inline">\(U\)</span> for the <span class="math inline">\(\{y_j\}\)</span>.</li>
+<li>Perform a line search to find the optimal coefficient <span class="math inline">\(c_0 \in
+[0,1]\)</span> such that <span class="math display">\[\mathscr J_p(\{y_j + c_0 U(y_j)\}; \mu)\]</span> is minimized. Update <span class="math inline">\(y_j' = y_j + c_0 U(y_j)\)</span>.</li>
+<li>Compute the constraint gradient <span class="math inline">\(V\)</span> for the <span class="math inline">\(\{y_j'\}\)</span>.</li>
+<li>Perform a line search to find the optimal coefficient <span class="math inline">\(c_1 \in [0,
+c_0]\)</span> such that <span class="math display">\[\mathscr C(\{y_j' - \lambda c_1 V(y_j')\})\]</span> is minimized. (Note that there is a sign difference between <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span> because of some poor foresight on my part in making my definitions, not because of anything semantically important).</li>
+<li>Update <span class="math inline">\(y_j'' = y_j' - \lambda c_1 V(y_j')\)</span></li>
+<li>Define <span class="math inline">\(y_j = y_j''\)</span> and loop steps 2-6 until a desired termination condition (e.g., stabilization of <span class="math inline">\(\mathscr J_p(f; \mu) + \lambda
+\mathscr C(f)\)</span>, or a fixed number of iterations, etc.)</li>
+</ol>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+<p><a href="https://arxiv.org/pdf/2409.16541#appendix.A">Appendix A of our preprint</a> shows a variety of outputs of the continuous version of this algorithm on PL domains in <span class="math inline">\(\mathbb R^2\)</span>.</p>
+<p>For the new version, unfortunately, the single testing dataset I have currently does not appear to possess significant heterogeneity (thus rendering analysis of the performance somewhat moot for now), and I did not have time to generate a suitable synthetic dataset for testing purposes.</p>
+<p>In any case, an example output (here run on a <span class="math inline">\(2d\)</span> dataset to help make the output visualization easier to understand): <video src="example-evolution-1.mp4" class="img-fluid" controls=""><a href="example-evolution-1.mp4">A video of the evolution</a></video> Eventually, the objective stabilizes on a configuration like the following: <img src="lastframe.png" class="img-fluid" alt="The stabilized output"> Note that, once introduced, the self-intersections are quite difficult for the algorithm to remove; it would be interesting to see if this can be addressed by blending the algorithm with an approach like <span class="citation" data-cites="kirov">(<a href="#ref-kirov" role="doc-biblioref">Kirov and Slepčev 2017</a>)</span> that allows making topological modifications.</p>
+<p>In any case, as a function of the iteration index, the combined objective <span class="math inline">\(\mathscr J_p(f; \mu) + \lambda \mathscr C(f)\)</span> looks like the following (note the initial ramp-up is because we actually make <span class="math inline">\(\lambda\)</span> dependent on the iteration index): <img src="combined_objs_alternating.png" class="img-fluid" alt="The combined objective over time"> It would be interesting to test the algorithm on data with more heterogeneity, and to see what the outputs look like after being fed back through a molecular reconstruction pipeline.</p>
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-delattre" class="csl-entry" role="listitem">
+Delattre, Sylvain, and Aurélie Fischer. 2020. <span>“<span class="nocase">On principal curves with a length constraint</span>.”</span> <em>Annales de l’Institut Henri Poincaré, Probabilités Et Statistiques</em> 56 (3): 2108–40. <a href="https://doi.org/10.1214/19-AIHP1030">https://doi.org/10.1214/19-AIHP1030</a>.
+</div>
+<div id="ref-kirov" class="csl-entry" role="listitem">
+Kirov, Slav, and Dejan Slepčev. 2017. <span>“<span class="nocase">Multiple Penalized Principal Curves: Analysis and Computation</span>.”</span> <em>J. Math. Imaging Vision</em> 59 (2): 234–56. <a href="https://doi.org/10.1007/s10851-017-0730-8">https://doi.org/10.1007/s10851-017-0730-8</a>.
+</div>
+<div id="ref-kobayashi" class="csl-entry" role="listitem">
+Kobayashi, Forest, Jonathan Hayase, and Young-Heon Kim. 2024. <span>“<span>Monge-Kantorovich Fitting With Sobolev Budgets</span>.”</span> <em>arXiv</em>, September. <a href="https://doi.org/10.48550/arXiv.2409.16541">https://doi.org/10.48550/arXiv.2409.16541</a>.
+</div>
+<div id="ref-obrien" class="csl-entry" role="listitem">
+O’Brien, Lucas, Forest Kobayashi, and Young-Heon Kim. 2024. <span>“<span class="nocase">Topological Properties of Spatially Optimal Irrigation Networks</span>.”</span> <em>In Preparation</em>.
+</div>
+<div id="ref-warren" class="csl-entry" role="listitem">
+Warren, Andrew, Anton Afanassiev, Forest Kobayashi, Young-Heon Kim, and Geoffrey Schiebinger. 2024. <span>“<span>Principal Curves In Metric Spaces And The Space Of Probability Measures</span>.”</span> <em>In Preparation</em>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -46,22 +46,27 @@ categories: [MATH 612]
      quarto convert your_jupyter_notebook.ipynb -o output_file.qmd
      ```
 7. **Edit the YAML in your `.qmd` file:** Ensure your YAML is consistent with the main template. For example:
-   ```yaml
-   ---
-   title: "Title of your blog post"
-   date: "Date" # Format example: August 9 2024
-   author:
-     - name: "Your Name" 
-   categories: [] # [biology, bioinformatics, theory, etc.]
-   bibliography: references.bib # If referencing anything
-   ---
-   ```
+  ```yaml
+  ---
+  title: "Title of your blog post"
+  date: "Date" # Format example: August 9 2024
+  author:
+    - name: "Your Name" 
+  jupyter: python3
+  categories: [] # [biology, bioinformatics, theory, etc.]
+  bibliography: references.bib # If referencing anything
+  execute:
+    freeze: auto
+  ---
+  ```
    Feel free to add further formatting, but ensure it remains consistent with the main template.
 8. **Delete your Jupyter notebook:** After converting it to a `.qmd` file, delete the original `.ipynb` file to prevent duplication in the blog post.
 9. **Commit and push your changes:** After completing your `.qmd` file, push your branch to GitHub. A pull request will be automatically created, and once reviewed, it will be merged into the main branch.
 
 Anatomy of a Quarto Document: 
 ![](img/quarto_doc_format.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+If you are running code, please do not forget the `execute: freeze: auto`, so that the website can be built without re-running your code each time.
+
 
 ### Additional Information for Quarto:
 

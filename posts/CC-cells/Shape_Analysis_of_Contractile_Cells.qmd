@@ -1,0 +1,374 @@
+---
+title: Shape Analysis of Contractile Cells
+execute:
+  freeze: true
+date: "October 28 2024"
+author:
+  - name: Yuqi Xiao
+categories:
+  - biology
+  - cell morphology
+bibliography: references.bib
+---
+
+# Introduction
+
+Capsular contracture (CC) is an ailing complication that arises commonly amonst breast cancer patients after reconstructive breast implant surgery. CC patients suffer from aesthetic deformation, pain, and in rare cases, they may develop anaplastic large cell lymphoma (ALCL), a type of cancer of the immune system. The mechanism of CC is unknown, and there are few objective assessments of CC based on histology.
+
+<center><img src="Baker_grade.png" width="600"/></center>
+<center>Figure 1: Baker grade</center>
+
+Baker grade is a subjective, clinical evaluation for the extent of CC (See Fig 1). Many researchers have measured histological properties in CC tissue samples, and correlated theses findings to their assigned Baker grade. It has been found that a high density of immune cells is associated with higher Baker grade. 
+
+These immune cells include fibroblasts and myofibroblasts, which can distort surrounding tissues by contracting and pulling on them. The transition from the fibroblast to myofibroblast phenotype is an important driving step in many fibrotic processes including capsular contracture. In wound healing processes, the contactility of myofibroblasts is essential in facilitating tissue remodelling, however, an exess amount of contratile forces creates a positive feedback loop, leading to the formation of pathological capsules with high density and extent of deformation. 
+
+Myofibroblasts, considered as an "activated" form of fibroblasts, is identified by the expression of alpha-smooth muscle actin ($\alpha$-SMA). However, this binary classification system does not capture the full range of complexities involved in the transition between these two phenotypes. Therefore, it is beneficial to develop a finer classification system of myofibroblasts to explain various levels of forces they can generate. One recent work uses pre-defined morphological features of cells, including perimeter and circularity, to create a continuous spectrum of myofibroblast activation [@hillsley2022strategy].
+
+[//]: # (Past work 1 including single cell force profiling: https://pmc.ncbi.nlm.nih.gov/articles/PMC7104857/#s2)
+[//]: # (Past work 2 including morphological features: https://pmc.ncbi.nlm.nih.gov/articles/PMC9293987/#Sec2)
+
+Research suggests that mechanical strain induces change in cell morphology, inducing round cells that are lacking in stress fibers into more broad, elongated shapes. We hypothesize that cell shapes influence their ability to generate forces via mechanisms of cell-matrix adheshion and cell traction. Further, we hypothesis that cell shape is directly correlated with the severity of CC by increasing contractile forces.
+
+In order to test these hypothesis, we will take a 2-step approach. The first step involves statistical analysis on correlation between cell shapes and their associated Baker grade. To do this, we collect cell images from CC samples with various Baker grades, using Geomstat we can compute a characteristic mean cell shape for each sample. Then, we cluster these characteristic cell shapes into 4 groups, and observe the extent of overlap between this classification and the Baker grade. We choose the elastic metric, associated with its geodesic distances, since it allows us to not only looking at classification, but also how cell shape deforms. If we can find a correlation, the second step is then to go back to in-vitro studies of fibroblasts, and answer the question: can the shapes of cells predict their disposition to developing into a highly contractile phenotype (linked to more severe CC)? I don't have a concrete plan for this second step yet, however, it motivates this project as it may suggest a way to predict clinical outcomes based on pre-operative patient assessment. 
+
+# Cell segmentation
+
+I was provided with histological images of CC tissues, by a group in Coppenhagen \{add credit and citations\}. The images are $\alpha$-SMA stained in order to visualize myofibroblasts, each image is associated with a Baker Grade and the age of the implant. The first step is to preprocess the images and segment the cells. Fiji is a great tool for this purpose.
+
+> **_TO ADD:_**  details on training the classifier. 
+
+# Pre-Processing
+
+## Sort labelling data
+
+The segmentation data can be exported as a file containing 2D coordinates of all pixels that are marked as borders. First, we need to identify individual cells from this data. We may view pixels as nodes in a graph, the problem then becomes splitting an unconnected graph into connected components. A tricky part is to process cells with overlapping/connected borders. 
+> **_TO ADD:_**  details on this algorithm. 
+
+From here, a few simple bash commands allow us to import the resulting data files as a numpy array of 2D coordinates, as an acceptable input for GeomStats.
+
+``` 
+# replace delimiters with sed
+sed -i 's/],/\n/g' *
+sed -i 's/,/ /g' *
+
+# remove [ with sed
+sed -i 's|[[]||g' * 
+```
+
+```{python}
+#| scrolled: true
+import sys
+from pathlib import Path
+import numpy as np
+from decimal import Decimal
+import matplotlib.pyplot as plt
+
+# sys.prefix = '/home/uki/Desktop/blog/posts/capsular-contracture/.venv'
+# sys.executable = '/home/uki/Desktop/blog/posts/capsular-contracture/.venv/bin/python'
+sys.path=['', '/opt/petsc/linux-c-opt/lib', '/home/uki/Desktop/blog/posts/capsular-contracture', '/usr/lib/python312.zip', '/usr/lib/python3.12', '/usr/lib/python3.12/lib-dynload', '/home/uki/Desktop/blog/posts/capsular-contracture/.venv/lib/python3.12/site-packages']
+
+directory = Path('/home/uki/Desktop/blog/posts/capsular-contracture/cells')
+file_iterator = directory.iterdir()
+cells = []
+
+for filename in file_iterator:
+    with open(filename) as file:
+        cell = np.loadtxt(file, dtype=int)
+        cells.append(cell)
+
+print(f"Total number of cells : {len(cells)}")
+```
+
+Since the data is unordered, we need to sort the coordinates in order to visualize cell shapes.
+
+```{python}
+def sort_coordinates(list_of_xy_coords):
+    cx, cy = list_of_xy_coords.mean(0)
+    x, y = list_of_xy_coords.T
+    angles = np.arctan2(x-cx, y-cy)
+    indices = np.argsort(angles)
+    return list_of_xy_coords[indices]
+```
+
+```{python}
+sorted_cells = []
+
+for cell in cells:
+    sorted_cells.append(sort_coordinates(cell))
+```
+
+```{python}
+index = 1
+cell_rand = cells[index]
+cell_sorted = sorted_cells[index]
+
+fig = plt.figure(figsize=(15, 5))
+
+fig.add_subplot(121)
+plt.scatter(cell_rand[:, 0], cell_rand[:, 1], color='black', s=4)
+
+plt.plot(cell_rand[:, 0], cell_rand[:, 1])
+plt.axis("equal")
+plt.title(f"Original coordinates")
+plt.axis("off")
+
+fig.add_subplot(122)
+plt.scatter(cell_sorted[:, 0], cell_sorted[:, 1], color='black', s=4)
+
+plt.plot(cell_sorted[:, 0], cell_sorted[:, 1])
+plt.axis("equal")
+plt.title(f"sorted coordinates")
+plt.axis("off")
+```
+
+_______________________
+> **_Original work ends around here, the below is a proof of concept mock pipeline performed on 3 cells, that needs to be adapted._**
+_______________________
+
+## Interpolation and removing duplicate sample points
+
+```{python}
+import geomstats.backend as gs
+from common import *
+import random
+import os
+import scipy.stats as stats
+from sklearn import manifold
+
+gs.random.seed(2024)
+```
+
+```{python}
+def interpolate(curve, nb_points):
+    """Interpolate a discrete curve with nb_points from a discrete curve.
+
+    Returns
+    -------
+    interpolation : discrete curve with nb_points points
+    """
+    old_length = curve.shape[0]
+    interpolation = gs.zeros((nb_points, 2))
+    incr = old_length / nb_points
+    pos = 0
+    for i in range(nb_points):
+        index = int(gs.floor(pos))
+        interpolation[i] = curve[index] + (pos - index) * (
+            curve[(index + 1) % old_length] - curve[index]
+        )
+        pos += incr
+    return interpolation
+
+
+k_sampling_points = 2000
+```
+
+```{python}
+index = 2
+cell_rand = sorted_cells[index]
+cell_interpolation = interpolate(cell_rand, k_sampling_points)
+
+fig = plt.figure(figsize=(15, 5))
+
+fig.add_subplot(121)
+plt.scatter(cell_rand[:, 0], cell_rand[:, 1], color='black', s=4)
+
+plt.plot(cell_rand[:, 0], cell_rand[:, 1])
+plt.axis("equal")
+plt.title(f"Original curve ({len(cell_rand)} points)")
+plt.axis("off")
+
+fig.add_subplot(122)
+plt.scatter(cell_interpolation[:, 0], cell_interpolation[:, 1], color='black', s=4)
+
+plt.plot(cell_interpolation[:, 0], cell_interpolation[:, 1])
+plt.axis("equal")
+plt.title(f"Interpolated curve ({k_sampling_points} points)")
+plt.axis("off")
+```
+
+```{python}
+def preprocess(curve, tol=1e-10):
+    """Preprocess curve to ensure that there are no consecutive duplicate points.
+
+    Returns
+    -------
+    curve : discrete curve
+    """
+
+    dist = curve[1:] - curve[:-1]
+    dist_norm = np.sqrt(np.sum(np.square(dist), axis=1))
+
+    if np.any( dist_norm < tol ):
+        for i in range(len(curve)-1):
+            if np.sqrt(np.sum(np.square(curve[i+1] - curve[i]), axis=0)) < tol:
+                curve[i+1] = (curve[i] + curve[i+2]) / 2
+
+    return curve
+```
+
+```{python}
+interpolated_cells = []
+
+for cell in sorted_cells:
+    interpolated_cells.append(preprocess(interpolate(cell, k_sampling_points)))
+```
+
+## Alignment
+
+```{python}
+from geomstats.geometry.pre_shape import PreShapeSpace
+
+AMBIENT_DIM = 2
+
+PRESHAPE_SPACE = PreShapeSpace(ambient_dim=AMBIENT_DIM, k_landmarks=k_sampling_points)
+
+PRESHAPE_SPACE.equip_with_group_action("rotations")
+PRESHAPE_SPACE.equip_with_quotient()
+
+
+def exhaustive_align(curve, base_curve):
+    """Align curve to base_curve to minimize the L² distance.
+
+    Returns
+    -------
+    aligned_curve : discrete curve
+    """
+    nb_sampling = len(curve)
+    distances = gs.zeros(nb_sampling)
+    base_curve = gs.array(base_curve)
+    for shift in range(nb_sampling):
+        reparametrized = [curve[(i + shift) % nb_sampling] for i in range(nb_sampling)]
+        aligned = PRESHAPE_SPACE.fiber_bundle.align(
+            point=gs.array(reparametrized), base_point=base_curve
+        )
+        distances[shift] = PRESHAPE_SPACE.embedding_space.metric.norm(
+            gs.array(aligned) - gs.array(base_curve)
+        )
+    shift_min = gs.argmin(distances)
+    reparametrized_min = [
+        curve[(i + shift_min) % nb_sampling] for i in range(nb_sampling)
+    ]
+    aligned_curve = PRESHAPE_SPACE.fiber_bundle.align(
+        point=gs.array(reparametrized_min), base_point=base_curve
+    )
+    return aligned_curve
+```
+
+```{python}
+aligned_cells = []
+BASE_CURVE = interpolated_cells[0]
+
+for cell in interpolated_cells:
+    aligned_cells.append(exhaustive_align(cell, BASE_CURVE))
+```
+
+```{python}
+#| scrolled: true
+index = 1
+unaligned_cell = interpolated_cells[index]
+aligned_cell = exhaustive_align(unaligned_cell, BASE_CURVE)
+
+fig = plt.figure(figsize=(15, 5))
+
+fig.add_subplot(131)
+plt.plot(BASE_CURVE[:, 0], BASE_CURVE[:, 1])
+plt.plot(BASE_CURVE[0, 0], BASE_CURVE[0, 1], "ro")
+plt.axis("equal")
+plt.title("Reference curve")
+
+fig.add_subplot(132)
+plt.plot(unaligned_cell[:, 0], unaligned_cell[:, 1])
+plt.plot(unaligned_cell[0, 0], unaligned_cell[0, 1], "ro")
+plt.axis("equal")
+plt.title("Unaligned curve")
+
+fig.add_subplot(133)
+plt.plot(aligned_cell[:, 0], aligned_cell[:, 1])
+plt.plot(aligned_cell[0, 0], aligned_cell[0, 1], "ro")
+plt.axis("equal")
+plt.title("Aligned curve")
+```
+
+# Data Analysis
+
+```{python}
+from geomstats.geometry.discrete_curves import DiscreteCurvesStartingAtOrigin
+
+cell_start = aligned_cells[0]
+cell_end = aligned_cells[1]
+
+CURVES_SPACE_SRV = DiscreteCurvesStartingAtOrigin(ambient_dim=2, k_sampling_points=2000)
+
+cell_start_at_origin = CURVES_SPACE_SRV.projection(cell_start)
+cell_end_at_origin = CURVES_SPACE_SRV.projection(cell_end)
+
+geodesic_func = CURVES_SPACE_SRV.metric.geodesic(
+    initial_point=cell_start_at_origin, end_point=cell_end_at_origin
+)
+
+n_times = 30
+times = gs.linspace(0.0, 1.0, n_times)
+geod_points = geodesic_func(times)
+```
+
+```{python}
+fig = plt.figure(figsize=(10, 2))
+plt.title("Geodesic between two cells")
+plt.axis("off")
+
+for i, curve in enumerate(geod_points):
+    fig.add_subplot(2, n_times // 2, i + 1)
+    plt.plot(curve[:, 0], curve[:, 1])
+    plt.axis("equal")
+    plt.axis("off")
+```
+
+```{python}
+plt.figure(figsize=(12, 12))
+for i in range(1, n_times - 1):
+    plt.plot(geod_points[i, :, 0], geod_points[i, :, 1], "o-", color="lightgrey")
+plt.plot(geod_points[0, :, 0], geod_points[0, :, 1], "o-b", label="Start Cell")
+plt.plot(geod_points[-1, :, 0], geod_points[-1, :, 1], "o-r", label="End Cell")
+
+plt.title("Geodesic for the Square Root Velocity metric")
+plt.legend()
+```
+
+```{python}
+from geomstats.learning.frechet_mean import FrechetMean
+
+mean = FrechetMean(CURVES_SPACE_SRV)
+
+cell_shapes_at_origin = CURVES_SPACE_SRV.projection(gs.array(aligned_cells))
+mean.fit(cell_shapes_at_origin[:500])
+
+mean_estimate = mean.estimate_
+
+plt.plot(mean_estimate[:, 0], mean_estimate[:, 1], "black");
+```
+
+```{python}
+#| scrolled: true
+print(gs.sum(gs.isnan(mean_estimate)))
+mean_estimate_clean = mean_estimate[~gs.isnan(gs.sum(mean_estimate, axis=1)), :]
+print(mean_estimate_clean.shape)
+mean_estimate_clean = interpolate(mean_estimate_clean, k_sampling_points - 1)
+print(gs.sum(gs.isnan(mean_estimate_clean)))
+print(mean_estimate_clean.shape)
+
+print(cell_shapes_at_origin.shape)
+for cell_at_origin in cell_shapes_at_origin:
+    plt.plot(cell_at_origin[:, 0], cell_at_origin[:, 1], "lightgrey", alpha=0.2)
+
+plt.plot(
+    mean_estimate_clean[:, 0], mean_estimate_clean[:, 1], "black", label="Mean cell"
+)
+plt.legend(fontsize=12);
+```
+
+Problems:
+1. Some weird shape are reading weird (potentially wrong?)
+2. Need some kind of bash or python script to process labelling data into numpy arrays
+3. Labelling coordinates comes in a clump, can't think of a easy way to process overlaps of cells (might discard)
+4. Cell shapes are in 2D, lose information
+

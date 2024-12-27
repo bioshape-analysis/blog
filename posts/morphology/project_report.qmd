@@ -1,7 +1,7 @@
 ---
 title: "Exploring cell shape dynamics dependency on the cell migration"
 bibliography: references.bib
-date: "October 28 2024" # Format example: August 9 2024
+date: "December 20 2024" # Format example: August 9 2024
 author:
   - name: "Pavel Buklemishev" 
 categories: [Cell Morphology, Cell Migration, Differential Geometry] # [biology, bioinformatics, theory, etc.]

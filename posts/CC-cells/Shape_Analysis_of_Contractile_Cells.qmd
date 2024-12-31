@@ -1,8 +1,6 @@
 ---
 title: Shape Analysis of Contractile Cells
-execute:
-  freeze: auto
-date: October 28 2024
+date: December 16 2024
 author:
   - name: Yuqi Xiao
 categories:
@@ -10,6 +8,8 @@ categories:
   - cell morphology
 bibliography: references.bib
 jupyter: .venv
+execute:
+    freeze: auto
 ---
 
 # Introduction

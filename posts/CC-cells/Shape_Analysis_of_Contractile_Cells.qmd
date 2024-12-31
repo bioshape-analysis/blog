@@ -7,7 +7,6 @@ categories:
   - biology
   - cell morphology
 bibliography: references.bib
-jupyter: .venv
 execute:
     freeze: auto
 ---

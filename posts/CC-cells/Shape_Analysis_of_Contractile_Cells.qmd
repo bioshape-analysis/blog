@@ -1,10 +1,6 @@
 ---
 title: Shape Analysis of Contractile Cells
-execute:
-  freeze: true
-
-  date: December 16 2024
-
+date: December 16 2024
 author:
   - name: Yuqi Xiao
 categories:
@@ -12,6 +8,8 @@ categories:
   - cell morphology
 bibliography: references.bib
 jupyter: .venv
+execute:
+    freeze: auto
 ---
 
 # Introduction
@@ -680,5 +678,9 @@ plt.plot(geod_points[-1, :, 0], geod_points[-1, :, 1], "o-r", label="End Cell")
 
 plt.title("Geodesic for the Square Root Velocity metric")
 plt.legend()
+```
+
+```{python}
+!pip freeze > requirements.txt
 ```
 

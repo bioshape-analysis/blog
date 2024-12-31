@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yuqi Xiao">
+<meta name="dcterms.date" content="2024-12-16">
 
 <title>Shape Analysis of Contractile Cells – bioshape-analysis</title>
 <style>
@@ -218,7 +219,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Invalid Date</p>
+        <p class="date">December 16, 2024</p>
       </div>
     </div>
     
@@ -235,14 +236,28 @@ window.Quarto = {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#cell-segmentation" id="toc-cell-segmentation" class="nav-link" data-scroll-target="#cell-segmentation">Cell segmentation</a></li>
+  <li><a href="#cell-segmentation" id="toc-cell-segmentation" class="nav-link" data-scroll-target="#cell-segmentation">Cell Segmentation</a>
+  <ul class="collapse">
+  <li><a href="#example-workflow" id="toc-example-workflow" class="nav-link" data-scroll-target="#example-workflow">Example workflow</a></li>
+  <li><a href="#some-data-wrangling" id="toc-some-data-wrangling" class="nav-link" data-scroll-target="#some-data-wrangling">Some data wrangling</a></li>
+  </ul></li>
   <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">Pre-Processing</a>
   <ul class="collapse">
   <li><a href="#sort-labelling-data" id="toc-sort-labelling-data" class="nav-link" data-scroll-target="#sort-labelling-data">Sort labelling data</a></li>
   <li><a href="#interpolation-and-removing-duplicate-sample-points" id="toc-interpolation-and-removing-duplicate-sample-points" class="nav-link" data-scroll-target="#interpolation-and-removing-duplicate-sample-points">Interpolation and removing duplicate sample points</a></li>
   <li><a href="#alignment" id="toc-alignment" class="nav-link" data-scroll-target="#alignment">Alignment</a></li>
   </ul></li>
-  <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis">Data Analysis</a></li>
+  <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis">Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#computing-mean-cell-shapes" id="toc-computing-mean-cell-shapes" class="nav-link" data-scroll-target="#computing-mean-cell-shapes">Computing mean cell shapes</a></li>
+  <li><a href="#differences-between-low-and-high-grade-cells" id="toc-differences-between-low-and-high-grade-cells" class="nav-link" data-scroll-target="#differences-between-low-and-high-grade-cells">Differences between low and high grade cells</a></li>
+  <li><a href="#testing" id="toc-testing" class="nav-link" data-scroll-target="#testing">Testing</a></li>
+  </ul></li>
+  <li><a href="#conclusion-and-future-work" id="toc-conclusion-and-future-work" class="nav-link" data-scroll-target="#conclusion-and-future-work">Conclusion and Future Work</a></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a>
+  <ul class="collapse">
+  <li><a href="#visualizing-deformations-between-cells" id="toc-visualizing-deformations-between-cells" class="nav-link" data-scroll-target="#visualizing-deformations-between-cells">Visualizing deformations between cells</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -263,280 +278,384 @@ window.Quarto = {
 Figure 1: Baker grade
 </center>
 <p>Baker grade is a subjective, clinical evaluation for the extent of CC (See Fig 1). Many researchers have measured histological properties in CC tissue samples, and correlated theses findings to their assigned Baker grade. It has been found that a high density of immune cells is associated with higher Baker grade.</p>
-<p>These immune cells include fibroblasts and myofibroblasts, which can distort surrounding tissues by contracting and pulling on them. The transition from the fibroblast to myofibroblast phenotype is an important driving step in many fibrotic processes including capsular contracture. In wound healing processes, the contactility of myofibroblasts is essential in facilitating tissue remodelling, however, an exess amount of contratile forces creates a positive feedback loop, leading to the formation of pathological capsules with high density and extent of deformation.</p>
+<p>These immune cells include fibroblasts and myofibroblasts, which can distort surrounding tissues by contracting and pulling on them. The transition from the fibroblast to myofibroblast phenotype is an important driving step in many fibrotic processes including capsular contracture. In wound healing processes, the contactility of myofibroblasts is essential in facilitating tissue remodelling, however, an exess amount of contratile forces creates a positive feedback loop of enhanced immune cell recruitment, leading to the formation of pathological capsules with high density and extent of deformation.</p>
 <p>Myofibroblasts, considered as an “activated” form of fibroblasts, is identified by the expression of alpha-smooth muscle actin (<span class="math inline">\(\alpha\)</span>-SMA). However, this binary classification system does not capture the full range of complexities involved in the transition between these two phenotypes. Therefore, it is beneficial to develop a finer classification system of myofibroblasts to explain various levels of forces they can generate. One recent work uses pre-defined morphological features of cells, including perimeter and circularity, to create a continuous spectrum of myofibroblast activation <span class="citation" data-cites="hillsley2022strategy">(<a href="#ref-hillsley2022strategy" role="doc-biblioref">Hillsley et al. 2022</a>)</span>.</p>
 <p>Research suggests that mechanical strain induces change in cell morphology, inducing round cells that are lacking in stress fibers into more broad, elongated shapes. We hypothesize that cell shapes influence their ability to generate forces via mechanisms of cell-matrix adheshion and cell traction. Further, we hypothesis that cell shape is directly correlated with the severity of CC by increasing contractile forces.</p>
 <p>In order to test these hypothesis, we will take a 2-step approach. The first step involves statistical analysis on correlation between cell shapes and their associated Baker grade. To do this, we collect cell images from CC samples with various Baker grades, using Geomstat we can compute a characteristic mean cell shape for each sample. Then, we cluster these characteristic cell shapes into 4 groups, and observe the extent of overlap between this classification and the Baker grade. We choose the elastic metric, associated with its geodesic distances, since it allows us to not only looking at classification, but also how cell shape deforms. If we can find a correlation, the second step is then to go back to in-vitro studies of fibroblasts, and answer the question: can the shapes of cells predict their disposition to developing into a highly contractile phenotype (linked to more severe CC)? I don’t have a concrete plan for this second step yet, however, it motivates this project as it may suggest a way to predict clinical outcomes based on pre-operative patient assessment.</p>
 </section>
 <section id="cell-segmentation" class="level1">
-<h1>Cell segmentation</h1>
-<p>I was provided with histological images of CC tissues, by a group in Coppenhagen {add credit and citations}. The images are <span class="math inline">\(\alpha\)</span>-SMA stained in order to visualize myofibroblasts, each image is associated with a Baker Grade and the age of the implant. The first step is to preprocess the images and segment the cells. Fiji is a great tool for this purpose.</p>
-<blockquote class="blockquote">
-<p><strong><em>TO ADD:</em></strong> details on training the classifier.</p>
-</blockquote>
+<h1>Cell Segmentation</h1>
+<p>I was provided with histological images of CC tissues, by a group in Coppenhagen {add credit and citations}. The images are <span class="math inline">\(\alpha\)</span>-SMA stained to visualize myofibroblasts, each image is associated with a Baker Grade and the age of the implant. The first step is to preprocess the images and segment the cells. After some attempts with different segmentation algorithms, I opted to use a custom segmentation model with squidpy.</p>
+<div id="877f85c1" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> decimal <span class="im">import</span> Decimal</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>sys.path<span class="op">=</span>[<span class="st">''</span>, <span class="st">'/opt/petsc/linux-c-opt/lib'</span>, <span class="st">'/home/uki'</span>, <span class="st">'/usr/lib/python312.zip'</span>, <span class="st">'/usr/lib/python3.12'</span>, <span class="st">'/usr/lib/python3.12/lib-dynload'</span>, <span class="st">'/home/uki/Desktop/blog/posts/CC-cells/.venv/lib/python3.12/site-packages'</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> squidpy <span class="im">as</span> sq</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="example-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="example-workflow">Example workflow</h2>
+<p>For each image, we go through the following process for cell segmentation.</p>
+<div id="367517da" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'/home/uki/Desktop/blog/posts/CC-cells/images/low/7-1.tif'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> sq.im.ImageContainer(filename)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># smooth image</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sq.im.process(img, layer<span class="op">=</span><span class="st">"image"</span>, method<span class="op">=</span><span class="st">"smooth"</span>, sigma<span class="op">=</span><span class="dv">0</span>) <span class="co">#sigma value depends on the quality of each image, needs to be manually adjusted</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the result</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> layer, ax <span class="kw">in</span> <span class="bu">zip</span>([<span class="st">"image"</span>, <span class="st">"image_smooth"</span>], axes):</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    img.show(layer, ax<span class="op">=</span>ax)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    ax.set_title(layer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-3-output-1.png" width="540" height="104" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="8beba030" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>img.show(<span class="st">"image_smooth"</span>, cmap<span class="op">=</span><span class="st">"gray"</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(img[<span class="st">"image_smooth"</span>][:, :, <span class="dv">0</span>, <span class="dv">0</span>] <span class="op">&lt;</span> <span class="dv">110</span>)  <span class="co"># in this case, setting the threshold at 110 gives us reasonable results</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> sns.histplot(np.array(img[<span class="st">"image_smooth"</span>]).flatten(), bins<span class="op">=</span><span class="dv">50</span>, ax<span class="op">=</span>axes[<span class="dv">2</span>])</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.show() <span class="co">#Second images are smoothed, then flattened, then histogram</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-4-output-1.png" width="1430" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="964f1415" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sq.im.segment(img<span class="op">=</span>img, layer<span class="op">=</span><span class="st">"image_smooth"</span>, method<span class="op">=</span><span class="st">"watershed"</span>, thresh<span class="op">=</span><span class="dv">110</span>, geq<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: This thresh must be adjusted per image analyzed based on histogram</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="ceb848f9" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(img)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of segments in crop: </span><span class="sc">{</span><span class="bu">len</span>(np.unique(img[<span class="st">'segmented_watershed'</span>]))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>img.show(<span class="st">"image"</span>, channel<span class="op">=</span><span class="dv">0</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> axes[<span class="dv">0</span>].set_title(<span class="st">"H&amp;E"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>img.show(<span class="st">"segmented_watershed"</span>, cmap<span class="op">=</span><span class="st">"jet"</span>, interpolation<span class="op">=</span><span class="st">"none"</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> axes[<span class="dv">1</span>].set_title(<span class="st">"segmentation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ImageContainer[shape=(182, 670), layers=['image', 'image_smooth', 'segmented_watershed']]
+Number of segments in crop: 281</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-6-output-2.png" width="540" height="104" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="some-data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="some-data-wrangling">Some data wrangling</h2>
+<p>We get a lot of cells from the segmented image. Unfortunately, the segmentation results are not immediately usable for our purposes, so I write an inelegenat script to find the identified cell borders. In this process we get rid of a large portion of segmentations that are unusable.</p>
+<div id="fca66654" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>my_array <span class="op">=</span> img[<span class="st">"segmented_watershed"</span>].data <span class="co">#plain numpy array of cellseg data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>my_array <span class="op">=</span> my_array.squeeze()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>my_rows, my_cols <span class="op">=</span> my_array.shape</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>mark_for_deletion <span class="op">=</span> np.zeros((my_rows,my_cols),dtype<span class="op">=</span>np.int8)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#intentionally omit boundaries</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,my_cols<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> y <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,my_rows<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    val <span class="op">=</span> my_array[y,x]</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> val <span class="op">==</span> <span class="dv">0</span>: <span class="co">#Not a cell so no processing required</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      <span class="cf">continue</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Not zero so this pixel is a cell</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Mark for deletion if all cardinal neighbors are part of the same cell</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> my_array[y<span class="op">-</span><span class="dv">1</span>,x] <span class="op">!=</span> val:</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">continue</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> my_array[y<span class="op">+</span><span class="dv">1</span>,x] <span class="op">!=</span> val:</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>      <span class="cf">continue</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> my_array[y,x<span class="op">-</span><span class="dv">1</span>] <span class="op">!=</span> val:</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>      <span class="cf">continue</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> my_array[y,x<span class="op">+</span><span class="dv">1</span>] <span class="op">!=</span> val:</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>      <span class="cf">continue</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    mark_for_deletion[y,x] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,my_cols<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> y <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,my_rows<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mark_for_deletion[y,x] <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>      my_array[y,x] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>plt.imshow(my_array,interpolation<span class="op">=</span><span class="st">'none'</span>)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>plt.show() <span class="co">#Third image shown is the borders I derived</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-7-output-1.png" width="575" height="188" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Some more work is required to find 2D coordinates resulting from this, we take away borders with too few data points to work with. This step runs quite slow at the moment and could be optimized.</p>
+<div id="00b19144" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>my_cell_borders <span class="op">=</span> []</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> val <span class="kw">in</span> np.unique(my_array):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    temp_array <span class="op">=</span> []</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> val <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,my_cols):</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> y <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,my_rows):</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> my_array[y,x] <span class="op">==</span> val:</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                temp_array.append(np.array([y,x]))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(temp_array)<span class="op">&gt;</span><span class="dv">9</span>:</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        my_cell_borders.append(np.array(temp_array))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We repeat this process for several images, due to the inconsistencies in the qualities of our obtained images, special image processing steps had to be designed for each image and implemented manually. These steps are omitted here, eventually we obtain 2 separate lists of 2D cell coordinates, for low grade (Baker I&amp;II) and high grade (Baker III&amp;IV) samples respectively.</p>
+<div id="274bb390" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'low-grade.pkl'</span>, <span class="st">'rb'</span>) <span class="im">as</span> fp:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    low_grade_cells <span class="op">=</span> pickle.load(fp)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span> (<span class="st">'high-grade.pkl'</span>, <span class="st">'rb'</span>) <span class="im">as</span> fp:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    high_grade_cells <span class="op">=</span> pickle.load(fp)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>cells <span class="op">=</span> low_grade_cells <span class="op">+</span> high_grade_cells</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total number of cells : </span><span class="sc">{</span><span class="bu">len</span>(low_grade_cells)<span class="op">+</span><span class="bu">len</span>(high_grade_cells)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total number of cells : 295</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="pre-processing" class="level1">
 <h1>Pre-Processing</h1>
 <section id="sort-labelling-data" class="level2">
 <h2 class="anchored" data-anchor-id="sort-labelling-data">Sort labelling data</h2>
-<p>The segmentation data can be exported as a file containing 2D coordinates of all pixels that are marked as borders. First, we need to identify individual cells from this data. We may view pixels as nodes in a graph, the problem then becomes splitting an unconnected graph into connected components. A tricky part is to process cells with overlapping/connected borders. &gt; <strong><em>TO ADD:</em></strong> details on this algorithm.</p>
-<p>From here, a few simple bash commands allow us to import the resulting data files as a numpy array of 2D coordinates, as an acceptable input for GeomStats.</p>
-<pre><code># replace delimiters with sed
-sed -i 's/],/\n/g' *
-sed -i 's/,/ /g' *
-
-# remove [ with sed
-sed -i 's|[[]||g' * </code></pre>
-<div id="1819760a" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> decimal <span class="im">import</span> Decimal</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># sys.prefix = '/home/uki/Desktop/blog/posts/capsular-contracture/.venv'</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># sys.executable = '/home/uki/Desktop/blog/posts/capsular-contracture/.venv/bin/python'</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>sys.path<span class="op">=</span>[<span class="st">''</span>, <span class="st">'/opt/petsc/linux-c-opt/lib'</span>, <span class="st">'/home/uki/Desktop/blog/posts/capsular-contracture'</span>, <span class="st">'/usr/lib/python312.zip'</span>, <span class="st">'/usr/lib/python3.12'</span>, <span class="st">'/usr/lib/python3.12/lib-dynload'</span>, <span class="st">'/home/uki/Desktop/blog/posts/capsular-contracture/.venv/lib/python3.12/site-packages'</span>]</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> Path(<span class="st">'/home/uki/Desktop/blog/posts/capsular-contracture/cells'</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>file_iterator <span class="op">=</span> directory.iterdir()</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>cells <span class="op">=</span> []</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> filename <span class="kw">in</span> file_iterator:</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(filename) <span class="im">as</span> <span class="bu">file</span>:</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        cell <span class="op">=</span> np.loadtxt(<span class="bu">file</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        cells.append(cell)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total number of cells : </span><span class="sc">{</span><span class="bu">len</span>(cells)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Total number of cells : 3</code></pre>
-</div>
-</div>
 <p>Since the data is unordered, we need to sort the coordinates in order to visualize cell shapes.</p>
-<div id="aaa91816" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sort_coordinates(list_of_xy_coords):</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    cx, cy <span class="op">=</span> list_of_xy_coords.mean(<span class="dv">0</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    x, y <span class="op">=</span> list_of_xy_coords.T</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    angles <span class="op">=</span> np.arctan2(x<span class="op">-</span>cx, y<span class="op">-</span>cy)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> np.argsort(angles)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> list_of_xy_coords[indices]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="757e7c99" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sort_coordinates(list_of_xy_coords):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    cx, cy <span class="op">=</span> list_of_xy_coords.mean(<span class="dv">0</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    x, y <span class="op">=</span> list_of_xy_coords.T</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    angles <span class="op">=</span> np.arctan2(x<span class="op">-</span>cx, y<span class="op">-</span>cy)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> np.argsort(angles)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> list_of_xy_coords[indices]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="95b6ced7" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sorted_cells <span class="op">=</span> []</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> cells:</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    sorted_cells.append(sort_coordinates(cell))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4f6ef919" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sorted_cells <span class="op">=</span> []</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> cells:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    sorted_cells.append(sort_coordinates(cell))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="f4c60ee6" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cell_rand <span class="op">=</span> cells[index]</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cell_sorted <span class="op">=</span> sorted_cells[index]</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>])</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Original coordinates"</span>)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_sorted[:, <span class="dv">0</span>], cell_sorted[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_sorted[:, <span class="dv">0</span>], cell_sorted[:, <span class="dv">1</span>])</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"sorted coordinates"</span>)</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2518cbd4" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>cell_rand <span class="op">=</span> cells[index]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>cell_sorted <span class="op">=</span> sorted_cells[index]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>])</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Original coordinates"</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_sorted[:, <span class="dv">0</span>], cell_sorted[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_sorted[:, <span class="dv">0</span>], cell_sorted[:, <span class="dv">1</span>])</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"sorted coordinates"</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-5-output-1.png" width="1135" height="409" class="figure-img"></p>
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-12-output-1.png" width="1135" height="409" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<hr>
-<blockquote class="blockquote">
-<p><strong><em>Original work ends around here, the below is a proof of concept mock pipeline performed on 3 cells, that needs to be adapted.</em></strong> _______________________</p>
-</blockquote>
 </section>
 <section id="interpolation-and-removing-duplicate-sample-points" class="level2">
 <h2 class="anchored" data-anchor-id="interpolation-and-removing-duplicate-sample-points">Interpolation and removing duplicate sample points</h2>
-<div id="589539a6" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geomstats.backend <span class="im">as</span> gs</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> common <span class="im">import</span> <span class="op">*</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> manifold</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>gs.random.seed(<span class="dv">2024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="96396c35" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geomstats.backend <span class="im">as</span> gs</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> common <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> manifold</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>gs.random.seed(<span class="dv">2024</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="9f744bcc" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> interpolate(curve, nb_points):</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Interpolate a discrete curve with nb_points from a discrete curve.</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">    interpolation : discrete curve with nb_points points</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    old_length <span class="op">=</span> curve.shape[<span class="dv">0</span>]</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    interpolation <span class="op">=</span> gs.zeros((nb_points, <span class="dv">2</span>))</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    incr <span class="op">=</span> old_length <span class="op">/</span> nb_points</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nb_points):</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> <span class="bu">int</span>(gs.floor(pos))</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        interpolation[i] <span class="op">=</span> curve[index] <span class="op">+</span> (pos <span class="op">-</span> index) <span class="op">*</span> (</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>            curve[(index <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> old_length] <span class="op">-</span> curve[index]</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        pos <span class="op">+=</span> incr</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> interpolation</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>k_sampling_points <span class="op">=</span> <span class="dv">2000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d1c83fb7" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> interpolate(curve, nb_points):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Interpolate a discrete curve with nb_points from a discrete curve.</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">    interpolation : discrete curve with nb_points points</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    old_length <span class="op">=</span> curve.shape[<span class="dv">0</span>]</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    interpolation <span class="op">=</span> gs.zeros((nb_points, <span class="dv">2</span>))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    incr <span class="op">=</span> old_length <span class="op">/</span> nb_points</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nb_points):</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> <span class="bu">int</span>(gs.floor(pos))</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        interpolation[i] <span class="op">=</span> curve[index] <span class="op">+</span> (pos <span class="op">-</span> index) <span class="op">*</span> (</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>            curve[(index <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> old_length] <span class="op">-</span> curve[index]</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>        pos <span class="op">+=</span> incr</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> interpolation</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>k_sampling_points <span class="op">=</span> <span class="dv">500</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="d2e2310e" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>cell_rand <span class="op">=</span> sorted_cells[index]</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cell_interpolation <span class="op">=</span> interpolate(cell_rand, k_sampling_points)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>])</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Original curve (</span><span class="sc">{</span><span class="bu">len</span>(cell_rand)<span class="sc">}</span><span class="ss"> points)"</span>)</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_interpolation[:, <span class="dv">0</span>], cell_interpolation[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_interpolation[:, <span class="dv">0</span>], cell_interpolation[:, <span class="dv">1</span>])</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Interpolated curve (</span><span class="sc">{</span>k_sampling_points<span class="sc">}</span><span class="ss"> points)"</span>)</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
-<pre><code>(np.float64(810.1893750000002),
- np.float64(850.848125),
- np.float64(18.650075000000008),
- np.float64(48.34842499999986))</code></pre>
-</div>
+<div id="da69f189" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>cell_rand <span class="op">=</span> sorted_cells[index]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>cell_interpolation <span class="op">=</span> interpolate(cell_rand, k_sampling_points)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_rand[:, <span class="dv">0</span>], cell_rand[:, <span class="dv">1</span>])</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Original curve (</span><span class="sc">{</span><span class="bu">len</span>(cell_rand)<span class="sc">}</span><span class="ss"> points)"</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(cell_interpolation[:, <span class="dv">0</span>], cell_interpolation[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'black'</span>, s<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>plt.plot(cell_interpolation[:, <span class="dv">0</span>], cell_interpolation[:, <span class="dv">1</span>])</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Interpolated curve (</span><span class="sc">{</span>k_sampling_points<span class="sc">}</span><span class="ss"> points)"</span>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-8-output-2.png" width="1135" height="409" class="figure-img"></p>
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-15-output-1.png" width="1135" height="409" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="66e6cbd9" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess(curve, tol<span class="op">=</span><span class="fl">1e-10</span>):</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Preprocess curve to ensure that there are no consecutive duplicate points.</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">    curve : discrete curve</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    dist <span class="op">=</span> curve[<span class="dv">1</span>:] <span class="op">-</span> curve[:<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    dist_norm <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(np.square(dist), axis<span class="op">=</span><span class="dv">1</span>))</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">any</span>( dist_norm <span class="op">&lt;</span> tol ):</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(curve)<span class="op">-</span><span class="dv">1</span>):</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> np.sqrt(np.<span class="bu">sum</span>(np.square(curve[i<span class="op">+</span><span class="dv">1</span>] <span class="op">-</span> curve[i]), axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">&lt;</span> tol:</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                curve[i<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> (curve[i] <span class="op">+</span> curve[i<span class="op">+</span><span class="dv">2</span>]) <span class="op">/</span> <span class="dv">2</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> curve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c748ab89" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess(curve, tol<span class="op">=</span><span class="fl">1e-10</span>):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Preprocess curve to ensure that there are no consecutive duplicate points.</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">    curve : discrete curve</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    dist <span class="op">=</span> curve[<span class="dv">1</span>:] <span class="op">-</span> curve[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    dist_norm <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(np.square(dist), axis<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">any</span>( dist_norm <span class="op">&lt;</span> tol ):</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(curve)<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> np.sqrt(np.<span class="bu">sum</span>(np.square(curve[i<span class="op">+</span><span class="dv">1</span>] <span class="op">-</span> curve[i]), axis<span class="op">=</span><span class="dv">0</span>)) <span class="op">&lt;</span> tol:</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                curve[i<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> (curve[i] <span class="op">+</span> curve[i<span class="op">+</span><span class="dv">2</span>]) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> curve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="6fae8ea3" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>interpolated_cells <span class="op">=</span> []</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> sorted_cells:</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    interpolated_cells.append(preprocess(interpolate(cell, k_sampling_points)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="22ecce8a" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>interpolated_cells <span class="op">=</span> []</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> sorted_cells:</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    interpolated_cells.append(preprocess(interpolate(cell, k_sampling_points)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="alignment" class="level2">
 <h2 class="anchored" data-anchor-id="alignment">Alignment</h2>
-<div id="5c547b74" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.geometry.pre_shape <span class="im">import</span> PreShapeSpace</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>AMBIENT_DIM <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>PRESHAPE_SPACE <span class="op">=</span> PreShapeSpace(ambient_dim<span class="op">=</span>AMBIENT_DIM, k_landmarks<span class="op">=</span>k_sampling_points)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>PRESHAPE_SPACE.equip_with_group_action(<span class="st">"rotations"</span>)</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>PRESHAPE_SPACE.equip_with_quotient()</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exhaustive_align(curve, base_curve):</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Align curve to base_curve to minimize the L² distance.</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">    aligned_curve : discrete curve</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    nb_sampling <span class="op">=</span> <span class="bu">len</span>(curve)</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    distances <span class="op">=</span> gs.zeros(nb_sampling)</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    base_curve <span class="op">=</span> gs.array(base_curve)</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> shift <span class="kw">in</span> <span class="bu">range</span>(nb_sampling):</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        reparametrized <span class="op">=</span> [curve[(i <span class="op">+</span> shift) <span class="op">%</span> nb_sampling] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nb_sampling)]</span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>        aligned <span class="op">=</span> PRESHAPE_SPACE.fiber_bundle.align(</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>            point<span class="op">=</span>gs.array(reparametrized), base_point<span class="op">=</span>base_curve</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>        distances[shift] <span class="op">=</span> PRESHAPE_SPACE.embedding_space.metric.norm(</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>            gs.array(aligned) <span class="op">-</span> gs.array(base_curve)</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    shift_min <span class="op">=</span> gs.argmin(distances)</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    reparametrized_min <span class="op">=</span> [</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>        curve[(i <span class="op">+</span> shift_min) <span class="op">%</span> nb_sampling] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nb_sampling)</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    aligned_curve <span class="op">=</span> PRESHAPE_SPACE.fiber_bundle.align(</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>        point<span class="op">=</span>gs.array(reparametrized_min), base_point<span class="op">=</span>base_curve</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> aligned_curve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="10d864a7" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.geometry.pre_shape <span class="im">import</span> PreShapeSpace</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>AMBIENT_DIM <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>PRESHAPE_SPACE <span class="op">=</span> PreShapeSpace(ambient_dim<span class="op">=</span>AMBIENT_DIM, k_landmarks<span class="op">=</span>k_sampling_points)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>PRESHAPE_SPACE.equip_with_group_action(<span class="st">"rotations"</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>PRESHAPE_SPACE.equip_with_quotient()</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> exhaustive_align(curve, base_curve):</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Align curve to base_curve to minimize the L² distance.</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co">    aligned_curve : discrete curve</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    nb_sampling <span class="op">=</span> <span class="bu">len</span>(curve)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    distances <span class="op">=</span> gs.zeros(nb_sampling)</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    base_curve <span class="op">=</span> gs.array(base_curve)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> shift <span class="kw">in</span> <span class="bu">range</span>(nb_sampling):</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>        reparametrized <span class="op">=</span> [curve[(i <span class="op">+</span> shift) <span class="op">%</span> nb_sampling] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nb_sampling)]</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>        aligned <span class="op">=</span> PRESHAPE_SPACE.fiber_bundle.align(</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>            point<span class="op">=</span>gs.array(reparametrized), base_point<span class="op">=</span>base_curve</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>        distances[shift] <span class="op">=</span> PRESHAPE_SPACE.embedding_space.metric.norm(</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>            gs.array(aligned) <span class="op">-</span> gs.array(base_curve)</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    shift_min <span class="op">=</span> gs.argmin(distances)</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>    reparametrized_min <span class="op">=</span> [</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>        curve[(i <span class="op">+</span> shift_min) <span class="op">%</span> nb_sampling] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nb_sampling)</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>    aligned_curve <span class="op">=</span> PRESHAPE_SPACE.fiber_bundle.align(</span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>        point<span class="op">=</span>gs.array(reparametrized_min), base_point<span class="op">=</span>base_curve</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> aligned_curve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="8d79ef44" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>aligned_cells <span class="op">=</span> []</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>BASE_CURVE <span class="op">=</span> interpolated_cells[<span class="dv">0</span>]</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> interpolated_cells:</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    aligned_cells.append(exhaustive_align(cell, BASE_CURVE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="055ad367" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>aligned_cells <span class="op">=</span> []</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>BASE_CURVE <span class="op">=</span> interpolated_cells[<span class="dv">0</span>]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> interpolated_cells:</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    aligned_cells.append(exhaustive_align(cell, BASE_CURVE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="6e55fd0a" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>unaligned_cell <span class="op">=</span> interpolated_cells[index]</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>aligned_cell <span class="op">=</span> exhaustive_align(unaligned_cell, BASE_CURVE)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">131</span>)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plt.plot(BASE_CURVE[:, <span class="dv">0</span>], BASE_CURVE[:, <span class="dv">1</span>])</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>plt.plot(BASE_CURVE[<span class="dv">0</span>, <span class="dv">0</span>], BASE_CURVE[<span class="dv">0</span>, <span class="dv">1</span>], <span class="st">"ro"</span>)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Reference curve"</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">132</span>)</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.plot(unaligned_cell[:, <span class="dv">0</span>], unaligned_cell[:, <span class="dv">1</span>])</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>plt.plot(unaligned_cell[<span class="dv">0</span>, <span class="dv">0</span>], unaligned_cell[<span class="dv">0</span>, <span class="dv">1</span>], <span class="st">"ro"</span>)</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Unaligned curve"</span>)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">133</span>)</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>plt.plot(aligned_cell[:, <span class="dv">0</span>], aligned_cell[:, <span class="dv">1</span>])</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>plt.plot(aligned_cell[<span class="dv">0</span>, <span class="dv">0</span>], aligned_cell[<span class="dv">0</span>, <span class="dv">1</span>], <span class="st">"ro"</span>)</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Aligned curve"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div id="b99c4c0f" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>unaligned_cell <span class="op">=</span> interpolated_cells[index]</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>aligned_cell <span class="op">=</span> exhaustive_align(unaligned_cell, BASE_CURVE)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">131</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>plt.plot(BASE_CURVE[:, <span class="dv">0</span>], BASE_CURVE[:, <span class="dv">1</span>])</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>plt.plot(BASE_CURVE[<span class="dv">0</span>, <span class="dv">0</span>], BASE_CURVE[<span class="dv">0</span>, <span class="dv">1</span>], <span class="st">"ro"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Reference curve"</span>)</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">132</span>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>plt.plot(unaligned_cell[:, <span class="dv">0</span>], unaligned_cell[:, <span class="dv">1</span>])</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>plt.plot(unaligned_cell[<span class="dv">0</span>, <span class="dv">0</span>], unaligned_cell[<span class="dv">0</span>, <span class="dv">1</span>], <span class="st">"ro"</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Unaligned curve"</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">133</span>)</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>plt.plot(aligned_cell[:, <span class="dv">0</span>], aligned_cell[:, <span class="dv">1</span>])</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>plt.plot(aligned_cell[<span class="dv">0</span>, <span class="dv">0</span>], aligned_cell[<span class="dv">0</span>, <span class="dv">1</span>], <span class="st">"ro"</span>)</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Aligned curve"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
 <pre><code>Text(0.5, 1.0, 'Aligned curve')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-13-output-2.png" width="1162" height="431" class="figure-img"></p>
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-20-output-2.png" width="1171" height="431" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -545,114 +664,387 @@ sed -i 's|[[]||g' * </code></pre>
 </section>
 <section id="data-analysis" class="level1">
 <h1>Data Analysis</h1>
-<div id="500f6167" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.geometry.discrete_curves <span class="im">import</span> DiscreteCurvesStartingAtOrigin</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>cell_start <span class="op">=</span> aligned_cells[<span class="dv">0</span>]</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>cell_end <span class="op">=</span> aligned_cells[<span class="dv">1</span>]</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>CURVES_SPACE_SRV <span class="op">=</span> DiscreteCurvesStartingAtOrigin(ambient_dim<span class="op">=</span><span class="dv">2</span>, k_sampling_points<span class="op">=</span><span class="dv">2000</span>)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>cell_start_at_origin <span class="op">=</span> CURVES_SPACE_SRV.projection(cell_start)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>cell_end_at_origin <span class="op">=</span> CURVES_SPACE_SRV.projection(cell_end)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>geodesic_func <span class="op">=</span> CURVES_SPACE_SRV.metric.geodesic(</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    initial_point<span class="op">=</span>cell_start_at_origin, end_point<span class="op">=</span>cell_end_at_origin</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>n_times <span class="op">=</span> <span class="dv">30</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>times <span class="op">=</span> gs.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, n_times)</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>geod_points <span class="op">=</span> geodesic_func(times)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="eb93a825" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">2</span>))</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Geodesic between two cells"</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, curve <span class="kw">in</span> <span class="bu">enumerate</span>(geod_points):</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    fig.add_subplot(<span class="dv">2</span>, n_times <span class="op">//</span> <span class="dv">2</span>, i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    plt.plot(curve[:, <span class="dv">0</span>], curve[:, <span class="dv">1</span>])</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"equal"</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="computing-mean-cell-shapes" class="level2">
+<h2 class="anchored" data-anchor-id="computing-mean-cell-shapes">Computing mean cell shapes</h2>
+<p>It is not particularly meaningful to compute a global mean cell shape, but here we may generate some reference data and some simple, reproducible steps for more in-depth analysis.</p>
+<div id="acaaac9c" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.geometry.discrete_curves <span class="im">import</span> DiscreteCurvesStartingAtOrigin</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.learning.frechet_mean <span class="im">import</span> FrechetMean</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>CURVES_SPACE_SRV <span class="op">=</span> DiscreteCurvesStartingAtOrigin(ambient_dim<span class="op">=</span><span class="dv">2</span>, k_sampling_points<span class="op">=</span>k_sampling_points)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> FrechetMean(CURVES_SPACE_SRV)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>cell_shapes_at_origin <span class="op">=</span> CURVES_SPACE_SRV.projection(gs.array(aligned_cells))</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>mean.fit(cell_shapes_at_origin[:<span class="dv">500</span>])</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>mean_estimate <span class="op">=</span> mean.estimate_</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>plt.plot(mean_estimate[:, <span class="dv">0</span>], mean_estimate[:, <span class="dv">1</span>], <span class="st">"black"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-15-output-1.png" width="763" height="187" class="figure-img"></p>
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-21-output-1.png" width="571" height="411" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="ed5030f3" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">12</span>))</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_times <span class="op">-</span> <span class="dv">1</span>):</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    plt.plot(geod_points[i, :, <span class="dv">0</span>], geod_points[i, :, <span class="dv">1</span>], <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"lightgrey"</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plt.plot(geod_points[<span class="dv">0</span>, :, <span class="dv">0</span>], geod_points[<span class="dv">0</span>, :, <span class="dv">1</span>], <span class="st">"o-b"</span>, label<span class="op">=</span><span class="st">"Start Cell"</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>plt.plot(geod_points[<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">0</span>], geod_points[<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">1</span>], <span class="st">"o-r"</span>, label<span class="op">=</span><span class="st">"End Cell"</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Geodesic for the Square Root Velocity metric"</span>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-16-output-1.png" width="951" height="949" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="9ee14929" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.learning.frechet_mean <span class="im">import</span> FrechetMean</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> FrechetMean(CURVES_SPACE_SRV)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>cell_shapes_at_origin <span class="op">=</span> CURVES_SPACE_SRV.projection(gs.array(aligned_cells))</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>mean.fit(cell_shapes_at_origin[:<span class="dv">500</span>])</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>mean_estimate <span class="op">=</span> mean.estimate_</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>plt.plot(mean_estimate[:, <span class="dv">0</span>], mean_estimate[:, <span class="dv">1</span>], <span class="st">"black"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-17-output-1.png" width="579" height="411" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="7a2a6c11" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gs.<span class="bu">sum</span>(gs.isnan(mean_estimate)))</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean <span class="op">=</span> mean_estimate[<span class="op">~</span>gs.isnan(gs.<span class="bu">sum</span>(mean_estimate, axis<span class="op">=</span><span class="dv">1</span>)), :]</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mean_estimate_clean.shape)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean <span class="op">=</span> interpolate(mean_estimate_clean, k_sampling_points <span class="op">-</span> <span class="dv">1</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gs.<span class="bu">sum</span>(gs.isnan(mean_estimate_clean)))</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mean_estimate_clean.shape)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cell_shapes_at_origin.shape)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> cell_shapes_at_origin:</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    mean_estimate_clean[:, <span class="dv">0</span>], mean_estimate_clean[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell"</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>plt.legend(fontsize<span class="op">=</span><span class="dv">12</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="349545ba" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gs.<span class="bu">sum</span>(gs.isnan(mean_estimate)))</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean <span class="op">=</span> mean_estimate[<span class="op">~</span>gs.isnan(gs.<span class="bu">sum</span>(mean_estimate, axis<span class="op">=</span><span class="dv">1</span>)), :]</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mean_estimate_clean.shape)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean <span class="op">=</span> interpolate(mean_estimate_clean, k_sampling_points <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gs.<span class="bu">sum</span>(gs.isnan(mean_estimate_clean)))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mean_estimate_clean.shape)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cell_shapes_at_origin.shape)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> cell_shapes_at_origin:</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    mean_estimate_clean[:, <span class="dv">0</span>], mean_estimate_clean[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell"</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>plt.legend(fontsize<span class="op">=</span><span class="dv">12</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>0
-(1999, 2)
+(499, 2)
 0
-(1999, 2)
-(3, 1999, 2)</code></pre>
+(499, 2)
+(295, 499, 2)</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-18-output-2.png" width="570" height="414" class="figure-img"></p>
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-22-output-2.png" width="566" height="411" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Problems: 1. Some weird shape are reading weird (potentially wrong?) 2. Need some kind of bash or python script to process labelling data into numpy arrays 3. Labelling coordinates comes in a clump, can’t think of a easy way to process overlaps of cells (might discard) 4. Cell shapes are in 2D, lose information</p>
+<p>We adjust the scaling manually.</p>
+<div id="94eb125b" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>mean_estimate_aligned <span class="op">=</span> <span class="fl">1.8</span> <span class="op">*</span> mean_estimate_clean</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> cell_shapes_at_origin:</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    mean_estimate_aligned[:, <span class="dv">0</span>], mean_estimate_aligned[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell"</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>plt.legend(fontsize<span class="op">=</span><span class="dv">12</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-23-output-1.png" width="566" height="411" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We compute the distance from each cell to the global mean cell shape, and plot the results on a histogram. It’s seen here that the majority of cells are close to the global mean.</p>
+<div id="dade1bd1" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dists_to_global_mean_list <span class="op">=</span> []</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> aligned_cells:</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    dists_to_global_mean_list.append(CURVES_SPACE_SRV.metric.dist(CURVES_SPACE_SRV.projection(cell), mean_estimate_aligned))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="a7afe66e" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>min_dists <span class="op">=</span> <span class="bu">min</span>(dists_to_global_mean_list)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>max_dists <span class="op">=</span> <span class="bu">max</span>(dists_to_global_mean_list)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(min_dists, max_dists)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>xx <span class="op">=</span> gs.linspace(gs.floor(min_dists), gs.ceil(max_dists), <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1.4633405312629748 8.794301541946876</code></pre>
+</div>
+</div>
+<div id="f53fdeed" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>, sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>, tight_layout<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">enumerate</span>(aligned_cells):</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    distances <span class="op">=</span> dists_to_global_mean_list</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    axs.hist(distances, bins<span class="op">=</span><span class="dv">10</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, density<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    kde <span class="op">=</span> stats.gaussian_kde(distances)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    axs.plot(xx, kde(xx))</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    axs.set_xlim((min_dists, max_dists))</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    axs.set_ylabel(<span class="st">"Fraction of cells"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>fig.suptitle(</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Histograms of srv distances (a=1, b=0.5) to global mean cell"</span>, fontsize<span class="op">=</span><span class="dv">20</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>Text(0.5, 0.98, 'Histograms of srv distances (a=1, b=0.5) to global mean cell')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-26-output-2.png" width="838" height="381" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="differences-between-low-and-high-grade-cells" class="level2">
+<h2 class="anchored" data-anchor-id="differences-between-low-and-high-grade-cells">Differences between low and high grade cells</h2>
+<p>Now, we attempt to characterize geometric differences between cells from low vs.&nbsp;high grade CC samples. Perhaps as expected, we see a more rounded shape for low grade cells, and a more long, spindle shape for high grade cells.</p>
+<div id="81a1a961" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>low <span class="op">=</span> aligned_cells[<span class="dv">0</span>:<span class="dv">167</span>]</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>high <span class="op">=</span> aligned_cells[<span class="dv">168</span>:<span class="bu">len</span>(aligned_cells)]</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>low_shapes <span class="op">=</span> CURVES_SPACE_SRV.projection(gs.array(low))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>mean.fit(low_shapes[:<span class="dv">500</span>])</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>mean_estimate_low <span class="op">=</span> mean.estimate_</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>high_shapes <span class="op">=</span> CURVES_SPACE_SRV.projection(gs.array(high))</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>mean.fit(high_shapes[:<span class="dv">500</span>])</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>mean_estimate_high <span class="op">=</span> mean.estimate_</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>plt.plot(mean_estimate_low[:, <span class="dv">0</span>], mean_estimate_low[:, <span class="dv">1</span>], <span class="st">"black"</span>)<span class="op">;</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Low Grade Cells"</span>)</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>plt.plot(mean_estimate[:, <span class="dv">0</span>], mean_estimate_high[:, <span class="dv">1</span>], <span class="st">"black"</span>)<span class="op">;</span></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"High Grade Cells"</span>)</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>(-1.9972225059184727,
+ 1.6950423762408362,
+ -0.177643622871598,
+ 3.8498647025428094)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-27-output-2.png" width="1135" height="409" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="27a37df0" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean_low <span class="op">=</span> mean_estimate_low[<span class="op">~</span>gs.isnan(gs.<span class="bu">sum</span>(mean_estimate_low, axis<span class="op">=</span><span class="dv">1</span>)), :]</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean_low <span class="op">=</span> interpolate(mean_estimate_clean_low, k_sampling_points <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean_high <span class="op">=</span> mean_estimate_high[<span class="op">~</span>gs.isnan(gs.<span class="bu">sum</span>(mean_estimate_high, axis<span class="op">=</span><span class="dv">1</span>)), :]</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>mean_estimate_clean_high <span class="op">=</span> interpolate(mean_estimate_clean_high, k_sampling_points <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> low_shapes:</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    mean_estimate_clean_low[:, <span class="dv">0</span>], mean_estimate_clean_low[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell shape for low grades"</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Low Grade Cells"</span>)</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> high_shapes:</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    mean_estimate_clean_high[:, <span class="dv">0</span>], mean_estimate_clean_high[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell shape for high grades"</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"High Grade Cells"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>Text(0.5, 1.0, 'High Grade Cells')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-28-output-2.png" width="1177" height="431" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="2efff624" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mean_estimate_aligned_low <span class="op">=</span> <span class="fl">1.8</span> <span class="op">*</span> mean_estimate_clean_low</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>mean_estimate_aligned_high <span class="op">=</span> <span class="fl">1.6</span> <span class="op">*</span> mean_estimate_clean_high</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">121</span>)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> low_shapes:</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    mean_estimate_aligned_low[:, <span class="dv">0</span>], mean_estimate_aligned_low[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell shape for low grades"</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Low Grade Cells"</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>fig.add_subplot(<span class="dv">122</span>)</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell_at_origin <span class="kw">in</span> high_shapes:</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>    plt.plot(cell_at_origin[:, <span class="dv">0</span>], cell_at_origin[:, <span class="dv">1</span>], <span class="st">"lightgrey"</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    mean_estimate_aligned_high[:, <span class="dv">0</span>], mean_estimate_aligned_high[:, <span class="dv">1</span>], <span class="st">"black"</span>, label<span class="op">=</span><span class="st">"Mean cell shape for high grades"</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"High Grade Cells"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>Text(0.5, 1.0, 'High Grade Cells')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-29-output-2.png" width="1177" height="431" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Below are the setup to visualizing distances with respect to each mean shape, due to time constraints this was not implemented.</p>
+<div id="e689829a" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>dists_to_mean_low <span class="op">=</span> []</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> low_shapes:</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    dist_to_low <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(cell, mean_estimate_aligned_low)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    dist_to_high <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(cell, mean_estimate_aligned_high)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    dists_to_mean_low.append(np.array([dist_to_low, dist_to_high]))</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>dists_to_mean_high <span class="op">=</span> []</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> high_shapes:</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    dist_to_low <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(cell, mean_estimate_aligned_low)</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    dist_to_high <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(cell, mean_estimate_aligned_high)</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    dists_to_mean_high.append(np.array([dist_to_low, dist_to_high]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="90db3da7" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dists <span class="op">=</span> dists_to_mean_low <span class="op">+</span> dists_to_mean_high</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>min_dists <span class="op">=</span> np.<span class="bu">min</span>(dists)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>max_dists <span class="op">=</span> np.<span class="bu">max</span>(dists)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(min_dists, max_dists)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>xx <span class="op">=</span> gs.linspace(gs.floor(min_dists), gs.ceil(max_dists), <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1.3595235583661602 8.828945361746527</code></pre>
+</div>
+</div>
+</section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing</h2>
+<p>Using a new set of images, we test the accuracy of this classification, we test on 11 cells from low Baker grade samples and 6 cells from high Baker grade samples.</p>
+<div id="1e865392" class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'test-low-grade.pkl'</span>, <span class="st">'rb'</span>) <span class="im">as</span> fp:</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    test_low_grade_cells <span class="op">=</span> pickle.load(fp)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span> (<span class="st">'test-high-grade.pkl'</span>, <span class="st">'rb'</span>) <span class="im">as</span> fp:</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    test_high_grade_cells <span class="op">=</span> pickle.load(fp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8c1e7faa" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>test_cells_aligned_low <span class="op">=</span> []</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>test_cells_aligned_high <span class="op">=</span> []</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> test_low_grade_cells:</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    cell_sorted <span class="op">=</span> sort_coordinates(cell)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    cell_interpolated <span class="op">=</span> preprocess(interpolate(cell_sorted, k_sampling_points))</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    cell_aligned <span class="op">=</span> exhaustive_align(cell_interpolated, BASE_CURVE)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    test_cells_aligned_low.append(cell_aligned)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> test_high_grade_cells:</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    cell_sorted <span class="op">=</span> sort_coordinates(cell)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    cell_interpolated <span class="op">=</span> preprocess(interpolate(cell_sorted, k_sampling_points))</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    cell_aligned <span class="op">=</span> exhaustive_align(cell_interpolated, BASE_CURVE)</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    test_cells_aligned_high.append(cell_aligned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="3a319ab2" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>dists_to_mean_test_low <span class="op">=</span> []</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>count_low <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> test_cells_aligned_low:</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    count <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    dist_to_low <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(CURVES_SPACE_SRV.projection(cell), mean_estimate_aligned_low)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    dist_to_high <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(CURVES_SPACE_SRV.projection(cell), mean_estimate_aligned_high)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    dists_to_mean_test_low.append(np.array([dist_to_low, dist_to_high]))</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dist_to_low <span class="op">&lt;=</span> dist_to_high:</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>        count_low <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>dists_to_mean_test_high <span class="op">=</span> []</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>count_high <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cell <span class="kw">in</span> test_cells_aligned_high:</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>    dist_to_low <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(CURVES_SPACE_SRV.projection(cell), mean_estimate_aligned_low)</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>    dist_to_high <span class="op">=</span> CURVES_SPACE_SRV.metric.dist(CURVES_SPACE_SRV.projection(cell), mean_estimate_aligned_high)</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    dists_to_mean_test_high.append(np.array([dist_to_low, dist_to_high]))</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dist_to_low <span class="op">&gt;=</span> dist_to_high:</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>        count_high <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fraction of low grade cells correctly identified : </span><span class="sc">{</span>count_low<span class="op">/</span><span class="bu">len</span>(test_cells_aligned_low)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fraction of high grade cells correctly identified : </span><span class="sc">{</span>count_high<span class="op">/</span><span class="bu">len</span>(test_cells_aligned_high)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Fraction of low grade cells correctly identified : 0.6363636363636364
+Fraction of high grade cells correctly identified : 0.8333333333333334</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion-and-future-work" class="level1">
+<h1>Conclusion and Future Work</h1>
+<p>Using applied methods in Riemannian geometry, we were able to identify cells from low vs.&nbsp;high grade contracture with different mean shapes. The findings corresponded to biological knowledge without the need to rely on pre-defined features, that is, more round-shaped cells are found in low-grade contractures, and more spindle-shaped cells are found in high grade contractures. The classification performed reasonably well on test data.</p>
+<p>There are many limitations to this small, pilot project. If this work is to be carried on in the future, there are two major goals that I will seek to address: 1. In addition to the elastic metric, other metrics may be tested to see if there is an improvement in the accuracy of classification. Furthermore, methods outside of Riemannian geometry can be implemented and compared with our results. This was attempted but I did not have enough time to run the analysis successfully. 2. Images in 2D results in loss of data. There are 3D cell shape reconstruction techniques, such as SHAPR, that would be interesting to apply on our dataset.</p>
+</section>
+<section id="appendix" class="level1">
+<h1>Appendix</h1>
+<section id="visualizing-deformations-between-cells" class="level2">
+<h2 class="anchored" data-anchor-id="visualizing-deformations-between-cells">Visualizing deformations between cells</h2>
+<div id="4a2f3903" class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geomstats.geometry.discrete_curves <span class="im">import</span> DiscreteCurvesStartingAtOrigin</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>cell_start <span class="op">=</span> aligned_cells[<span class="dv">0</span>]</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>cell_end <span class="op">=</span> aligned_cells[<span class="dv">1</span>]</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>CURVES_SPACE_SRV <span class="op">=</span> DiscreteCurvesStartingAtOrigin(ambient_dim<span class="op">=</span><span class="dv">2</span>, k_sampling_points<span class="op">=</span>k_sampling_points)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>cell_start_at_origin <span class="op">=</span> CURVES_SPACE_SRV.projection(cell_start)</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>cell_end_at_origin <span class="op">=</span> CURVES_SPACE_SRV.projection(cell_end)</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>geodesic_func <span class="op">=</span> CURVES_SPACE_SRV.metric.geodesic(</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>    initial_point<span class="op">=</span>cell_start_at_origin, end_point<span class="op">=</span>cell_end_at_origin</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>n_times <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>times <span class="op">=</span> gs.linspace(<span class="fl">0.0</span>, <span class="fl">1.0</span>, n_times)</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>geod_points <span class="op">=</span> geodesic_func(times)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="73db980b" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">2</span>))</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Geodesic between two cells"</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, curve <span class="kw">in</span> <span class="bu">enumerate</span>(geod_points):</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    fig.add_subplot(<span class="dv">2</span>, n_times <span class="op">//</span> <span class="dv">2</span>, i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    plt.plot(curve[:, <span class="dv">0</span>], curve[:, <span class="dv">1</span>])</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"equal"</span>)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-36-output-1.png" width="763" height="187" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="36b95f88" class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">12</span>))</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_times <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    plt.plot(geod_points[i, :, <span class="dv">0</span>], geod_points[i, :, <span class="dv">1</span>], <span class="st">"o-"</span>, color<span class="op">=</span><span class="st">"lightgrey"</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>plt.plot(geod_points[<span class="dv">0</span>, :, <span class="dv">0</span>], geod_points[<span class="dv">0</span>, :, <span class="dv">1</span>], <span class="st">"o-b"</span>, label<span class="op">=</span><span class="st">"Start Cell"</span>)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>plt.plot(geod_points[<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">0</span>], geod_points[<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">1</span>], <span class="st">"o-r"</span>, label<span class="op">=</span><span class="st">"End Cell"</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Geodesic for the Square Root Velocity metric"</span>)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Shape_Analysis_of_Contractile_Cells_files/figure-html/cell-37-output-1.png" width="941" height="949" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="1214052c" class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip freeze <span class="op">&gt;</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 
+</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">

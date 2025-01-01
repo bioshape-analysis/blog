@@ -10,11 +10,11 @@ categories: [cryo-EM] # [biology, bioinformatics, theory, etc.]
 ## Background
 Cryogenic electron microscopy (cryo-EM), a cryomicroscopy technique applied on samples embedding in ice, along with recent development of powerful hardwares and softwares, have achieved huge success in the determination of biomolecular structures at near-atomic level. Cryo-EM takes screenshots of thousands or millions of particles in different poses frozen in the sample, and thus allows the reconstruction of the 3D structure from those 2D projections. 
 
-Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprise of many sub-units, and their compositions may vary within the sample and are of research interest. Spike protein is an example of conformational heterogeneity, where the receptor-binding domain (RBD) keeps switching between close and open states in order to bind to receptors and meanwhile resist the binding of antibody. When studying the antigen-antibody complex, both compositional and conformational heterogeneity need to be considered.
+Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprise of many sub-units, and their compositions may vary within the sample and are of research interest. Spike protein is an example of conformational heterogeneity, where the receptor-binding domain (RBD) keeps switching between close and open states in order to bind to receptors and meanwhile resist the binding of antibody [@PPR:PPR217218]. When studying the antigen-antibody complex, both compositional and conformational heterogeneity need to be considered.
 
 ![A simple illustration of the conformational heterogeneity of spike protein, where it displays two kinds of conformations: closed RBD and open RBD of one chain (colored in blue) [@Wang2020]. Spike protein is a trimer so in reality all the three chains will move possibly in different ways and the motion of spike protein is much more complex than what's shown here.](img/spike.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
 
-The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM data started from relatively simple 3D classfication, which outputs discrete classes of different conformations. This is usually done by expectation-maximization (EM) algorithms, where 2D particle stacks were iteratively assigned to classes and used to reconstruct the volume of that class. However, such an approach has two problems: first, the classification decreases the number of images used to reconstruct the volume, and thus lower the resolution we are able to achieve; second, the motion of biomolecule is continuous in reality and discrete classification may not describe the heterogeneity very well, and we may miss some transient states.
+The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM data started from relatively simple 3D classfication, which outputs discrete classes of different conformations. This is usually done by expectation-maximization (EM) algorithms, where 2D particle stacks were iteratively assigned to classes and used to reconstruct the volume of that class [@scheres_2012]. However, such an approach has two problems: first, the classification decreases the number of images used to reconstruct the volume, and thus lower the resolution we are able to achieve; second, the motion of biomolecule is continuous in reality and discrete classification may not describe the heterogeneity very well, and we may miss some transient states.
 
 Therefore, nowadays people start to focus on methods modeling continuous heterogeneity without any classification step to avoid the above issues. Most methods adopt similar structures, where 2D particle stacks are mapped to latent embeddings, clusters/trajectories are estimated in latent space, and finally volumes are mapped and reconstructed from latent embeddings. Early methods use linear mapping (e.g. 3DVA), but with the applications of deep learning techniques in the field of cryo-EM data processing, people find methods adapted from variational autoencoder (VAE) achieving better performance (e.g. cryoDRGN, 3DFlex). Nevertheless, the latent space obtained from VAE and other deep learning methods is hard to interpret, and do not conserve distances and densities, imposing difficulties in reconstructing motions/trajectories, which are what most structure biologists desire at the end.
 
@@ -65,7 +65,7 @@ $$d_{s,v}(h) = \lVert S_sV^{-1/2}(M_v(\hat{x}_{CV}-\hat{x}(h)))\rVert_2^2$$
 
 where $S_s$ is a matrix that extracts shell $s$; $M_v$ is a matrix extracting subvolume $v$; and $V$ is a diagonal matrix containing the variance of the template. For each $s$ and $v$, the minimizer over $h$ of the cross-validarion score is selected, and the final volume is obtained by first recombining frequency shells for each subvolume and then recombining all the subvolumes.
 
-![Volumes are reconstructed from the embedding by adaptive kernel regression.](img/3D_reconstruct.png){ width=100% style="display: block; margin-left: auto; margin-right: auto;" }
+![Volumes are reconstructed from the embedding by adaptive kernel regression [@Gilles2023].](img/3D_reconstruct.png){ width=100% style="display: block; margin-left: auto; margin-right: auto;" }
 
 ### Estimation of state density
 Since motion is what structure biologists finally want, we have to figure out a method to sample from latent space to form a trajectory representing the motion of the molecule. According to Boltzmann statistics, the density of a particular state is a measure of the free energy of that state, which means a path which maximizes conformational density is equivalent to the path minimizing the free energy. Taking the advantage of linear mapping, we can easily relate embedding density to conformational density. The embedding density estimator is given by:
@@ -101,15 +101,15 @@ The original paper of RECOVAR presents results on precatalytic spliceosome datas
 
 Results on EMPIAR-10180 focuses on comformational heterogeneity. Three local maxima in conformational density were identified, a path between two of which was identified to show arm regions moving down followed by head regions moving up.
 
-![Latent space and volume view of precatalytic spliceosome conformational heterogeneity. Latent view of the path is projected on the plane formed by different combinations of two principal components.](img/EMPIAR-10180.png){ width=75% style="display: block; margin-left: auto; margin-right: auto;" }
+![Latent space and volume view of precatalytic spliceosome conformational heterogeneity. Latent view of the path is projected on the plane formed by different combinations of two principal components [@Gilles2023].](img/EMPIAR-10180.png){ width=75% style="display: block; margin-left: auto; margin-right: auto;" }
 
 EMPIAR-10345 contains both conformational and compositional heterogeneity. Two local maxima were found, with the smaller one corresponds to a different composition never reported by provious studies. Also a motion of the arm was found along the path.
 
-![RECOVAR finds both comformational and compositional heterogeneity within integrin](img/EMPIAR-10345.png){ width=45% style="display: block; margin-left: auto; margin-right: auto;" }
+![RECOVAR finds both comformational and compositional heterogeneity within integrin [@Gilles2023].](img/EMPIAR-10345.png){ width=45% style="display: block; margin-left: auto; margin-right: auto;" }
 
 EMPIAR-10076 is used to show the ability of RECOVAR to find stable states. RECOVAR finds two stable states of the 70S ribosomes.
 
-![The volume of two stable states are reconstructed, correspinding to two peaks in densities](img/EMPIAR-10076.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+![The volume of two stable states are reconstructed, correspinding to two peaks in densities [@Gilles2023].](img/EMPIAR-10076.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
 
 ### Results of SARS-CoV2 datasets
 

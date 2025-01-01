@@ -1,0 +1,5 @@
+Farm Number,country_name,type,calculated_perimeter_m,calulated_area_ha,number of vertices,distance_to_frechet_mean,z_score
+Farm 310,United States,field,744797.7117,2600780.265,3,591590.0609,48.78489608
+Farm 71,Canada,field,864206.5248,4251124.388,5,709800.2531,58.58065508
+Farm 45,Canada,field,341370.9916,84531.14744,5,177371.8498,14.45975292
+Farm 2792,India,field,200958.9993,217002.8763,4,166440.3554,13.55388953

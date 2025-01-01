@@ -1,0 +1,38 @@
+---
+title: "Extracting cell geometry from Atomic Force Microscopy"
+subtitle: "Part 2: Temporal amd morphological analysis"
+jupyter: python3
+
+author:
+  - name: "Clément Soubrier" 
+    email: "c.soubrier@math.ubc.ca"
+    affiliations:
+      - name: KDD Group
+
+  - name: "Khanh Dao Duc" 
+    email: "kdd@math.ubc.ca"
+    affiliations:
+      - name: Department of Mathematics, UBC
+        url: "https://www.math.ubc.ca/"
+      - name: Department of Computer Science, UBC
+        url: "https://www.cs.ubc.ca/"
+
+date: "September 17 2024"
+categories: [biology, bioinformatics]    
+
+callout-icon: false
+format:
+  html:
+    code-fold: true
+bibliography: bibliography.bib
+
+execute:
+  echo: true
+  freeze: auto
+  warning: false
+
+---
+
+# Intro
+
+# References

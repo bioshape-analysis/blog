@@ -1,0 +1,15 @@
+{
+  "hash": "6df77e3830dc0b59953455304dce3e02",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Title of your blog post\"\ndate: \"Date\" # Format example: August 9 2024\nauthor:\n  - name: \"Your Name\" \ncategories: [] # [biology, bioinformatics, theory, etc.]\n---\n\n\n\n#\n\n\n::: {.cell}\n\n```{.r .cell-code}\nvariable <- 2\nprint(variable)\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n[1] 2\n```\n\n\n:::\n:::\n\n\n\n##\n\n###",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

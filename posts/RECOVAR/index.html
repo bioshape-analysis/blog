@@ -228,14 +228,14 @@ window.Quarto = {
 <section id="background" class="level2">
 <h2 class="anchored" data-anchor-id="background">Background</h2>
 <p>Cryogenic electron microscopy (cryo-EM), a cryomicroscopy technique applied on samples embedding in ice, along with recent development of powerful hardwares and softwares, have achieved huge success in the determination of biomolecular structures at near-atomic level. Cryo-EM takes screenshots of thousands or millions of particles in different poses frozen in the sample, and thus allows the reconstruction of the 3D structure from those 2D projections.</p>
-<p>Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprise of many sub-units, and their compositions may vary within the sample and are of research interest. Spike protein is an example of conformational heterogeneity, where the receptor-binding domain (RBD) keeps switching between close and open states in order to bind to receptors and meanwhile resist the binding of antibody. When studying the antigen-antibody complex, both compositional and conformational heterogeneity need to be considered.</p>
+<p>Early algorithms and softwares of processing cryo-EM data focus on resolving homogeneous structure of biomolecules. However, many biomolecules are very dynamic in conformations, compositions, or both. For example, ribosomes comprise of many sub-units, and their compositions may vary within the sample and are of research interest. Spike protein is an example of conformational heterogeneity, where the receptor-binding domain (RBD) keeps switching between close and open states in order to bind to receptors and meanwhile resist the binding of antibody <span class="citation" data-cites="PPR:PPR217218">(<a href="#ref-PPR:PPR217218" role="doc-biblioref">Taka et al. 2020</a>)</span>. When studying the antigen-antibody complex, both compositional and conformational heterogeneity need to be considered.</p>
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
 <figure class="figure">
 <p><img src="img/spike.png" class="img-fluid figure-img" style="width:65.0%"></p>
 <figcaption>A simple illustration of the conformational heterogeneity of spike protein, where it displays two kinds of conformations: closed RBD and open RBD of one chain (colored in blue) <span class="citation" data-cites="Wang2020">(<a href="#ref-Wang2020" role="doc-biblioref">Wang et al. 2020</a>)</span>. Spike protein is a trimer so in reality all the three chains will move possibly in different ways and the motion of spike protein is much more complex than what’s shown here.</figcaption>
 </figure>
 </div>
-<p>The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM data started from relatively simple 3D classfication, which outputs discrete classes of different conformations. This is usually done by expectation-maximization (EM) algorithms, where 2D particle stacks were iteratively assigned to classes and used to reconstruct the volume of that class. However, such an approach has two problems: first, the classification decreases the number of images used to reconstruct the volume, and thus lower the resolution we are able to achieve; second, the motion of biomolecule is continuous in reality and discrete classification may not describe the heterogeneity very well, and we may miss some transient states.</p>
+<p>The initial heterogeneity analysis of 3D structrues reconstructed from cryo-EM data started from relatively simple 3D classfication, which outputs discrete classes of different conformations. This is usually done by expectation-maximization (EM) algorithms, where 2D particle stacks were iteratively assigned to classes and used to reconstruct the volume of that class <span class="citation" data-cites="scheres_2012">(<a href="#ref-scheres_2012" role="doc-biblioref">Scheres 2012</a>)</span>. However, such an approach has two problems: first, the classification decreases the number of images used to reconstruct the volume, and thus lower the resolution we are able to achieve; second, the motion of biomolecule is continuous in reality and discrete classification may not describe the heterogeneity very well, and we may miss some transient states.</p>
 <p>Therefore, nowadays people start to focus on methods modeling continuous heterogeneity without any classification step to avoid the above issues. Most methods adopt similar structures, where 2D particle stacks are mapped to latent embeddings, clusters/trajectories are estimated in latent space, and finally volumes are mapped and reconstructed from latent embeddings. Early methods use linear mapping (e.g.&nbsp;3DVA), but with the applications of deep learning techniques in the field of cryo-EM data processing, people find methods adapted from variational autoencoder (VAE) achieving better performance (e.g.&nbsp;cryoDRGN, 3DFlex). Nevertheless, the latent space obtained from VAE and other deep learning methods is hard to interpret, and do not conserve distances and densities, imposing difficulties in reconstructing motions/trajectories, which are what most structure biologists desire at the end.</p>
 <p>Recent developed software RECOVAR <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>, using a linear mapping like 3DVA, was shown to achieve comparable or even better performance with deep learning methods, and meanwhile has high interpretability and allows easy recovery of motions/trajectories from latent space. For this project, I will review the pipeline of RECOVAR, discussed improvements and extensions we made to this pipeline, and present heterogeneity analysis results from the original paper and our SARS-CoV2 spike protein dataset.</p>
 </section>
@@ -271,7 +271,7 @@ window.Quarto = {
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
 <figure class="figure">
 <p><img src="img/3D_reconstruct.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption>Volumes are reconstructed from the embedding by adaptive kernel regression.</figcaption>
+<figcaption>Volumes are reconstructed from the embedding by adaptive kernel regression <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>.</figcaption>
 </figure>
 </div>
 </section>
@@ -308,21 +308,21 @@ window.Quarto = {
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
 <figure class="figure">
 <p><img src="img/EMPIAR-10180.png" class="img-fluid figure-img" style="width:75.0%"></p>
-<figcaption>Latent space and volume view of precatalytic spliceosome conformational heterogeneity. Latent view of the path is projected on the plane formed by different combinations of two principal components.</figcaption>
+<figcaption>Latent space and volume view of precatalytic spliceosome conformational heterogeneity. Latent view of the path is projected on the plane formed by different combinations of two principal components <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>.</figcaption>
 </figure>
 </div>
 <p>EMPIAR-10345 contains both conformational and compositional heterogeneity. Two local maxima were found, with the smaller one corresponds to a different composition never reported by provious studies. Also a motion of the arm was found along the path.</p>
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
 <figure class="figure">
 <p><img src="img/EMPIAR-10345.png" class="img-fluid figure-img" style="width:45.0%"></p>
-<figcaption>RECOVAR finds both comformational and compositional heterogeneity within integrin</figcaption>
+<figcaption>RECOVAR finds both comformational and compositional heterogeneity within integrin <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>.</figcaption>
 </figure>
 </div>
 <p>EMPIAR-10076 is used to show the ability of RECOVAR to find stable states. RECOVAR finds two stable states of the 70S ribosomes.</p>
 <div class="quarto-figure quarto-figure-center" style="display: block; margin-left: auto; margin-right: auto;">
 <figure class="figure">
 <p><img src="img/EMPIAR-10076.png" class="img-fluid figure-img" style="width:65.0%"></p>
-<figcaption>The volume of two stable states are reconstructed, correspinding to two peaks in densities</figcaption>
+<figcaption>The volume of two stable states are reconstructed, correspinding to two peaks in densities <span class="citation" data-cites="Gilles2023">(<a href="#ref-Gilles2023" role="doc-biblioref">Gilles and Singer 2024</a>)</span>.</figcaption>
 </figure>
 </div>
 </section>
@@ -360,6 +360,12 @@ window.Quarto = {
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-Gilles2023" class="csl-entry" role="listitem">
 Gilles, Marc Aurèle, and Amit Singer. 2024. <span>“Cryo-EM Heterogeneity Analysis Using Regularized Covariance Estimation and Kernel Regression.”</span> <a href="https://doi.org/10.1101/2023.10.28.564422">https://doi.org/10.1101/2023.10.28.564422</a>.
+</div>
+<div id="ref-scheres_2012" class="csl-entry" role="listitem">
+Scheres, Sjors H. W. 2012. <span>“RELION: Implementation of a Bayesian Approach to Cryo-EM Structure Determination.”</span> <em>Journal of Structural Biology</em> 180 (3): 519–30. https://doi.org/<a href="https://doi.org/10.1016/j.jsb.2012.09.006">https://doi.org/10.1016/j.jsb.2012.09.006</a>.
+</div>
+<div id="ref-PPR:PPR217218" class="csl-entry" role="listitem">
+Taka, Elhan, Sema Yilmaz, Mert Golcuk, Ceren Kilinc, Umut Aktas, Ahmet Yildiz, and Mert Gur. 2020. <span>“Critical Interactions Between the SARS-CoV-2 Spike Glycoprotein and the Human ACE2 Receptor.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2020.09.21.305490">https://doi.org/10.1101/2020.09.21.305490</a>.
 </div>
 <div id="ref-Wang2020" class="csl-entry" role="listitem">
 Wang, Mei-Yue, Rong Zhao, Li-Juan Gao, Xue-Fei Gao, De-Ping Wang, and Ji-Min Cao. 2020. <span>“SARS-CoV-2: Structure, Biology, and Structure-Based Therapeutics Development.”</span> <em>Frontiers in Cellular and Infection Microbiology</em> 10. <a href="https://doi.org/10.3389/fcimb.2020.587269">https://doi.org/10.3389/fcimb.2020.587269</a>.

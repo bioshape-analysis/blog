@@ -193,7 +193,7 @@ $$
 
 This can be broken down into:
 
-- $ \sup_{a \in A} \inf_{b \in B} \| a - b \| $: The maximum distance from a point in $ A $ to the closest point in $ B $.
+- $\sup_{a \in A} \inf_{b \in B} \| a - b \|$: The maximum distance from a point in $ A $ to the closest point in $ B $.
 - $ \sup_{b \in B} \inf_{a \in A} \| b - a \| $: The maximum distance from a point in $ B $ to the closest point in $ A $.
 
 The Hausdorff distance quantifies the greatest deviation between the two sets of points, considering how well one set covers the other.

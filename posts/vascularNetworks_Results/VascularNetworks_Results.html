@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Ali Fele Paranj">
-<meta name="dcterms.date" content="2024-11-05">
+<meta name="dcterms.date" content="2024-12-10">
 
-<title>Vascular Networks – bioshape-analysis</title>
+<title>Vascular Networks Results – bioshape-analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,27 +22,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -164,7 +144,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Vascular Networks</h1>
+      <h1 class="title">Vascular Networks Results</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Graph theory</div>
                 <div class="quarto-category">Vascular Networks</div>
@@ -185,7 +165,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">November 5, 2024</p>
+        <p class="date">December 10, 2024</p>
       </div>
     </div>
     
@@ -201,17 +181,7 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a>
-  <ul class="collapse">
-  <li><a href="#anderson-chaplain-model-of-angiogenesis" id="toc-anderson-chaplain-model-of-angiogenesis" class="nav-link" data-scroll-target="#anderson-chaplain-model-of-angiogenesis">Anderson-Chaplain Model of Angiogenesis</a></li>
-  <li><a href="#branching-annihilating-random-walker" id="toc-branching-annihilating-random-walker" class="nav-link" data-scroll-target="#branching-annihilating-random-walker">Branching-Annihilating Random Walker</a></li>
-  </ul></li>
-  <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing">Data Pre-Processing</a>
-  <ul class="collapse">
-  <li><a href="#time-evolution-of-networks" id="toc-time-evolution-of-networks" class="nav-link" data-scroll-target="#time-evolution-of-networks">Time Evolution Of Networks</a></li>
-  </ul></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <li><a href="#results" id="toc-results" class="nav-link active" data-scroll-target="#results">Results</a>
   <ul class="collapse">
   <li><a href="#enhanced-loop-detection-algorithm" id="toc-enhanced-loop-detection-algorithm" class="nav-link" data-scroll-target="#enhanced-loop-detection-algorithm">Enhanced Loop Detection Algorithm</a></li>
   <li><a href="#statistical-analysis-of-loops" id="toc-statistical-analysis-of-loops" class="nav-link" data-scroll-target="#statistical-analysis-of-loops">Statistical Analysis of Loops</a></li>
@@ -245,97 +215,6 @@ window.Quarto = {
 
 
 
-<section id="abstract" class="level1">
-<h1>Abstract</h1>
-<p>I have introduced some basic concepts of micro-circulation and the vascular networks and how they get created (angiogenesis) in health and disease. Then I discuss some angiogenesis models (Anderson-Chaplain as well as BARW) and use the tools of the geomstats to analyze the loopy structure in these networks. I explained the characteristics of the loopy structures in the networks in terms of the parameters of the model. Furthermore, I consider the time evolution of the graphs created by these networks and how the characterization of the loopy structures change through time in these networks.</p>
-</section>
-<section id="introduction" class="level1">
-<h1>Introduction</h1>
-<p>Vascular network in animals is a complex network of vessels to carry the nutrients to and wastes out from the tissue. Main parts of the blood circulation system is determined during the embryo development (like the location and characterization of the main veins and arteries). However, the exact positioning and hierarchy of the capillary networks is not predetermined genetically, but is an adaptive process. A tissue under hypoxia (experiencing low oxygen) will initiate biochemical signals to recruit new vessels. One of the main signaling molecules is the tumor angiogenic factor (TAF) and as the name suggests it is highly expressed by tumor under oxygen stress (hypoxia). The TAF molecules will diffuse in the interstitial space. Upon interaction with pre-existing vessels, they will digest through the basal membrane of the pre-existing vessels and will activate the endothelial cells (that are lining the inner part lumen of all vessels in the body). The endothelial cells activated by TAF will turn into tip cells which will move up in the gradient of TAF, and they will make branches of vessels which will grow as the tip cells are moving. See figure below for details.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/Angiogenesis.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<figcaption>Steps of angiogenesis process. The endothelial cells are “activated” by the TAF molecules and turn into tip cells that move towards the source of TAF (up the gradient) and produce new blood vessel segments along their way. This is called tip-induced angiogenesis. This figure is taken from <span class="citation" data-cites="Atale2020">(<a href="#ref-Atale2020" role="doc-biblioref">Atale and Rani 2020</a>)</span></figcaption>
-</figure>
-</div>
-<p>There are also other factors important in the process of tip cell movement among which is the concentration of fibronectin in the environment. Fibronectin is a protein that acts like a glue and attaches the cells to intracellular matrix, which mediates the cell movement. In the section related to the angiogenesis models we will discuss how this protein is considered in the models.</p>
-<section id="anderson-chaplain-model-of-angiogenesis" class="level2">
-<h2 class="anchored" data-anchor-id="anderson-chaplain-model-of-angiogenesis">Anderson-Chaplain Model of Angiogenesis</h2>
-<p>Anderson-Chaplain model of angiogenesis describes the angiogenesis process considering the factors like TAF and fibronectin. This model contains three variables <span class="math inline">\(\newcommand{\R}{\mathbb{R}}\)</span> <span class="math inline">\(\newcommand{\abs}[1]{|#1|}\)</span></p>
-<ul>
-<li><span class="math inline">\(n = n(X,t): \Omega \times \R \to \R\)</span>: the endothelial-cell density (per unit area).</li>
-<li><span class="math inline">\(c = c(X,t): \Omega \times \R \to \R\)</span>: the tumor angiogenic factor (TAF) concentration (nmol per unit area).</li>
-<li><span class="math inline">\(f = f(X,t): \Omega \times \R \to \R\)</span>: the fibronectin concentration (nmol per unit area).</li>
-</ul>
-<p>and the time evolution is governed by the following system of PDEs</p>
-<p><span class="math display">\[\begin{align*}
-        &amp;\frac{\partial n}{\partial t} =  D_n\nabla^2 n  - \nabla\cdot(\chi n\nabla c) - \nabla\cdot(\rho n \nabla f), \\
-        &amp;\frac{\partial c}{\partial t} = -\lambda n c, \\
-        &amp;\frac{\partial f}{\partial t} = \omega n - \mu n f,
-    \end{align*}\]</span></p>
-<p>where <span class="math inline">\(D_n\)</span> is a diffusion constant taking the random movement of tip cells into account, <span class="math inline">\(\chi, \rho\)</span> reflects the strength of the chemotaxis of tip cells due to the gradient of TAF, and fibronectin respectively. Furthermore, <span class="math inline">\(\lambda, \mu\)</span> is the rate at which tip cells consume the TAF and fibronectin respectively, and <span class="math inline">\(\omega\)</span> denotes the production of fibronectin by the tip cells. Note that we assume at the start of the angiogenesis process, we have a steady state distribution of fibronectin and TAF and is not diffusing. This assumption is not entirely true and can be enhanced.</p>
-<p>Here in this report, we will be using the discrete and stochastic variation of this model. For more detail see <span class="citation" data-cites="Anderson1998">(<a href="#ref-Anderson1998" role="doc-biblioref">Anderson and Chaplain 1998</a>)</span>. See figure below for some example outputs of the model.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/Anderson.png" class="img-fluid figure-img"></p>
-<figcaption>Some example output of the Anderson-Chaplain model of angiogenesis using the implementation of the model shared by <span class="citation" data-cites="Nardini2021">(<a href="#ref-Nardini2021" role="doc-biblioref">Nardini et al. 2021</a>)</span>. We have assumed the source of TAF molecules is located at the right edge of the domain, while the pre-existing parent vessels is located at the left edge of the domain. The strength of the chemotaxis and haptotactic (due to fibronectin) signaling is set to be <span class="math inline">\(\chi = 0.4\)</span>, and <span class="math inline">\(\rho = 0.4\)</span>.</figcaption>
-</figure>
-</div>
-</section>
-<section id="branching-annihilating-random-walker" class="level2">
-<h2 class="anchored" data-anchor-id="branching-annihilating-random-walker">Branching-Annihilating Random Walker</h2>
-<p>The Anderson-Chaplain model of angiogenesis is not the only formulation of this phenomena. A popular alternative formulation is using the notion of branching annihilating random walkers for the to explain the branching morphogenesis of vascular networks. A very detailed discussion on this formulation can be found in <span class="citation" data-cites="Hannezo2017">Uçar et al. (<a href="#ref-Ucar2021" role="doc-biblioref">2021</a>)</span>. This formulation has been also successful to models a vast variety of tip-driven morphogenesis in mammary-glands, prostate, kidney <span class="citation" data-cites="Hannezo2017">(<a href="#ref-Hannezo2017" role="doc-biblioref">Hannezo et al. 2017</a>)</span>, lymphatic system <span class="citation" data-cites="Ucar2023">(<a href="#ref-Ucar2023" role="doc-biblioref">Uçar et al. 2023</a>)</span>, neural branching <span class="citation" data-cites="Ucar2021">(<a href="#ref-Ucar2021" role="doc-biblioref">Uçar et al. 2021</a>)</span>, and etc.</p>
-<p>The core idea behind this formulation is to assume that the tip cells undergo a branching-annihilating random walk, i.e.&nbsp;they move randomly in the space, turn into pairs randomly (branching), and as they move they produce new cells (stalk) behind their trails, and finally annihilate if they encounter any of the stalk cells. See figure below:</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/BARW.png" class="img-fluid figure-img"></p>
-<figcaption>The network generated by branching-annihilating process, where the tip cells (orange circles) are doing random walk (not necessarily unbiased random walk) and each generate two random walkers at random times (branching). The tip cells make the stalk cells (the blue lines) along their way and the tip cells annihilate when encounter any of the stalk cells.</figcaption>
-</figure>
-</div>
-</section>
-</section>
-<section id="data-pre-processing" class="level1">
-<h1>Data Pre-Processing</h1>
-<p>The data generated by the Anderson-Chaplain model or BARW model are typically matrices (i.e.&nbsp;images) (however, there are certain ways to construct a graph representing the final structure during the simulation). To be able to do any form of computation with the simulated data (like finding the loops, etc) it is convenient to turn the images into a graph.</p>
-<p>For the outputs of the Anderson-Chaplain model , since the vessels are more crowded at some regions, we first did a dilation followed by a erosion (using OpenCV) to enhance the images for further processing. We then applied a connectivity-8 kernel to the enhanced images to find the nodes, and finally used the processes information to turn the vascular network in the image into a graph in python (using NetworkX library). See figure below for more details. We also applied the same processing pipeline on the data generated by the BARW model which is shown in the following figure</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/BARWProc.png" class="img-fluid figure-img"></p>
-<figcaption>The loop detection processing pipeline performed on the data set generated by the BARW formulation of the branching morphogenesis. Right: the initial raw synthetic data, Left: detected loop through the loop detection pipeline.</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/AndersonProc.png" class="img-fluid figure-img"></p>
-<figcaption>fig-cap: The pre-processing pipeline the synthetic data by Anderson-Chaplain model. Top left: The synthetic data generated by the model. Top right: A series of dilation and erosion applied on the image to enhance the images for network extraction. Bottom left: Applying a connectivity-8 kernel on the image to get the nodes of the graph and converting the processed information to NetworkX graph data structure. Then we apply the cycle finding algorithm in the NetworkX to detect the cycles. Bottom right: The overlay of the detected cycles on the original image.</figcaption>
-</figure>
-</div>
-<p>The new data structure that we store the synthetic data (i.e.&nbsp;as graphs in NetworkX) gives us a tremendous flexibility in working and analyzing the shape of each individual loops. See the following figure for further details on this. This data structure will also come in handy when we study the time evolution of the graphs.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/loops.png" class="img-fluid figure-img"></p>
-<figcaption>Converting the synthetic data from binary images to graph in NetworkX gives us a great flexibility in working and analyzing (or even evolving) individual loops. For instance, in the figures above, Left and Right sub-figures represent the individual scaled version of the loops of Anderson-Chaplain and BARW models respectively. Note that the shapes that looks more jagged correspond to the larger loops, whereas the loops with dull boundary correspond to the smaller loops.</figcaption>
-</figure>
-</div>
-<p><strong>Study Plan</strong>: In this section we will use the notions of Kendall shape space to study the structure of the loops that appear under different parameters of the model.</p>
-<section id="time-evolution-of-networks" class="level2">
-<h2 class="anchored" data-anchor-id="time-evolution-of-networks">Time Evolution Of Networks</h2>
-<p>Vascular networks are not static structure, but rather the evolve in time in response to the changing metabolic demand of the underlying tissue, as well as the metabolic cost of the network itself, and the overall energy required to pump the fluid through the network (See <span class="citation" data-cites="Pries2010">Pries and Secomb (<a href="#ref-Pries2014" role="doc-biblioref">2014</a>)</span> for more discussion). To put this in different words, the role of vascular networks is to deliver nutrients to the tissue and remove the wastes. To do this, it needs to have a space filling configuration with lots of branches. However, due to the Poiseuille law for the flow of fluids in a tube, the power needed to pump the fluid through the tube scales with <span class="math inline">\(r^{-4}\)</span> where <span class="math inline">\(r\)</span> is the radius of the tube. I.e. smaller vessel segments needs a huge power to pump the blood through them. Thus have a massively branched structure is not an optimal solution. On the other hand, the vascular network consists of cells which requires maintenance as well. Thus the optimized vascular network should have a low volume as well. Because of these dynamics in action, in the angiogenesis process first a mesh of new blood vessels form which later evolve to a more ordered and hierarchical structure in a self-organization process.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/remodeling2.png" class="img-fluid figure-img"></p>
-<figcaption>Remodeling of vascular network of chick chorioallantoic membrane. Initially (sub-figure 1) a mesh of vascular networks form. Then (sub-figures 2,3,4), through the remodeling dynamics, a more ordered and hierarchical structure emerges. Images are taken from <span class="citation" data-cites="Richard2018">(<a href="#ref-Richard2018" role="doc-biblioref">Richard et al. 2018</a>)</span>.</figcaption>
-</figure>
-</div>
-<p>To determine the time evolution of the vascular network we first need to formulate the problem in an appropriate way. First, we represent a given vascular network with a multi-weighted graph <span class="math inline">\(G=(\mathcal{V},\mathcal{E})\)</span> where <span class="math inline">\(V\)</span> is the set of vertices and <span class="math inline">\(E\)</span> is the edge set. We define the pressure <span class="math inline">\(\mathbf{P}\)</span> on the nodes, the flow $ $ on the edges, and let <span class="math inline">\(C_{i,j}, L_{i,j}\)</span> denote the conductivity of an edge, and <span class="math inline">\(L_{i,j}\)</span> denote the length of the same edge. Given the source and sink terms on the nodes $ $, the flow in the edges can be determined by <span class="math display">\[\mathcal{L} \mathbf{P} = \mathbf{q},\]</span> where <span class="math inline">\(\mathcal{L}\)</span> is the Laplacian matrix of the graph. For more details on this see . Once we know the pressures on the nodes, we can easily calculate the flow through the edges by <span class="math display">\[\bf{Q} = \bf{C} L^{-1} \bf{\Delta} \bf{P}, \tag{2}\]</span> where <span class="math inline">\(C\)</span> is a diagonal matrix of the conductance of the edges, <span class="math inline">\(L\)</span> is the diagonal matrix of the length of each edge, $ $ is the transpose of the incidence matrix, and $ P $ is the pressure on the nodes. <span class="math inline">\(Q\)</span> is the flow of the edges. Once we know the flow in the edges, we can design evolution law to describe the time evolution of the weights of the edges (which by Poiseuille’s is a function of the radius of the vessel segment). The evolution law can be derived by defining an energy functional and moving down the gradient of the energy functional to minimize it, or we can take an ad-hoc method and write a mechanistic ODE for time evolution of the conductances. For the energy functional one can write <span class="math display">\[ E(\mathbf{C}) = \frac{1}{2} \sum_{e\in \mathcal{E}}(\frac{Q_e^2}{C_e} + \nu C_e^\gamma), \]</span> where $ $ is the edge set of the graph, $ Q_e, C_e $ is the flow and conductance of the edge $ e $, and $ ,$ are parameters. The first term in the sum is of the form ``power=current$ $potential’’ and reflects the power required to pump the flow, and the second term can be shown that reflects the volume of the total network. We can set <span class="math display">\[ \frac{d \mathbf{C}}{dt} = -\nabla E, \]</span> which determines the time evolution of the weights in a direction that reduces the total energy. The steady-state solution of this ODE system is precisely the Euler-Lagrange formulation of the least action principle. Alternatively, one can come up with carefully designed ODEs for the time evolution of the conductances that represents certain biological facts. In particular <span class="math display">\[ \frac{d C_e}{dt} = \alpha |Q_e|^{2\sigma} - b C_e + g \]</span> proposed by , and <span class="math display">\[ \frac{d}{dt} \sqrt{C_e} = F(Q_e) - c\sqrt{C_e}, \]</span> proposed by has been popular choices. See for more details. It is important to note that in the simulations shown here, the initial network is a toy network. This can be improved by using any of the vascular network generated by any of the angiogenesis models discussed before.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/evolution.png" class="img-fluid figure-img"></p>
-<figcaption>Time evolution of optimal transport network. A triangulation of a 2D domain is considered to be the graph over which we optimize the flow. The sink term is represented by green dot, while the sources are represented by yellow dots. Different sub-figures show the flow network at different time steps towards converging to the optimal configuration.</figcaption>
-</figure>
-</div>
-</section>
-</section>
 <section id="results" class="level1">
 <h1>Results</h1>
 <p>We have performed different goemetrical analysis and clustering methods on the loops tructure of the generated graphs by Branching-Annihilating-Random-Walker model. We need to highlight that assigning meaningful biological explanations was not the focus of this study.</p>
@@ -521,42 +400,13 @@ For a graph, the Laplacian matrix contains the information on the in/out flow of
 <p>Similar to the Poisson equation on the graph which is equivalent Kirchhoff’s law, we can solve other types of heat and wave equations on the graph as well. The Laplacian matrix play a key role. <span class="math display">\[ \frac{\partial p}{\partial t} = - \mathcal{L} p + q,  \]</span> for the heat equation, and <span class="math display">\[ \frac{\partial^2 p}{\partial t^2} = -\mathcal{L}p + q, \]</span> for the wave equation.</p>
 </section>
 <section id="references" class="level2">
-
-
+<h2 class="anchored" data-anchor-id="references">References</h2>
 
 
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-Anderson1998" class="csl-entry" role="listitem">
-Anderson, A. R., and M. A. Chaplain. 1998. <span>“Continuous and Discrete Mathematical Models of Tumor-Induced Angiogenesis.”</span> <em>Bulletin of Mathematical Biology</em> 60 (5): 857–99. <a href="https://doi.org/10.1006/bulm.1998.0042">https://doi.org/10.1006/bulm.1998.0042</a>.
-</div>
-<div id="ref-Atale2020" class="csl-entry" role="listitem">
-Atale, Neha, and Vibha Rani. 2020. <span>“Angiogenesis: <span>A</span> <span>Therapeutic</span> <span>Target</span> for <span>Cancer</span>.”</span> In, edited by Hardeep Singh Tuli, 165–83. Singapore: Springer. <a href="https://doi.org/10.1007/978-981-15-7586-0_9">https://doi.org/10.1007/978-981-15-7586-0_9</a>.
-</div>
-<div id="ref-Hannezo2017" class="csl-entry" role="listitem">
-Hannezo, Edouard, Colinda L. G. J. Scheele, Mohammad Moad, Nicholas Drogo, Rakesh Heer, Rosemary V. Sampogna, Jacco van Rheenen, and Benjamin D. Simons. 2017. <span>“A <span>Unifying</span> <span>Theory</span> of <span>Branching</span> <span>Morphogenesis</span>.”</span> <em>Cell</em> 171 (1): 242–255.e27. <a href="https://doi.org/10.1016/j.cell.2017.08.026">https://doi.org/10.1016/j.cell.2017.08.026</a>.
-</div>
-<div id="ref-Nardini2021" class="csl-entry" role="listitem">
-Nardini, John T., Bernadette J. Stolz, Kevin B. Flores, Heather A. Harrington, and Helen M. Byrne. 2021. <span>“Topological Data Analysis Distinguishes Parameter Regimes in the <span>Anderson</span>-<span>Chaplain</span> Model of Angiogenesis.”</span> <em>PLoS Computational Biology</em> 17 (6): e1009094. <a href="https://doi.org/10.1371/journal.pcbi.1009094">https://doi.org/10.1371/journal.pcbi.1009094</a>.
-</div>
-<div id="ref-Pries2010" class="csl-entry" role="listitem">
-Pries, Axel R., Michael Höpfner, Ferdinand le Noble, Mark W. Dewhirst, and Timothy W. Secomb. 2010. <span>“The Shunt Problem: Control of Functional Shunting in Normal and Tumour Vasculature.”</span> <em>Nature Reviews Cancer</em> 10 (8): 587–93. <a href="https://doi.org/10.1038/nrc2895">https://doi.org/10.1038/nrc2895</a>.
-</div>
-<div id="ref-Pries2014" class="csl-entry" role="listitem">
-Pries, Axel R., and Timothy W. Secomb. 2014. <span>“Making <span>Microvascular</span> <span>Networks</span> <span>Work</span>: <span>Angiogenesis</span>, <span>Remodeling</span>, and <span>Pruning</span>.”</span> <em>Physiology</em> 29 (6): 446–55. <a href="https://doi.org/10.1152/physiol.00012.2014">https://doi.org/10.1152/physiol.00012.2014</a>.
-</div>
-<div id="ref-Richard2018" class="csl-entry" role="listitem">
-Richard, Sophie, Amanda Brun, Antonio Tedesco, Benjamin Gallois, Naoual Taghi, Philippe Dantan, Johanne Seguin, and Vincent Fleury. 2018. <span>“Direct Imaging of Capillaries Reveals the Mechanism of Arteriovenous Interlacing in the Chick Chorioallantoic Membrane.”</span> <em>Communications Biology</em> 1 (1): 1–11. <a href="https://doi.org/10.1038/s42003-018-0229-x">https://doi.org/10.1038/s42003-018-0229-x</a>.
-</div>
-<div id="ref-Ucar2023" class="csl-entry" role="listitem">
-Uçar, Mehmet Can, Edouard Hannezo, Emmi Tiilikainen, Inam Liaqat, Emma Jakobsson, Harri Nurmi, and Kari Vaahtomeri. 2023. <span>“Self-Organized and Directed Branching Results in Optimal Coverage in Developing Dermal Lymphatic Networks.”</span> <em>Nature Communications</em> 14 (September): 5878. <a href="https://doi.org/10.1038/s41467-023-41456-7">https://doi.org/10.1038/s41467-023-41456-7</a>.
-</div>
-<div id="ref-Ucar2021" class="csl-entry" role="listitem">
-Uçar, Mehmet Can, Dmitrii Kamenev, Kazunori Sunadome, Dominik Fachet, Francois Lallemend, Igor Adameyko, Saida Hadjab, and Edouard Hannezo. 2021. <span>“Theory of Branching Morphogenesis by Local Interactions and Global Guidance.”</span> <em>Nature Communications</em> 12 (1): 6830. <a href="https://doi.org/10.1038/s41467-021-27135-5">https://doi.org/10.1038/s41467-021-27135-5</a>.
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

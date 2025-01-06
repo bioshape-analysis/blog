@@ -1,10 +1,11 @@
 ---
-title: Vascular Networks Results
+title: Quantifying the Loop Structures in Human Vascular Networks
 author: Ali Fele Paranj
 date: December 10 2024
 categories:
   - Graph theory
   - Vascular Networks
+  - Network Analysis
 bibliography: references.bib
 jupyter: python3
 ---
@@ -35,21 +36,21 @@ As mentioned above, detected cycles are the basis cycles. The space of all cycle
 
 ![](images/multiScaleCycles.png)
 
-We can also extract and scale all of the loops for further analysis. The following figure shows all the loops in the network
+We can also extract and scale all of the loops for further analysis. The following figure shows all the loops in the network. We need to highlight that fact theat while some of the loops might "look" similar looking but they are not the same loops! The reason behind the similarity between these loops comes from the algorithms that are used to find these loops. Algorithm is as follows: First we find a spanning tree of the network. Then the basis loops (shown below) are derived by adding one edge at a time to this tree, where the edges are selected from the collection of edges in the complementary graph of the spanning tree. So different spanning trees will result in different loop structures of the network.  
 
 ![](images/grid_basis.png)
 
-The following figures shows some of the loop strucgures that we can get by combining the loops above.
+The following figures shows some of the loop structures that we can get by combining the loops above. Note that some of the loops appear as polygons sharing an edges. These structures are shown below but are considered as the outliers of the dataset and are not considered in any of the subsequent analysis.
 
 ![](images/grid_Generated.png)
 
 ## Statistical Analysis of Loops
 
-The mechanism that generated the vascular networks is an stochastic process (Branching process + Simple Radnom Walk process + local interactions (annihilation)). So we need to use statistical notions to make some observations. In the figure below, the histogram of the cycle length is plotted. The interesting observation is the fact that the number of cycles is exponentially distributed (with respect to the Cycle length). The slope of this line (on log-log plot) can reveal some very important facts about the universality class that our model belongs to. Not only this is very interesting and important from theoretical point of view, but also it can have very useful practical applications. For instance, in comparing the simulated network with real vascualr networks, this slope can be one of the components of comparison.
+The mechanism that generated the vascular networks is an stochastic process (Branching process + Simple Radnom Walk process + local interactions (annihilation)). So we need to use statistical notions to make some observations. In the figure below, the histogram of the cycle length is plotted. The interesting observation is the fact that the number of cycles is exponentially distributed (with respect to the Cycle length). The slope of this line (on log-log plot) can reveal some very important facts about the universality class that our model belongs to. Not only this is very interesting and important from theoretical point of view, but also it can have very useful practical applications. For instance, in comparing the simulated network with real vascular networks, this slope can be one of the components of comparison.
 
 ![](images/CountVsLengthLogLog.png)
 
-Furthremore, it is instructive to study the correlation matrix between some of the features of the loop. 
+Furthermore, it is instructive to study the correlation matrix between some of the features of the loop. The correlation matrix below shows that there are no correlation between the position of the centriods and the geometrical structures of the loops (i.e. length, area, compactness, etc). This correlation coefficient can be used to compare the resutls of the simulated networks with the real networks of human retina.
 
 ![](images/FeatureCorrelationMatrix.png)
 
@@ -61,7 +62,7 @@ In geometric shape analysis, comparing cycles involves quantifying their similar
 
 ### Fréchet Distance
 
-The **Fréchet Distance** between two curves $ A = \{a(t) \mid t \in [0,1]\} $ and $ B = \{b(t) \mid t \in [0,1]\} $ is defined as:
+The **Fréchet Distance** between two curves $A = \{a(t) \mid t \in [0,1]\}$ and $B = \{b(t) \mid t \in [0,1]\}$ is defined as:
 
 $$
 d_F(A, B) = \inf_{\alpha, \beta} \max_{t \in [0,1]} \| a(\alpha(t)) - b(\beta(t)) \|,
@@ -69,14 +70,14 @@ $$
 
 where:
 
-- $ \alpha(t) $ and $ \beta(t) $ are continuous, non-decreasing reparameterizations of the curves $ A $ and $ B $.
-- $ \| \cdot \| $ denotes the Euclidean norm.
-- The infimum is taken over all possible parameterizations $ \alpha $ and $ \beta $.
+- $\alpha(t)$ and $\beta(t)$ are continuous, non-decreasing reparameterizations of the curves $A$ and $B$.
+- $\| \cdot \|$ denotes the Euclidean norm.
+- The infimum is taken over all possible parameterizations $\alpha$ and $\beta$.
 
 
 #### Interpretation of Heatmap
 
-The heatmap for the Fréchet distance shows the pairwise distances between all cycles. Each entry $ (i, j) $ in the heatmap represents $ d_F(C_i, C_j) $, the Fréchet distance between cycle $ C_i $ and cycle $ C_j $. Key insights include:
+The heatmap for the Fréchet distance shows the pairwise distances between all cycles. Each entry $(i, j)$ in the heatmap represents $d_F(C_i, C_j)$, the Fréchet distance between cycle $C_i$ and cycle $C_j$. Key insights include:
 
 - **Small Values:** Cycles with low Fréchet distances are geometrically similar in terms of overall shape and trajectory.
 - **Large Values:** Larger distances indicate significant differences in the geometry or shape of the cycles.
@@ -87,7 +88,7 @@ The heatmap highlights clusters of similar cycles and outliers with unique geome
 
 ### Hausdorff Distance
 
-The **Hausdorff Distance** between two sets of points $ A $ and $ B $ is defined as:
+The **Hausdorff Distance** between two sets of points $A$ and $B$ is defined as:
 
 $$
 d_H(A, B) = \max \{ \sup_{a \in A} \inf_{b \in B} \| a - b \|, \sup_{b \in B} \inf_{a \in A} \| b - a \| \}.
@@ -95,15 +96,15 @@ $$
 
 This can be broken down into:
 
-- $ \sup_{a \in A} \inf_{b \in B} \| a - b \| $: The maximum distance from a point in $ A $ to the closest point in $ B $.
-- $ \sup_{b \in B} \inf_{a \in A} \| b - a \| $: The maximum distance from a point in $ B $ to the closest point in $ A $.
+- $\sup_{a \in A} \inf_{b \in B} \| a - b \|$: The maximum distance from a point in $A$ to the closest point in $B$.
+- $\sup_{b \in B} \inf_{a \in A} \| b - a \|$: The maximum distance from a point in $B$ to the closest point in $A$.
 
 The Hausdorff distance quantifies the greatest deviation between the two sets of points, considering how well one set covers the other.
 
 
 ### Interpretation of Heatmap
 
-The heatmap for the Hausdorff distance shows pairwise distances between cycles. Each entry $ (i, j) $ represents $ d_H(C_i, C_j) $, the Hausdorff distance between cycle $ C_i $ and cycle $ C_j $. Key insights include:
+The heatmap for the Hausdorff distance shows pairwise distances between cycles. Each entry $(i, j)$ represents $d_H(C_i, C_j)$, the Hausdorff distance between cycle $C_i$ and cycle $C_j$. Key insights include:
 
 - **Small Values:** Indicates that the points of one cycle are closely aligned with the points of another cycle.
 - **Large Values:** Reflects that one cycle has points significantly farther away from the other, suggesting geometric dissimilarity.
@@ -141,13 +142,13 @@ For each cycle in the networks, the following features are extracted:
 
 In analyzing geometric properties of cycles in networks, high-dimensional feature spaces often obscure relationships between cycles. This section describes the use of feature engineering and nonlinear dimensionality reduction techniques (**t-SNE** and **UMAP**) to uncover hidden patterns, simplify visualization, and enhance interpretability. The outputs are 2D visualizations that highlight structural and functional groupings within the data. The following composite features were derived:
 
-- **Area-to-Length Ratio:** Computed as $ \frac{\text{Area}}{\text{Length}} $. This feature differentiates between compact cycles (high ratio) and elongated cycles (low ratio).
-- **Normalized Compactness:** Computed as $ \frac{\text{Compactness}}{\text{Length}} $. This feature accounts for the relative efficiency of cycles in enclosing their area.
+- **Area-to-Length Ratio:** Computed as $\frac{\text{Area}}{\text{Length}}$. This feature differentiates between compact cycles (high ratio) and elongated cycles (low ratio).
+- **Normalized Compactness:** Computed as $\frac{\text{Compactness}}{\text{Length}}$. This feature accounts for the relative efficiency of cycles in enclosing their area.
 
 
 ## Dimensionality Reduction
 
-Nonlinear dimensionality reduction methods project high-dimensional data into a lower-dimensional space while preserving specific structural properties.
+TSNE and UMAP are used to perform dimensionality reduction on standardized composite features derived from network cycles. These features include Length, Area, Compactness, Centroid coordinates, and additional composite metrics like Area-to-Length ratio and Normalized Compactness. The input data to both methods is the scaled feature matrix, which is created by normalizing these attributes. TSNE focuses on preserving the local and global data structure with a perplexity parameter of 30, while UMAP emphasizes local neighborhood relationships with n_neighbors set to 5. 
 
 ### t-SNE (t-Distributed Stochastic Neighbor Embedding)
 
@@ -166,9 +167,21 @@ Nonlinear dimensionality reduction methods project high-dimensional data into a 
 ![Some notes to interpret the plot: UMAP preserves both local and global structures, making it suitable for analyzing large-scale patterns. Transitions between clusters indicate gradual changes in feature space, useful for understanding progression or hierarchy in cycle characteristics. Dense clusters suggest strong feature alignment, while sparse areas highlight feature variability.
 ](images/UMap.png)
 
+Labeling for visualization could be based on clustering results (e.g., KMeans, hierarchical clustering) or categories defined by cycle properties like size or geometric similarity. However, at this stage and for this project, there are no known lables that can be assigned to thse clusters.
+
 ### Conclusion
 
 We used a stochastic process (Branching Annihilating Random Walker) to generate some random networks (that resembes the vascular networks). Then we translated this structure to a networkX data frame for easier processing. We extracted the cycle basis for the cycle space of the graph and using the symmetric difference operation we generated new cycles (of different scales). Then performed different statistical and geometrical analysis on the shape of the loops in the graph. Also we calculated different features for the graph and used dimnsionality reduction methods to see if we can observe any structures (clusters) in low dimension.
+
+
+### Next Step
+In this work, we provided no hypothesis and no conclusions as it is not a project that can fit within the limits of a course project. However, we presented some computations that can be used to compare the simulated vascular networks with the real vascular networks of human. So, our next step is to run the model with different parameters and do the comparison. For this step we will use the realistic vascular network in human retina. This data that is converted to the graph structure in another project by the author. The following figure shows some part of this dataset:
+
+![This figure shows the extracted graph structure of the vascular network in the human renina. The dataset used for this purpose is the ROSE dataset that contains the segmented images of human retina. The graph dataset is developed by the author and more information can be found here: https://github.com/alifele/Graph-Structure-of-Vascular-Networks-of-Retina](images/ROSE-O-Train.png)
+
+
+
+
 
 ## Appendix
 

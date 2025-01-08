@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.39">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -91,7 +91,7 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -230,7 +230,7 @@ div.csl-indent {
 <section id="preparations-before-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="preparations-before-analysis">Preparations before analysis</h2>
 <p>For image denoising and binarization we will use the <a href="https://github.com/opencv/opencv">OpenCV</a> library. Images will be loaded into Numpy arrays.</p>
-<div id="eed5c78a" class="cell" data-execution_count="1">
+<div id="fdc0a772" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -244,7 +244,7 @@ div.csl-indent {
 </figure>
 </div>
 </div>
-<div id="05caa284" class="cell" data-execution_count="2">
+<div id="2ee210a7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>src <span class="op">=</span> cv2.imread(<span class="st">"data/data.png"</span>, cv2.IMREAD_COLOR)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># filter strength for luminance component = 10</span></span>
@@ -264,7 +264,7 @@ div.csl-indent {
 </div>
 </div>
 <p>As we are only interested in finding contours in the image, RGB colors will not be important. In fact, it makes it harder to analyze. We start by changing the color coding of the image to grayscale.</p>
-<div id="458b9ea9" class="cell" data-execution_count="3">
+<div id="b40a0e5b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>src <span class="op">=</span> cv2.imread(<span class="st">"data/data-denoised.png"</span>, cv2.IMREAD_COLOR)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>src_gray <span class="op">=</span> cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)</span>
@@ -280,7 +280,7 @@ div.csl-indent {
 </div>
 </div>
 <p>The final step is to completely binarize the image. We are only interested in parts of the image that are considered to be DNA matter, which has a smaller color value compared to the background. We will apply a threshold to the image. Any pixel with a color value above 80 is considered to be DNA matter and it is mapped to a white pixel. Everything else is mapped to a black pixel.</p>
-<div id="1a3d0011" class="cell" data-execution_count="4">
+<div id="a08e3fe1" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>src <span class="op">=</span> cv2.imread(<span class="st">"data/data-grayscale.png"</span>, cv2.IMREAD_COLOR)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># threshold: 80</span></span>
@@ -304,7 +304,7 @@ div.csl-indent {
 <p>We will make use of the <code>findContours</code> function in <code>OpenCV</code> with the additional parameter <code>RETR_TREE</code>, which stands for contour retrieval tree. For our purposes, a contour is just a continuous set of points, but its position is also important. A shape can be located inside another shape or it might be connected to some other shape, which is useful information.</p>
 <p>We consider the outer contour a <em>parent</em>, and the inner one a <em>child</em>. <code>findContours</code> returns a multi-dimensional array that contains the parent and child relation for any contour in an image.</p>
 <p>After finding contours from the binarized image, we draw them on top of the original AFM image we initially started with.</p>
-<div id="b5c88b38" class="cell" data-execution_count="5">
+<div id="b6d35bfe" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>src <span class="op">=</span> cv2.imread(<span class="st">"data/data.png"</span>, cv2.IMREAD_COLOR)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>src_binary <span class="op">=</span> cv2.imread(<span class="st">"data/data-binary.png"</span>, cv2.IMREAD_UNCHANGED)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -332,7 +332,7 @@ div.csl-indent {
 <section id="segmentation" class="level2">
 <h2 class="anchored" data-anchor-id="segmentation">Segmentation</h2>
 <p>The hierarchy tree returned by <code>findContours</code> lets us iterate through any piece or specific level. The following code draws the outermost contours.</p>
-<div id="e9073f00" class="cell" data-execution_count="6">
+<div id="a4959d38" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>contours, hierarchy <span class="op">=</span> cv2.findContours(src_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>hierarchy <span class="op">=</span> hierarchy[<span class="dv">0</span>]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -374,7 +374,7 @@ div.csl-indent {
 <section id="detecting-closed-contours" class="level2">
 <h2 class="anchored" data-anchor-id="detecting-closed-contours">Detecting closed contours</h2>
 <p>If a contour passes through one pixel more than once, we expect it to have a child contour inside. A closed shape will have an outer contour and at least one inner contour. By looking at the values in the returned tree <code>hierarchy</code>, we can determine whether a contour is open or closed.</p>
-<div id="85b5e940" class="cell" data-execution_count="7">
+<div id="1ebc64c1" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>src <span class="op">=</span> cv2.imread(<span class="st">"data/data.png"</span>, cv2.IMREAD_COLOR)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>src_binary <span class="op">=</span> cv2.imread(<span class="st">"data/data-binary.png"</span>, cv2.IMREAD_UNCHANGED)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>

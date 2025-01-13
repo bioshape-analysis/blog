@@ -1,5 +1,5 @@
 ---
-title: "Exploring cell shape dynamics dependency on the cell migration"
+title: "Exploring the relation between cell shape and motility"
 bibliography: references.bib
 date: "October 28 2024" # Format example: August 9 2024
 author:
@@ -9,7 +9,7 @@ categories: [Cell Morphology, Cell Migration, Differential Geometry] # [biology,
 ## Background
 Cell morphology is an emerging field of biological research that examines the shape, size, and internal structure of cells to describe their state and the processes occurring within them. Today, more and more scientist across the world are investigating visible cellular transformations to predict cellular phenotypes. This research has significant practical implications: understanding specific cellular features characteristic of certain diseases, such as cancer, could lead to new approaches for early detection and classification.
 
-In this work, we will explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeletal structures [@Mogilner_Oster_1996]. According to current understanding, actin polymerization causes protrusions at the leading edge of a cell, forming specific structures known as lamellipodia and filopodia. Elongation of cells in the direction of movement is also reported. These changes can be observed during experiments.
+In this work, we will explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeletal structures [@Mogilner_Oster_1996]. For example, past experimental studies show that actin polymerization causes protrusions at the leading edge of a cell, forming specific structures known as lamellipodia and filopodia (ref), while cells elongate along the direction they move. 
 
 
 ![](img/all_cells.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }

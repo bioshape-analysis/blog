@@ -1,18 +1,31 @@
 ---
-title: "Exploring cell shape dynamics dependency on the cell migration"
+title: "Exploring the relation between cell shape and motility"
 bibliography: references.bib
 date: "October 28 2024" # Format example: August 9 2024
 author:
-  - name: "Pavel Bukleomishev" 
-categories: [Cell Morphology, Cell Migration, Differential Geometry] # [biology, bioinformatics, theory, etc.]
+  - name: "Pavel Buklemishev" 
+
+  
+categories: [Cell Morphology, Cell Migration, Differential Geometry] # 
+
+
+callout-icon: false
+format:
+  html:
+    code-fold: true
+
+execute:
+  echo: true
+  freeze: auto
+  warning: false
+
 ---
+
 ## Background
 Cell morphology is an emerging field of biological research that examines the shape, size, and internal structure of cells to describe their state and the processes occurring within them. Today, more and more scientist across the world are investigating visible cellular transformations to predict cellular phenotypes. This research has significant practical implications: understanding specific cellular features characteristic of certain diseases, such as cancer, could lead to new approaches for early detection and classification.
 
-In this work, we will explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeletal structures [@Mogilner_Oster_1996]. According to current understanding, actin polymerization causes protrusions at the leading edge of a cell, forming specific structures known as lamellipodia and filopodia. Elongation of cells in the direction of movement is also reported. These changes can be observed during experiments.
+In this work, we will explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeletal structures [@Mogilner_Oster_1996]. For example, past experimental studies show that actin polymerization causes protrusions at the leading edge of a cell, forming specific structures known as lamellipodia and filopodia [@Lauffenburger_Horwitz_1996], while cells elongate along the direction they move[@SenGupta_Parent_Bear_2021]. 
 
-
-![](img/all_cells.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
 
 ## Goals
 Our goal is to perform a differential geometry analysis of cellular shape curves to explore the correlation between shape differences and spatial displacement. Using the Riemann Elastic Metric[@10.1007/978-3-031-38299-4_60]:
@@ -62,10 +75,17 @@ This dataset contains real cell contours obtained via fluorescent microscopy in 
 │   └── ...
 └── ...
 ```
+<!--
+![](img/all_cells.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+-->
 
 ## Single cell dynamics
 
-```python
+In this section, we provide the code which allows to demonstrate the temporary-spatial cell dynamics. In this particular example we are visualizing the shapes and position of dataset cell №15 @fig-img which we will be investigated in the project.
+
+```{python}
+#| eval: false
+#| output: false
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -92,7 +112,9 @@ plt.savefig(f"single_cell_{N}.png", dpi=300, bbox_inches='tight')
 
 ```
 
-![The cell form in different time moments](img/single_cell_15.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+![The cell #15 in different time moments. The colored curves visualize the cell shape in different time moments, the colored dots are centroids. Each color corresponds to a certain time moment which is shown in the legend.](img/single_cell_15.png){#fig-img}
+ 
+
 
 ## References
 

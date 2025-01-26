@@ -1,158 +1,43 @@
 ---
-title: "Exploring cell shape dynamics dependency on the cell migration"
+title: "Exploring the relation between cell shape and motility"
 bibliography: references.bib
-date: "October 28 2024" # Format example: August 9 2024
+date: "December 20 2024" # Format example: August 9 2024
 author:
   - name: "Pavel Buklemishev" 
-categories: [Cell Morphology, Cell Migration, Differential Geometry] # [biology, bioinformatics, theory, etc.]
+
+  
+categories: [Cell Morphology, Cell Migration, Differential Geometry] # 
+
+
+callout-icon: false
 format:
   html:
     code-fold: true
+
 execute:
+  echo: true
   freeze: auto
----
+  warning: false
 
 ---
 
-# Introduction 
 
-## Background
-Cell morphology is an emerging field of biological research that examines the shape, size, and internal structure of cells to describe their state and the processes occurring within them. Today, more and more scientists across the world are investigating visible cellular transformations to predict cellular phenotypes. This research has significant practical implications: understanding specific cellular features characteristic of certain diseases, such as cancer, could lead to new approaches for early detection and classification.
+In our previous proposal, we introduce our project to study how changes in cell shapes can be associated with motility and introduced our dataset. Here we report the methods
+and results we obtained in two main parts:
 
-In this work, we explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeleton structures [@Mogilner_Oster_1996]. Current understanding suggests that actin polymerization causes protrusions at the cell's leading edge, forming structures known as lamellipodia and filopodia. These changes impact the shape of a cell and can be evaluated numerically. We aim to characterize the motion of single cells and align it with shape changes.
+1. **Cell Spatial Migration**:
 
-## Goals
+    We visualize and classify the trajectories of motion for cell dataset.
 
-Our primary goal is to characterize observed cell motion and analyze their shape dynamics. Specifically, we aim to explore bounds and correlations between cellular motility and shape variation.
-
-### Spatial migration description tools
-
-To analyze cell migration, we assume that a cell moves as a point without rotation. Displacements of the cell's mass center, velocities, and directional angles are computed from centroid coordinates at different time points. Using these metrics, we predict motion modes and migration patterns through the segment classifier framework [@VEGA20181018].
-
-### Shape description tools
-
-To analyze changes in cell shape over time, we employ differential geometry approaches, particularly the Riemann Elastic Metric [@10.1007/978-3-031-38299-4_60]. This metric allows us to detect how the cell form stretches and bends:
-$$ 
-g_c^{a, b}(h, k) = a^2 \int_{[0,1]} \langle D_s h, N \rangle \langle D_s k, N \rangle \, ds 
-+ b^2 \int_{[0,1]} \langle D_s h, T \rangle \langle D_s k, T \rangle \, ds 
-$$
-
-We estimate the Riemann distance between two cellular boundary curves to mathematically describe shape changes over time. The algorithm is implemented using the Python Geomstats package.
-
-
-By setting $a=1$ and $b = {\frac{1}{2}}$, we employ the Square Root Velocity (SRV) metric in this work.
-
-Besides, the conformal mapping framework [@Zhou2023.04.12.536640] is used to detect cell protrusions at specific time points.
-
-## Dataset
-
-This dataset contains real cell contours obtained via fluorescent microscopy in Professor Prasad's lab, segmented by Clément Soubrier.
-
-- **204 directories**:  
-  Each directory is named `cell_*`, representing an individual cell.  
-
-- **Frames**:  
-  Subdirectories inside each cell are named `frame_*`, capturing different time points for that cell.  
-
-### NumPy Array Objects in Each Frame  
-- **centroid.npy**: Stores the coordinates of the cell's centroid.  
-- **outline.npy**: Contains segmented points as Cartesian coordinates.  
-- **time.npy**: Timestamp of the frame.
-
-### Structure  
-
-```bash
-├── cell_i
-│   ├── frame_j
-│   │   ├── centroid.npy
-│   │   ├── outline.npy
-│   │   └── time.npy
-│   ├── frame_k
-│   │   ├── centroid.npy
-│   │   ├── outline.npy
-│   │   └── time.npy
-│   └── ...
-├── cell_l
-│   ├── frame_m
-│   │   ├── centroid.npy
-│   │   ├── outline.npy
-│   │   └── time.npy
-│   └── ...
-└── ...
-```
-
-## Dataset example: single cell dynamics through the time
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import os
-
-fig, ax = plt.subplots(figsize=(10, 10), layout='constrained')
-
-N = 15
-
-number_of_frames = sum(os.path.isdir(os.path.join(f"cells/cell_{N}", entry)) for entry in os.listdir(f"cells/cell_{N}"))
-colors = plt.cm.tab20(np.linspace(0, 1, number_of_frames))
-for i in range(1,number_of_frames+1):
-    time = np.load(f'cells/cell_{N}/frame_{i}/time.npy')
-    border = np.load(f'cells/cell_{N}/frame_{i}/outline.npy')
-    centroid = np.load(f'cells/cell_{N}/frame_{i}/centroid.npy')
-
-    
-    color = colors[i - 1]
-
-    ax.plot(border[:, 0], border[:, 1], label=time, color=color)
-    ax.scatter(centroid[0], centroid[1], color=color)
-plt.legend()    
-
-plt.savefig(f"single_cell_{N}.png", dpi=300, bbox_inches='tight')
-
-```
-
-![The cell form in different time moments](img/single_cell_15.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
-
-# Main part
-
-## Plan 
-
-The study is divided into two main parts:
-
-1. Cell Spatial Migration:
-
-    We visualize and classify the trajectories of motion for a large set of cells and analyze velocities and directional angle patterns.
-
-2. Shape Dynamics:
+2. **Shape Dynamics**:
 
     We compute the Riemann distances over time and investigate characteristic events to understand cell shape behavior during migration. We also use conformal mapping to analyze protrusions and other shape features.
 
-## Cell spatial migration 
-
-To simplify the analysis, centroid and time data were organized into arrays.
-
-```python
-for cell_i in range(1,204):
-    number_of_frames = sum(os.path.isdir(os.path.join(f"cells/cell_{cell_i}", entry)) for entry in os.listdir(f"cells/cell_{cell_i}"))  
-
-    iter_distance = np.zeros(number_of_frames)
-    iter_time = np.zeros(number_of_frames)
-    iter_centroid = np.array([np.random.rand(2) for _ in range(number_of_frames)])
-    for i in range(number_of_frames):
-        iter_time[i] = np.load(f'cells/cell_{cell_i}/frame_{i+1}/time.npy')
-        iter_centroid[i] = np.load(f'cells/cell_{cell_i}/frame_{i+1}/centroid.npy')
-    riemann_distances.append(iter_distance)
-    times.append(iter_time)
-    centroids.append(iter_centroid)
-data_path = ########
-with open(data_path+"/times.npy", 'wb') as f:
-    np.save(f, np.array(times, dtype=object))
-with open(data_path+"/centroid.npy", 'wb') as f:
-    np.save(f, np.array(centroids, dtype=object))
-```
+# 1. Cell Spatial Migration 
 
 ### Modes of migration 
 
- Cells exhibit different migration patterns, such as free diffusion, directed migration, and confined motion. Mean Squared Displacement (MSD) analysis was used to distinguish these modes. [@Modes] [@MSD].
+ Cells exhibit different migration patterns, such as free diffusion, directed migration, and confined motion. Mean Squared Displacement (MSD) analysis was used to distinguish these modes. [@Modes] [@MSD] [@wikipedia_anomalous_diffusion].
 
 
 Mean squared displacement (MSD): 
@@ -162,7 +47,7 @@ $$msd(t) = <[x(t+t_0) - x(t)]^2 + [y(t+t_0) - y(t)]^2> $$
 Experimentally, the MSD depends on time in a polynomial way:
 $$ msd(t)  = C t^{\alpha}$$
 
-The motion types are described by the value of the parameter $\alpha$ 
+The motion types are described by the value of the parameter $\alpha$(@fig-types): 
 
 - **$\alpha = 1$**: Free Difusion.  
 - **$\alpha = 2$**: Directed Diffusion.  
@@ -170,19 +55,21 @@ The motion types are described by the value of the parameter $\alpha$
 - **$\alpha <1$**: Subdiffusion (anomalous diffusion, confined diffusion).
 - **$\alpha \approx 0$**: Immobility
 
-![Diffusion types [@picture]](img/diff_types.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+![Diffusion types [@picture]](img/diff_types.png){#fig-types width=65% style="display: block; margin-left: auto; margin-right: auto;" }
 
-Using the trajectories, we aim to determine the motion type and identify potential transitions between them.
+Using the trajectories, we aim to determine the motions type that appears in the trajectory of a cell and identify potential transitions between them.
+We discuss the trajectories analysis in the following sections.
 
-However, we do not observe superdiffusion mode in our classification part of work.
 
-### Trajectories  
+### Trajectories visualization
 
-First, we visualize the trajectories of cells in space by using this code.
+The cell can exhibit different diffusion behavior while migrating in space, thus, initially to investigate these modes of migration we need to visualize the cell trajectories. We visualize the cell trajectory using the following Python code(the dataset was initially adjusted @sec-organization): 
 
 #### Code
 
-```python 
+```{python}
+#| eval: false
+#| output: false 
 def plot_cell_trajectory(n):
     centroids = centr[n - 1]  
     centroids = np.array(centroids)
@@ -213,7 +100,7 @@ def plot_cell_trajectory(n):
         s=100,
         alpha=0.7
     )
-    plt.plot(x_coords, y_coords, linestyle='-', color='gray', alpha=0.5)  # Линия траектории
+    plt.plot(x_coords, y_coords, linestyle='-', color='gray', alpha=0.5)  
 
     plt.title(f"Cell Num {n}")
     plt.xlabel('X Coordinate')
@@ -227,106 +114,26 @@ def plot_cell_trajectory(n):
 
 ```
 
-#### Trajectory example:
+![The cell №87 trajectory](img/cell_traj_87.png){#fig-traj87 width=65% style="display: block; margin-left: auto; margin-right: auto;" }
 
-
-![The cell №87 trajectory](img/cell_traj_87.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
-
-The trajectory for cell №87 shows potential directed motion intervals, but further analysis is required to confirm motion modes.
+We build the trajectories of the cells of the whole dataset. In the example figure(@fig-traj87) one can see the trajectory of the cell №87. However, building trajectories itself doesn't give an answer which modes a cell exhibits. Thus, we need to formulate and demonstrate a technique that help as to segmentize and classify the modes.  
 
 [All the trajectories pdf](files/trajectories.pdf)
 
+### Trajectory classification.
 
-### Velocity and angle
+**DC-MSS** - divide-and-conquer moment scaling spectrum transient mobility analysis framework [@VEGA20181018] which classifies trajectory segments into predefined motion types and detects mobility switches. In our project, we use this tool to describe the trajectories of cells. Although this method is powerful and efficient for classifying trajectories, it has its cons as well. As it was designated for the molecular motion analysis it doesn't take into account superdiffusion mode which is more typical for living species.
+Thus, method distinguishes between free diffusion, confined motion, immobility, and directed migration, and we will assume that if a cell exhibits superdiffusion mode, it will be covered by the lattest one.
 
-To further investigate motion patterns, we calculated the velocity and directional angle between consecutive frames. 
 
-#### Code
-
-```python 
-def plot_angle_vel_cell(cell_num):
-
-    velocities = []
-    riemann_distances = []
-    time_data = []
-    time_data1 = []
-    rel_angle = []
-    
-    num_frames = len(centr[cell_num-1])  
-    
-    for frame in range(1, num_frames):
-        time_data.append(get_times(cell_num-1, frame))
-        rel_angle.append(get_velocity_angle_rel(cell_num-1, frame))
-    for frame in range(1, num_frames):
-        riemann_distances.append(get_riemann_dist(cell_num-1, frame))
-        time_data1.append(get_times(cell_num-1, frame))
-        velocities.append(get_abs_velocity(cell_num-1, frame))
-    
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    ax.plot(time_data1, velocities, label="Velocity", color="green", linewidth=1.5)
-    ax.set_xlabel("Time", fontsize=10)
-    ax.set_ylabel("Velocity", fontsize=10)
-    ax.tick_params(axis="both", which="major", labelsize=8)
-    ax.legend(loc="upper left", fontsize=8)
-
-    ax_angle = ax.twinx()
-    ax_angle.plot(time_data, rel_angle, label="Angle", color="red", linewidth=1.5)
-    ax_angle.set_ylabel("Angle (degrees)", fontsize=10, color="red")
-    ax_angle.tick_params(axis="y", labelsize=8, colors="red")
-    ax_angle.legend(loc="upper right", fontsize=8)
-    
-    ax.set_title(f"Cell {cell_num}", fontsize=12)
-    
-    plt.tight_layout()
-    plt.show()
-
-```
-
-#### Velocity/Angle visualization example:
-
-![The cell №87 velocity and angle visualization](img/angle_cell_87.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
-
-Velocity plots revealed segments of nearly constant speed, potentially indicating directed migration, while angle plots were often noisy and inconclusive. 
-
-[All the velocities and angles pdf](files/angle_vel.pdf)
-
-#### Further steps:  DC-MSS
-
-Since, all the previous approaches didn't give the complete result, we applied the segment classification framework (divide-and-conquer moment scaling spectrum(**DC-MSS**)) [@VEGA20181018] which classifies trajectory segments into predefined motion types. 
-
-After converting data to the framework format we can get the segmentized classified trajectory picture. This method distinguishes between free diffusion, confined motion, directed migration, and immobility, although it cannot differentiate between superdiffusion and directed motion, thus we assume that it is a single direct migration mode.
-
-#### Data preparation
-
-Before running the DC-MSS framework, we prepare the trajectory data:
-
-```python
-import numpy as np
-from scipy.io import savemat
-                                                                            
-tracks = {}
-for i, trajectory in enumerate(data):
-    n_frames = trajectory.shape[0]
-    row = np.zeros(n_frames * 8)  
-    for j, (x, y) in enumerate(trajectory):
-        start_idx = j * 8  
-        row[start_idx] = x 
-        row[start_idx + 1] = y  
-
-    tracks[f"track_{i+1}"] = row  
-
-output_path = "trajectory_data.mat"
-savemat(output_path, {'tracks': tracks})
-```
-
-This piece of code converts trajectory data into a .mat file, compatible with MATLAB.
+After converting data to the framework format we can get desired mode classification. 
 
 #### Running the DC-MSS Framework in MATLAB
+After preparing data for the framework(@sec-dcmssprep) we process the classification.
 
-The following MATLAB code processes the prepared data:
-
-```matlab
+```{python}
+#| eval: false
+#| output: false
 loaded = load("../trajectory_data.mat");
 allTracks = loaded.tracks;
 
@@ -349,71 +156,358 @@ for i = 1:length(trackNames)
 end
 
 h5FileName = 'time_events.h5';
-if exist(h5FileName, 'file') == 2
-    delete(h5FileName); 
-end
 
 trackNames = fieldnames(results);
 for i = 1:length(trackNames)
     trackName = trackNames{i};
     data = results.(trackName).momentScalingSpectrum;
-    if ~isempty(data)
-        h5create(h5FileName, ['/', trackName], size(data));
-        h5write(h5FileName, ['/', trackName], data);
-    end
 end
 ```
 
-![Classified track. Cyan corresponds to the free diffusion, Magenta - directed motion](img/segmented_track.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+By varying **peakAlpha** parameter one can get different confidence level for choosing peaks when initially segmenting track.
 
-The classified trajectory segments provide clearer insights into motion types. However, the framework has a confidence level of classification parameter **peakAlpha** which impacts the classification process. We haven't choosen the suitable for us, so we will conduct the study based on two levels: 95 and 90. 
 
-## Shape analysis
+::: {.row}
+::: {.column width="40%"}
+![Classified track with 95% confidence level. Cyan corresponds to the free diffusion, Magenta - directed motion](img/segmented_track.png){#fig-95-class}
+:::
+::: {.column width="47%"}
+![Classified track with 90% confidence level. Blue corresponds to the confined diffusion](img/conf_level_90.png){#fig-90-class}
+:::
+:::
 
-To analyze shape dynamics, we compute Riemann distances between consecutive, aligned cell shapes. This accounts for transformations like translation, scaling, and reparametrization while penalizing rotation.
+In the example (@fig-95-class and @fig-90-class) we can see that the classified trajectory segments provide insights into motion types. However, (@fig-90-class) looks much more natively as the motion changes in the cyan part of trajectory(@fig-95-class) are visible to the naked eye. 
 
-### Alignment
+## Dataset Motion Modes Analysis {#sec-mean_velo}
 
-The alignment function (kindly provided by Wanxin Li) ensures proper alignment of cell shapes:
+In this section, we organize the dataset based on the migration modes classification discussed in the previous sections.
 
-```python
-def align(point, base_point, rescale, rotation, reparameterization, k_sampling_points): #rotation set as False
-    """
-    Align point and base_point via quotienting out translation, rescaling, rotation and reparameterization
-    """
+First, we will estimate the proportion of each observed migration mode relative to the total.
 
-    total_space = DiscreteCurvesStartingAtOrigin(k_sampling_points=k_sampling_points)
-   
+### Motion Modes Distribution
+
+Using the illustrations (@fig-prop95, @fig-prop90), it is evident that, despite the presence of unclassified trajectory segments, the two predominant regimes describing the trajectories are the free and confined migration modes.
+
+```{python}
+#| eval: false
+#| output: false
+
+def get_motion_type_distribution():
+    type_counts = defaultdict(int)
+    total_count = 0
+
+    with h5py.File('time_events_95.h5', 'r') as f:
+        for plot_index in range(total_plots):
+            track_i_data = f[f'/track_{plot_index+1}'][:]
+            first_three_rows = track_i_data[:3]
+            interval_types = first_three_rows[2, :]
+            
+            for interval_type in interval_types:
+                if not np.isnan(interval_type):
+                    type_counts[int(interval_type)] += 1
+                    total_count += 1
+                else:
+                    type_counts["unclassified"] += 1
+                    total_count += 1
+
+    proportions = {key: count / total_count for key, count in type_counts.items()}
+    return proportions
+
+def plot_motion_type_distribution():
+
+    proportions = get_motion_type_distribution()
+
+
+    types = ["Immobile", "Confined Diffusion", "Free Diffusion", "Directed Diffusion", "Unclassified"]
+    colors = ["brown", "blue", "cyan", "magenta", "black"]
+    keys = [0, 1, 2, 3, "unclassified"]
+
+    values = [proportions.get(key, 0) for key in keys]
+    plt.figure(figsize=(8, 6))
+    plt.pie(
+        values,
+        labels=types,
+        colors=colors,
+        autopct="%1.1f%%",
+        startangle=140,
+        textprops={'color': 'white', 'fontsize': 12}  
+    )
+    plt.title("Proportion of Motion Types")
+    plt.tight_layout()
+    plt.savefig("motion_type_distribution_90.png")
+    plt.show()
+```
+
+::: {.columns}
+::: {.column width="50%"}
+![Confidence level 0.95. Cyan corresponds to the free diffusion, Magenta - directed motion, Blue - confined diffusion, Brown - to immobile cells, Black - unclassified.](img/prop95.png){#fig-prop95 fig-align="center" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Confidence level 0.90.](img/prop90.png){#fig-prop90 fig-align="center" width="100%"}
+:::
+:::
+
+### Transition between Modes Matrix
+
+
+The transition fractions of mode switches can also be represented using a Transition Matrix. These matrices (@fig-transmat95, @fig-transmat90) illustrate the most frequent transitions between migration modes, offering valuable insight into the dynamics of mode switching. From these illustrations, we can draw the following conclusions:
+
+1. Probabilities of the transition from one mode to another usually depends on the direction of a transition.
+
+2. The most dominant mode transition is from free diffusion to the confined mode. 
+
+3. Cells tend to switch between modes in a sequential manner, following the pattern: Immobile → Confined → Free → Directed and in the opposite direction.
+```{python}
+#| eval: false
+#| output: false
+
+def compute_transition_matrix_with_unclassified():
+    transition_counts = np.zeros((5, 5))  
+    total_transitions = 0
+
+    with h5py.File('time_events_95.h5', 'r') as f:
+        for plot_index in range(total_plots):
+            track_i_data = f[f'/track_{plot_index+1}'][:]
+            first_three_rows = track_i_data[:3]
+            interval_types = first_three_rows[2, :]
+
+            for start_idx in range(len(interval_types) - 1):
+                type_from = interval_types[start_idx]
+                type_to = interval_types[start_idx + 1]
+
+
+                type_from = int(type_from) if not np.isnan(type_from) else 4  
+                type_to = int(type_to) if not np.isnan(type_to) else 4  
+
+                if type_from != type_to:  
+                    transition_counts[type_from, type_to] += 1
+                    total_transitions += 1
+
+
+    transition_matrix = (transition_counts / total_transitions) * 100  
+    return transition_matrix
+
+def plot_transition_matrix_with_unclassified(transition_matrix):
+    types = ["Immobile", "Confined Diffusion", "Free Diffusion", "Directed Diffusion", "Unclassified"]
     
-    # Quotient out translation 
-    point = total_space.projection(point) 
-    point = point - gs.mean(point, axis=0)
+    plt.figure(figsize=(8, 6))
+    masked_matrix = np.ma.masked_where(np.eye(len(types)), transition_matrix)  
+    plt.imshow(masked_matrix, cmap="Blues", aspect="auto")
+    for i in range(5):
+        plt.fill([i - 0.5, i + 0.5, i + 0.5, i - 0.5],
+                 [i - 0.5, i - 0.5, i + 0.5, i + 0.5],
+                 color='black')
 
-    base_point = total_space.projection(base_point)
-    base_point = base_point - gs.mean(base_point, axis=0)
+    plt.colorbar(label="%")
 
-    # Quotient out rescaling
-    if rescale:
-        point = total_space.normalize(point) 
-        base_point = total_space.normalize(base_point)
-    
-    # Quotient out rotation
-    if rotation:
-        point = rotation_align(point, base_point, k_sampling_points)
+    plt.xticks(ticks=np.arange(len(types)), labels=types, rotation=45)
+    plt.yticks(ticks=np.arange(len(types)), labels=types)
+    plt.title("Transition Matrix")
 
-    # Quotient out reparameterization
-    if reparameterization:
-        aligner = DynamicProgrammingAligner(total_space)
-        total_space.fiber_bundle = ReparametrizationBundle(total_space, aligner=aligner)
-        point = total_space.fiber_bundle.align(point, base_point)
-    return point
+
+
+    for i in range(len(types)):
+        for j in range(len(types)):
+            if i != j:  
+                plt.text(j, i, f"{transition_matrix[i, j]:.1f}%", ha='center', va='center', color='black')
+
+    plt.tight_layout()
+    plt.savefig("transition_matrix_with_unclassified_95.png")
+    plt.show()
+```
+
+
+::: {.columns}
+::: {.column width="50%"}
+![Confidence level 0.95. The Y-axis represents the migration mode from which cells transition to a new observed mode, while the X-axis corresponds to the mode they transition into.](img/transition_matrix_with_unclassified_95.png){#fig-transmat95 fig-align="center" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Confidence level 0.90.](img/transition_matrix_with_unclassified_90.png){#fig-transmat90 fig-align="center" width="100%"}
+:::
+:::
+
+
+### Free and Directed Diffusion: average velocities {#sec-avvel}
+
+Since the most interpretable regimes for observers are free diffusion and directed motion, in the following subsections, we investigate cell motility characteristics concerning these two modes.
+We compute the mean velocities associated with these migration modes, presenting both the mean values and their 95% confidence intervals. Unfortunately, the p-value for the t-test at the 95% confidence level segmentation(@fig-meanvelocity95) exceeds the required 0.05, which limits the statistical significance of the observed differences. However, the segmentation at the 90% confidence level demonstrates statistical significance for the observed velocities. As we can see in (@fig-meanvelocity90), the velocity in directed migration is higher than in free diffusion. This can be explained by the active mechanisms involved in directed migration, such as the reorganization of the cytoskeleton, enhanced energy expenditure, which result in more efficient and faster movement compared to the random free diffusion. 
+```{python}
+#| eval: false
+#| output: false
+def average_velocity_with_ttest():
+    type_data = defaultdict(list)
+
+    with h5py.File('time_events_95.h5', 'r') as f:
+        for plot_index in range(total_plots):
+            track_i_data = f[f'/track_{plot_index+1}'][:]
+            first_three_rows = track_i_data[:3]
+            event_indices = first_three_rows[0, :].astype(int) - 1
+            interval_types = first_three_rows[2, :]
+
+            for start_idx, interval_type in enumerate(interval_types):
+                if start_idx + 1 < len(event_indices) and interval_type in [2, 3]:                      start = event_indices[start_idx] + 1  
+                    end = event_indices[start_idx + 1]
+                    segment = [get_abs_velocity(plot_index, idx) for idx in range(start, end + 1)]
+                    type_data[int(interval_type)].extend(segment)
+
+ 
+    free_diffusion = type_data[2]
+    directed_diffusion = type_data[3]
+
+    t_stat, p_value = ttest_ind(free_diffusion, directed_diffusion, equal_var=False)
+
+
+    plt.figure(figsize=(8, 6))
+    types = ["Free Diffusion", "Directed Diffusion"]
+    colors = ["cyan", "magenta"]
+    means = []
+    conf_intervals = []
+
+    for key, velocities in zip([2, 3], [free_diffusion, directed_diffusion]):
+        if velocities:  
+            mean = np.mean(velocities)
+            ci = sem(velocities) * 1.96  
+            means.append(mean)
+            conf_intervals.append(ci)
+        else:
+            means.append(0)
+            conf_intervals.append(0)
+
+    x = np.arange(len(types))
+
+    for idx, (mean, ci, color) in enumerate(zip(means, conf_intervals, colors)):
+        plt.errorbar(x[idx], mean, yerr=ci, fmt='o', color=color, ecolor=color, elinewidth=2, capsize=5)
+
+    plt.text(0.5, max(means) + max(conf_intervals) * 1.2,
+             f"T-test p-value: {p_value:.3e}",
+             ha='center', fontsize=12, color='black')
+
+    plt.xticks(x, types)
+    plt.ylabel("Velocity")
+    plt.tight_layout()
+    plt.savefig("mean_velocity_with_ttest_95.png")
+    plt.show()
+```
+
+::: {.columns}
+::: {.column width="50%"}
+![Confidence level 0.95.](img/mean_velocity_with_ttest_95.png){#fig-meanvelocity95 fig-align="center" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Confidence level 0.90.](img/mean_velocity_with_ttest_90.png){#fig-meanvelocity90 fig-align="center" width="100%"}
+:::
+:::
+
+### Free and Directed Diffusion: average angles {#sec-avang}
+
+Analogously to the previous subsection, we measured the average directional angles associated with different migration modes. Both segmentation levels satisfy the p-value criterion, confirming the statistical significance of the results. From both images, it is evident that cells exhibit more stable behavior in the directed diffusion mode, with noticeably less rotational movement.
+```{python}
+#| eval: false
+#| output: false
+
+def average_angle_with_ttest():
+    type_data = defaultdict(list)
+
+    with h5py.File('time_events_90.h5', 'r') as f:
+        for plot_index in range(total_plots):
+            track_i_data = f[f'/track_{plot_index+1}'][:]
+            first_three_rows = track_i_data[:3]
+            event_indices = first_three_rows[0, :].astype(int) - 1
+            interval_types = first_three_rows[2, :]
+
+            for start_idx, interval_type in enumerate(interval_types):
+                if start_idx + 1 < len(event_indices) and interval_type in [2, 3]:                      start = event_indices[start_idx] + 1 
+                    end = event_indices[start_idx + 1]
+                    segment = [get_velocity_angle_rel(plot_index, idx) for idx in range(start, end + 1)]
+                    type_data[int(interval_type)].extend(segment)
+
+    free_diffusion = type_data[2]
+    directed_diffusion = type_data[3]
+
+    t_stat, p_value = ttest_ind(free_diffusion, directed_diffusion, equal_var=False)
+
+
+    plt.figure(figsize=(8, 6))
+    types = ["Free Diffusion", "Directed Diffusion"]
+    colors = ["cyan", "magenta"]
+    means = []
+    conf_intervals = []
+
+    for key, angles in zip([2, 3], [free_diffusion, directed_diffusion]):
+        if angles: 
+
+            sigma = 2
+            angles_smoothed = gaussian_filter1d(angles, sigma=sigma)
+
+            mean = np.mean(angles_smoothed)
+            ci = sem(angles_smoothed) * 1.96 
+            means.append(mean)
+            conf_intervals.append(ci)
+        else:
+            means.append(0)
+            conf_intervals.append(0)
+
+    x = np.arange(len(types))
+
+
+    for idx, (mean, ci, color) in enumerate(zip(means, conf_intervals, colors)):
+        plt.errorbar(x[idx], mean, yerr=ci, fmt='o', color=color, ecolor=color, elinewidth=2, capsize=5)
+
+    plt.text(0.5, max(means) + max(conf_intervals) * 1.2,
+             f"T-test p-value: {p_value:.3e}",
+             ha='center', fontsize=12, color='black')
+
+    plt.xticks(x, types)
+    plt.ylabel("Angle")
+    plt.tight_layout()
+    plt.savefig("mean_angle_with_ttest_90.png")
+    plt.show()
 
 ```
+
+
+::: {.columns}
+::: {.column width="50%"}
+![Confidence level 0.95.](img/mean_angle_with_ttest_95.png){#fig-meanangle95 fig-align="center" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Confidence level 0.90.](img/mean_angle_with_ttest_90.png){#fig-meanangle90 fig-align="center" width="100%"}
+:::
+:::
+
+
+
+
+# 2. Shape analysis
+
+After describing the spatial migration of a cell, our next goal is to investigate the dynamics of its shape. We employ the SRV Riemann Elastic Metrics to compute the distance between two shapes[@10.1007/978-3-031-38299-4_60]: 
+
+$$ 
+g_c^{1, 0.5}(h, k) = \int_{[0,1]} \langle D_s h, N \rangle \langle D_s k, N \rangle \, ds 
++ 0.5^2 \int_{[0,1]} \langle D_s h, T \rangle \langle D_s k, T \rangle \, ds  \text{ - SRV metrics}
+$$
+
+For a single cell given time moments $t$ and $t+1$, we:
+
+1. Interpolate the segmentized cell shape for both of moments t and t+1
+
+2. Align the cell shapes. We quotient out transition and reparametrization but ignore the rotation. We expect that the rotation is a significant aspect in spatial migration and we need to focus it. 
+
+3. Compute the SRV metrics for an each couple of consequent aligned cell shapes(@sec-align), dividing them by time differences, and, therefore we obtain Riemann Velocities (They would be mentioned in the text as distances as well). 
+
+
+
 ### Distance Computation
 
 Riemann distances are computed between consequent aligned shapes:
 
-```python
+```{python}
+#| eval: false
+#| output: false
 riemann_distances = []
 a = 1
 b = 1/2
@@ -451,191 +545,48 @@ for cell_i in range(1, 205):
 ### Dividing by delta t in the results.
 ```
 
-### Plotting function
+Riemann Velocities visualization - (@sec-riemann_simple).
 
-```python
-def plot_riemann_cell(plot_index):
-    riemann_distances = []
-    time_data = []
-    
-    num_frames = len(centr[plot_index-1])
-    
-    for frame in range(1, num_frames):
 
-        dist_value = get_riemann_dist(plot_index-1, frame) / (get_times(plot_index-1, frame) - get_times(plot_index-1, frame - 1))
-        riemann_distances.append(dist_value)
-        time_data.append(get_times(plot_index-1, frame))
+Moreover, we hypothesize that the cells' shape dynamics, as described by Riemann Velocities, are influenced by the migration mode they exhibit. Therefore, we align the Riemann Velocities with the mode segmentation obtained earlier for further analysis.
 
-    plt.figure(figsize=(8,6))
-    plt.plot(time_data, riemann_distances, marker='o', linestyle='-')
-    plt.xlabel("Time")
-    plt.ylabel("Riemann Velocities")
-    plt.title(f"Cell {plot_index}")
-    plt.grid(True)
-    plt.show()
-```
+Riemann Velocities visualization with segmentation - (@sec-riemann_segmentation).
 
-![Riemann Velocities graph for cell №87](img/r.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+From the example pictures (@fig-segm095, @fig-segm090), the peak at time point 49 aligns well with the observed transition in migration modes, suggesting that a connection may exist.
+
+::: {.columns}
+::: {.column width="50%"}
+![Confidence level 0.95.](img/riemann_single_cell_87_classification_95.png){#fig-segm095 fig-align="center" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Confidence level 0.90.](img/riemann_single_cell_87_classification_90.png){#fig-segm090 fig-align="center" width="100%"}
+:::
+:::
+
+Based on the general results, we can formulate a hypothesis: Riemann velocity peaks emerge when the motion mode switches between Directed Diffusion and Confined/Free Diffusion modes. However, with the current data, we cannot confidently confirm this correlation. Nevertheless, some examples (e.g., cells №33, 36, 41, 57, etc.) suggest that this dependency could be a promising target for future exploration. 
+
 
 [All the Riemann Velocities pdf](files/riemann_times.pdf)
 
-
-## Combining the results: analysing Riemann velocities in the context of determined events
-
-The separate investigation of cell trajectories and cell shape variations did not yield promising results. However, we believe that analyzing classified trajectories together with Riemann velocities may reveal compelling evidence.
-
-By extracting event time points from the DC-MSS framework and overlaying them on the Riemann velocity plots, we expect to observe characteristic peaks corresponding to transitions between motion modes.
-```python
-def riemann_times_with_events(cell_num):
-    cell_index = cell_num - 1
-    riemann_distances = []
-    time_data = []
-
-
-    num_frames = len(centr[cell_index])
-    for frame in range(1, num_frames):
-        dt = get_times(cell_index, frame) - get_times(cell_index, frame - 1)
-        riemann_distances.append(get_riemann_dist(cell_index, frame) / dt)
-        time_data.append(get_times(cell_index, frame))
-
-    with h5py.File('time_events.h5', 'r') as f:
-        track_i_data = f[f'/track_{cell_index + 1}'][:]
-        first_two_rows = track_i_data[:2]
-        time_points = np.intersect1d(first_two_rows[0, :], first_two_rows[1, :])
-        print(f"Cell #{cell_index + 1} Data: {first_two_rows}")
-        print(f"Cell #{cell_index + 1} Time Points: {time_points}")
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(time_data, riemann_distances, label='Riemann velocity', color='blue')
-    plt.xlabel("Time")
-    plt.ylabel("Riemann Velocity")
-    plt.title(f"Cell {cell_index + 1}", fontsize=12)
-    plt.grid(True)
-
-    for tp in time_points:
-        if tp - 1 < len(time_data):  
-            x = time_data[int(tp) - 1]
-            y = riemann_distances[int(tp) - 1]
-            plt.scatter(x, y, color="red", label="Event time" if tp == time_points[0] else "")
-
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-```
-
-<div style="display: flex; justify-content: space-around; align-items: center;">
-  <figure style="text-align: center;">
-    <img src="img/cell87_90.png" alt="Confidence level 0.90" style="width: 100%;"/>
-    <figcaption>Confidence level 0.90</figcaption>
-  </figure>
-  <figure style="text-align: center;">
-    <img src="img/cell87_95.png" alt="Confidence level 0.95" style="width: 100%;"/>
-    <figcaption>Confidence level 0.95</figcaption>
-  </figure>
-</div>
-
-As seen in the images, the number of detected events varies depending on the confidence level of the DC-MSS framework. Unfortunately, we do not observe a direct link between Riemann velocity extrema and switching between time events. However, the peak at time point 49 aligns well with the observed transition in migration modes, suggesting that a connection may exist.
 
 [Riemann velocities and events (0.9 confidence level)](files/riemann_with_events_90.pdf)
 
 [Riemann velocities and events (0.95 confidence level)](files/riemann_with_events_95.pdf)
 
-## Riemann velocities with Classified Segments  
-
-As we do not observe a clear connection between events and Riemann velocities, the link might lie in specific transitions between motion modes (e.g., Free Diffusion to Directed Migration). To investigate this further, we need to visualize all motion modes on the Riemann velocity plots.
-   
-
-```python
-def riemann_single_cell_classification(cell_number):
-    cell_index = cell_number - 1  
-
-
-    riemann_distances = []
-    time_data = []
-    type_data = defaultdict(list)  
-
-    with h5py.File('time_events_90.h5', 'r') as f:
-        track_i_data = f[f'/track_{cell_index+1}'][:]
-        first_three_rows = track_i_data[:3]
-        event_indices = first_three_rows[0, :].astype(int) - 1  
-        interval_types = first_three_rows[2, :]  # 
-
- 
-    time_data = [times[cell_index][idx] for idx in range(1, len(times[cell_index]))]  
-    riemann_distances = [
-        get_riemann_dist(cell_index, idx) / (get_times(cell_index, idx) - get_times(cell_index, idx - 1))
-        for idx in range(1, len(times[cell_index]))
-    ]
-
-    interval_colors = {
-        0: "brown",      
-        1: "blue",       
-        2: "cyan",       
-        3: "magenta",    
-        "unclassified": "black"  
-    }
-
-
-    fig, ax = plt.subplots(figsize=(8, 6))
-
-    for start_idx, interval_type in enumerate(interval_types):
-        start = event_indices[start_idx]
-        end = event_indices[start_idx + 1] if start_idx + 1 < len(event_indices) else len(time_data) - 1
-
-        if start < len(time_data) and end < len(time_data):
-            time_segment = time_data[start:end + 1]  
-            segment = riemann_distances[start:end + 1]
-
-            interval_type = int(interval_type) if not np.isnan(interval_type) else "unclassified"
-            color = interval_colors.get(interval_type, "black")
-
-            type_data[interval_type].extend(segment)
-
-            ax.plot(time_segment, segment, color=color)
-
-    from matplotlib.lines import Line2D
-    legend_elements = [
-        Line2D([0], [0], color="brown", lw=2, label="Immobile"),
-        Line2D([0], [0], color="blue", lw=2, label="Confined Diffusion"),
-        Line2D([0], [0], color="cyan", lw=2, label="Free Diffusion"),
-        Line2D([0], [0], color="magenta", lw=2, label="Directed Diffusion"),
-        Line2D([0], [0], color="black", lw=2, label="Unclassified")
-    ]
-    ax.legend(handles=legend_elements, loc="upper right", fontsize=8)
-
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Riemann velocity")
-    ax.set_title(f"Cell {cell_number}", fontsize=10)
-    ax.tick_params(axis='both', which='major', labelsize=8)
-
-    plt.tight_layout()
-    plt.savefig(f"riemann_single_cell_{cell_number}_classification_90.png")
-    plt.show()
-
-```
-
-
-::: {.columns}
-::: {.column width="50%"}
-![](img/riemann_single_cell_87_classification_90.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;">Confidence level 0.90.</p>
-:::
-::: {.column width="50%"}
-![](img/riemann_single_cell_87_classification_95.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;">Confidence level 0.95.</p>
-:::
-:::
-
 [Riemann velocities and classified segments  (0.9 confidence level)](files/riemann_with_classification_90.pdf)
 
 [Riemann velocities and classified segments (0.95 confidence level)](files/riemann_with_classification_95.pdf)
 
-Based on these results, we can formulate a hypothesis: Riemann velocity peaks emerge when the motion mode switches between Directed Diffusion and Confined/Free Diffusion modes. However, with the current data, we cannot confidently confirm this correlation. Nevertheless, some examples (e.g., cells №33, 36, 41, 57, etc.) suggest that this dependency could be a promising target for future exploration.
-
-We can visualize the spatial behaviour of a cell via the motion types as well. 
 
 
-```python
+We can visualize the spatial behaviour of a cell via the motion types as well (@fig-3d95, @fig-3d90). This could be helpful in the further research.
+
+
+```{python}
+#| eval: false
+#| output: false
 def plot_cell_by_motion_type(n):
 
     cell_dir = 'cells'
@@ -707,116 +658,468 @@ def plot_cell_by_motion_type(n):
     ax.set_title(f"Cell {n}")
     plt.show()
 ```
+
 ::: {.columns}
 ::: {.column width="50%"}
-![](img/cell87_3d_90.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;">Confidence level 0.90.</p>
+![Confidence level 0.95.](img/cell87_3d_95.png){#fig-3d95 fig-align="center" width="100%"}
 :::
 ::: {.column width="50%"}
-![](img/cell87_3d_95.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;">Confidence level 0.95.</p>
+![Confidence level 0.90.](img/cell87_3d_90.png){#fig-3d90 fig-align="center" width="100%"}
+:::
+:::
+
+### Free and Directed Diffusion: Riemann Velocities
+
+In this section, similar to (@sec-avvel, @sec-avang), we compute the mean values of Riemann Velocities associated with Free and Directed Diffusion modes.
+
+The figures (@fig-ttestrim95, @fig-ttestrim90) illustrate that during directed migration, cells exhibit fewer shape perturbations compared to free diffusion modes. This suggests that the cytoskeleton in cells undergoing directed migration is more stable than in cells in diffusive modes.
+
+```{python}
+#| eval: false
+#| output: false
+
+def average_riemann_distances_with_ttest():
+    type_data = defaultdict(list)
+
+    with h5py.File('time_events_90.h5', 'r') as f:
+        for plot_index in range(total_plots):
+            track_i_data = f[f'/track_{plot_index+1}'][:]
+            first_three_rows = track_i_data[:3]
+            event_indices = first_three_rows[0, :].astype(int) - 1
+            interval_types = first_three_rows[2, :]
+
+            for start_idx, interval_type in enumerate(interval_types):
+                if start_idx + 1 < len(event_indices) and interval_type in [2, 3]: 
+                    start = event_indices[start_idx] + 1  
+                    end = event_indices[start_idx + 1]
+                    segment = [
+                        get_riemann_dist(plot_index, idx) /
+                        (get_times(plot_index, idx) - get_times(plot_index, idx - 1))
+                        for idx in range(start, end + 1)
+                    ]
+                    type_data[int(interval_type)].extend(segment)
+
+    free_diffusion = type_data[2]
+    directed_diffusion = type_data[3]
+
+
+    t_stat, p_value = ttest_ind(free_diffusion, directed_diffusion, equal_var=False)
+
+    plt.figure(figsize=(8, 6))
+    types = ["Free Diffusion", "Directed Diffusion"]
+    colors = ["cyan", "magenta"]
+    means = []
+    conf_intervals = []
+
+    for key, distances in zip([2, 3], [free_diffusion, directed_diffusion]):
+        if distances:  
+            mean = np.mean(distances)
+            ci = sem(distances) * 1.96  
+            means.append(mean)
+            conf_intervals.append(ci)
+        else:
+            means.append(0)
+            conf_intervals.append(0)
+
+    x = np.arange(len(types))
+
+    for idx, (mean, ci, color) in enumerate(zip(means, conf_intervals, colors)):
+        plt.errorbar(x[idx], mean, yerr=ci, fmt='o', color=color, ecolor=color, elinewidth=2, capsize=5)
+
+    plt.text(0.5, max(means) + max(conf_intervals) * 1.2,
+             f"T-test p-value: {p_value:.3e}",
+             ha='center', fontsize=12, color='black')
+
+    plt.xticks(x, types)
+    plt.ylabel("Riemann Velocity")
+
+    plt.tight_layout()
+    plt.savefig("riemann_distances_with_ttest_90.png")
+    plt.show()
+```
+
+
+::: {.row}
+::: {.column width="49%"}
+![Confidence level 0.95.](img/riemann_distances_with_ttest_95.png){#fig-ttestrim95 fig-align="center" width="100%"}
+:::
+::: {.column width="49%"}
+![ Confidence level 0.90.](img/riemann_distances_with_ttest_90.png){#fig-ttestrim90 fig-align="center" width="100%"}
+:::
+:::
+
+Continuing this investigation, we can create scatter plots to visualize the relationships between Riemann velocities and angles, as well as between Riemann velocities and distances. These plots (@fig-scat95, @fig-scat90) illustrate that in the directed migration mode, the scatter of Riemann distances is more concentrated, showing less variability in the Directed Migration mode.
+
+
+```{python}
+#| eval: false
+#| output: false
+def plot_velocity_riemann_and_angle_riemann_for_two_modes():
+    type_data = defaultdict(lambda: {'velocity': [], 'riemann': [], 'angle': []})
+    colors = {2: "cyan", 3: "magenta"}
+    labels = {2: "Free Diffusion", 3: "Directed Diffusion"}
+    with h5py.File('time_events_95.h5', 'r') as f:
+        for plot_index in range(total_plots):
+            track_i_data = f[f'/track_{plot_index+1}'][:]
+            first_three_rows = track_i_data[:3]
+            event_indices = first_three_rows[0, :].astype(int) - 1
+            interval_types = first_three_rows[2, :]
+
+            for start_idx, interval_type in enumerate(interval_types):
+                if start_idx + 1 < len(event_indices) and interval_type in [2, 3]: 
+                    start = event_indices[start_idx] + 1
+                    end = event_indices[start_idx + 1]
+                    type_key = int(interval_type)
+
+                    for idx in range(start, end + 1):
+                        velocity = get_abs_velocity(plot_index, idx)
+                        riemann_distance = get_riemann_dist(plot_index, idx) / (get_times(plot_index, idx) - get_times(plot_index, idx - 1))
+                        angle = get_velocity_angle_rel(plot_index, idx)
+
+                        type_data[type_key]['velocity'].append(velocity)
+                        type_data[type_key]['riemann'].append(riemann_distance)
+                        type_data[type_key]['angle'].append(angle)
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    for mode in [2, 3]:  
+        plt.scatter(
+            type_data[mode]['velocity'],
+            type_data[mode]['riemann'],
+            color=colors[mode],
+            label=labels[mode],
+            alpha=0.7
+        )
+    plt.xlabel("Velocity")
+    plt.ylabel("Riemann Distance")
+    plt.title("Velocity vs Riemann Distance")
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    for mode in [2, 3]: 
+        plt.scatter(
+            type_data[mode]['angle'],
+            type_data[mode]['riemann'],
+            color=colors[mode],
+            label=labels[mode],
+            alpha=0.7
+        )
+    plt.xlabel("Angle")
+    plt.ylabel("Riemann Distance")
+    plt.title("Angle vs Riemann Distance")
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig("scatter_two_95.png")
+    plt.show()
+```
+
+::: {.row}
+::: {.column width="49%"}
+![Confidence level 0.95.](img/scatter_two_95.png){#fig-scat95 fig-align="center" width="100%"}
+:::
+::: {.column width="49%"}
+![Confidence level 0.95.](img/scatter_two_90.png){#fig-scat90 fig-align="center" width="100%"}
 :::
 :::
 
 
 # Conformal mapping
 
-Conformal mapping is a powerful tool for visualizing and comparing shapes and surfaces (@Zhou2023.04.12.536640). As a cell migrates and its protrusions grow, this framework allows us to identify specific protrusion growth events and their corresponding time points. Clement Soubrier prepared the framework for analyzing the current dataset.
 
 
-::: {.columns}
-::: {.column width="100%"}
-![](img/combined_cell_87.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;"> Cell analysis using conformal mapping tool </p>
-:::
-:::
+The conformal mapping is a mathematical transformation that preserves local angles and shapes while potentially altering the size. In this study, we apply conformal maps based on the minimization of area distortion to transform the cell shape into a disk. This transformation allows us to observe protrusions locally, relative to a reference shape obtained after applying the conformal map. The algorithm, as described and implemented in prior works [@Hu_Zou_Hua_2014].
 
-In this analysis, we focus on observing shape dynamics at key time events, exploring protrusions for characteristic behaviors.  
+The example of topographical representation of a cell can be seen below {@fig-com87}: 
 
 ::: {.columns}
 ::: {.column width="100%"}
-![](img/combined_cell_87_1.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;"> t = 51 </p>
+![Cell Shape and Conformal Topographical Representation Over Time.](img/combined_cell_87.png){#fig-com87 fig-align="center" width="100%"}
 :::
 :::
 
-From this topological representation of the cell, we observe that when the cell transitions from directed migration to a free/confined diffusion mode, a new noticeable protrusion is formed, and the entire structure of the cell membrane undergoes a significant change.
+As discussed in the project proposal, during cell migration, the cytoskeleton undergoes changes that lead to the formation of protrusions on the cell membrane. These protrusions can be detected in two ways:
 
+1. **Curvature Analysis**: By computing the curvature of the cell shape and identifying its local extrema, which indicate significant deformations of cell shape.
 
-::: {.columns}
-::: {.column width="100%"}
-![](img/combined_cell_87_2.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;"> t = 85 </p>
-:::
-:::
+2. **Conformal Mapping Analysis**: By calculating the difference between the topological cell representation obtained after applying conformal mapping and identifying local maxima, which reveal the locations of protrusions.
 
-At this stage, the cell increases its volume almost uniformly across the entire membrane curve.
+Clement Soubrier adjusted the **unwrap2D** framework [@Zhou2023.04.12.536640] for our specific problem and developed the code to accumulate protrusion statistics using both methods. The results are presented below.
 
 ::: {.columns}
-::: {.column width="100%"}
-![](img/combined_cell_87_3.png){fig-align="center" width="100%"}
-<p style="text-align: center; font-size: 0.9em;"> t = 230 </p>
+::: {.column width="50%"}
+![Curvature defined protrusion map](img/curv_conformal.png){#fig-confcurv  fig-align="center" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Topologically defined protrusion map](img/conf_topology.png){#fig-conftop fig-align="center" width="100%"}
 :::
 :::
 
-Topological analysis reveals how the cell transforms two protrusions into a single one while decreasing its volume.
+@fig-confcurv and @fig-conftop demonstrate pie charts showing the difference between the protrusion direction and the direction of cell migration. These figures reveal that protrusions emerge at the front and rear of the cell, a behavior consistently observed in many experiments [@SenGupta_Parent_Bear_2021]. @fig-confcurv additionally highlights that the protrusion region at the front of the cell is broader than at the rear, which may be associated with the formation of lamellipodia.
 
-# Statistical research
+This section demonstrated how conformal mapping can be used to investigate cell shape dynamics. However, the analysis conducted here is not limited to the whole dataset examples. Future research could focus on more detailed single-cell analyses, exploring the interplay between protrusion dynamics and cell migration.
 
-We also conducted statistical research to measure the values of key parameters across different motion types.
-
-### Parameter statistical research for 0.9 confidence level of trajectory classification.
-
-::: {.columns}
-::: {.column width="33%"}
-![](img/mean_riemann_distances_09.png){fig-align="center" width="100%"}
-:::
-::: {.column width="33%"}
-![](img/mean_velocity_09.png){fig-align="center" width="100%"}
-:::
-::: {.column width="33%"}
-![](img/mean_angle_09.png){fig-align="center" width="100%"}
-:::
-:::
-
-### Parameter statistical research for 0.95 confidence level of trajectory classification.
-
-::: {.columns}
-::: {.column width="33%"}
-![](img/mean_riemann_distances_095.png){fig-align="center" width="100%"}
-:::
-::: {.column width="33%"}
-![](img/mean_velocity_095.png){fig-align="center" width="100%"}
-:::
-::: {.column width="33%"}
-![](img/mean_angle_095.png){fig-align="center" width="100%"}
-:::
-:::
-
-Both confidence level results demonstrate that cell migration modes can be characterized by the average values of these parameters. However, p-value tests indicate that additional data is required to fully support our theory.
+Additional examples of conformal mapping application to single cell analysis are provided in (@sec-someconf).
 
 # Conclusion
 
-In this work, we analyzed cell movement and shape dynamics parameters, characterizing migration based on these factors. We investigated absolute velocity, directional angle of motion, and the behavior of cell trajectories over time. Cell migration modes were distinguished using a segmentation classification framework, which identified transitions between motility regimes.
+In this project, we conducted an analysis of cell migration and shape dynamics processes. We examined cell trajectories over time, identifying migration modes and transitions between motility regimes using a segmentation and classification framework.
 
-While we observed that Riemann velocities coincided with certain motion switch events, we found no consistent global correlation linking Riemann velocity behavior to these transitions. This lack of correlation may be due to errors in cell segmentation. To address this, we propose repeating the experiment with a resegmented dataset to improve accuracy.
+While we observed that Riemann velocities coincided with certain motion switch events, no consistent global correlation was found between Riemann velocity behavior and these transitions. This lack of correlation might be attributed to errors in cell segmentation. Repeating the experiment with a resegmented dataset might enhance accuracy.
 
-Nevertheless, we gained specific insights, such as peaks in Riemann velocity being associated with certain transitions and statistical correlations between Riemann velocity values and motion types. However, due to limited data, we cannot make definitive conclusions.
+Despite this, the accumulated statistical data of Riemann velocities highlights that cell shape variations depend significantly on the migration modes observed. Cell spatial velocities and directional angles also varied during transitions between migration modes.
 
-We also completed a conformal mapping analysis of a single cell (№87), where we observed protrusion formation at specific time points. It would be valuable to extend this research to other cells to identify similar behaviors, such as the formation of multiple large protrusions or uniform cell growth.
+Conformal mapping, a promising tool applied in this study, reaffirmed classical experimental results on direction of protrusion growth. However, at this stage, we have only minimally explored the use of conformal mapping for investigating specific artifacts of cell migration. In future, it would be valuable to focus on single-cell analysis identifying similar patterns of cell behavior, such as the formation of multiple large protrusions or uniform cell growth. Quantifying the protrusion analysis(counting them, locating, measuring size etc) would be promising as well.
+
+Besides, our research opens the door for combining Riemann velocities analysis with conformal mapping tools. One may detect the protrusion events observed due to conformal mapping and align it with Riemann dynamics. 
 
 Thus, based on these conclusions, the following future plans are proposed: 
 
 # Future plans
 
-1. Increase the dataset to observe more characteristic switches from mode to mode and account for more data in statistical research.
-2. Improve segmentation.
-3. Analyze protrusion dynamics of multiple cells via conformal mapping.
-4. Look for protrusion behavior patterns (cooperative protrusion interplay during the characteristic events).
-5. Add the superdiffusion mode to the classifier.
-6. Compare the Riemann Velocity dynamics with conformal mapping method results on less motile cells.
+1. **Dataset expansion**: increase the dataset size to observe more characteristic transitions between migration modes and obtain more data for the statistical analysis.
 
-## References
+2. **Resegmentation**: test the existing methods on a resegmented dataset.
+
+3. **Improve single cell conformal analysis**: looking for consistent cooperative protrusion patterns appear at different event, potentially protrusions distribution.
+
+4. **Quantifying the protrusion**: develop mathematical tools to describe properties of protrusive behavior, including size, quantity, and shape of individual protrusions.
+
+5. **Testing another classifier**: since the classifier we employ doesn't take the superdiffusion mode into consideration, it might be useful to take another one. For example, DL-MSS might help [@Arts_Smal_Paul_Wyman_Meijering_2019] .
+
+6. **Combine Riemann Velocity and Conformal Mapping tools**: align Riemann velocity dynamics with protrusion patterns identified using conformal mapping. Moreover, looking at less motile cells may simplify the observation of protrusions.
+
+
+# Appendix
+
+### Dataset organization {#sec-organization}
+
+To simplify the analysis, centroid and time data were organized into arrays.
+
+```{python}
+#| eval: false
+#| output: false
+for cell_i in range(1,204):
+    number_of_frames = sum(os.path.isdir(os.path.join(f"cells/cell_{cell_i}", entry)) for entry in os.listdir(f"cells/cell_{cell_i}"))  
+
+    iter_distance = np.zeros(number_of_frames)
+    iter_time = np.zeros(number_of_frames)
+    iter_centroid = np.array([np.random.rand(2) for _ in range(number_of_frames)])
+    for i in range(number_of_frames):
+        iter_time[i] = np.load(f'cells/cell_{cell_i}/frame_{i+1}/time.npy')
+        iter_centroid[i] = np.load(f'cells/cell_{cell_i}/frame_{i+1}/centroid.npy')
+    riemann_distances.append(iter_distance)
+    times.append(iter_time)
+    centroids.append(iter_centroid)
+data_path = ########
+with open(data_path+"/times.npy", 'wb') as f:
+    np.save(f, np.array(times, dtype=object))
+with open(data_path+"/centroid.npy", 'wb') as f:
+    np.save(f, np.array(centroids, dtype=object))
+```
+
+### DC-MSS data preparation {#sec-dcmssprep}
+
+```{python}
+#| eval: false
+#| output: false
+import numpy as np
+from scipy.io import savemat
+                                                                            
+tracks = {}
+for i, trajectory in enumerate(data):
+    n_frames = trajectory.shape[0]
+    row = np.zeros(n_frames * 8)  
+    for j, (x, y) in enumerate(trajectory):
+        start_idx = j * 8  
+        row[start_idx] = x 
+        row[start_idx + 1] = y  
+
+    tracks[f"track_{i+1}"] = row  
+
+output_path = "trajectory_data.mat"
+savemat(output_path, {'tracks': tracks})
+```
+
+This piece of code converts trajectory data into a .mat file, compatible with MATLAB.
+
+### Alignment {#sec-align}
+
+The alignment function (kindly provided by Wanxin Li) ensures proper alignment of cell shapes:
+
+```{python}
+#| eval: false
+#| output: false
+def align(point, base_point, rescale, rotation, reparameterization, k_sampling_points): #rotation set as False
+    """
+    Align point and base_point via quotienting out translation, rescaling, rotation and reparameterization
+    """
+
+    total_space = DiscreteCurvesStartingAtOrigin(k_sampling_points=k_sampling_points)
+   
+    
+    # Quotient out translation 
+    point = total_space.projection(point) 
+    point = point - gs.mean(point, axis=0)
+
+    base_point = total_space.projection(base_point)
+    base_point = base_point - gs.mean(base_point, axis=0)
+
+    # Quotient out rescaling
+    if rescale:
+        point = total_space.normalize(point) 
+        base_point = total_space.normalize(base_point)
+    
+    # Quotient out rotation
+    if rotation:
+        point = rotation_align(point, base_point, k_sampling_points)
+
+    # Quotient out reparameterization
+    if reparameterization:
+        aligner = DynamicProgrammingAligner(total_space)
+        total_space.fiber_bundle = ReparametrizationBundle(total_space, aligner=aligner)
+        point = total_space.fiber_bundle.align(point, base_point)
+    return point
+
+```
+
+### Plotting Riemann Velocities of time {#sec-riemann_simple}
+
+```{python}
+#| eval: false
+#| output: false
+def plot_riemann_cell(plot_index):
+    riemann_distances = []
+    time_data = []
+    
+    num_frames = len(centr[plot_index-1])
+    
+    for frame in range(1, num_frames):
+
+        dist_value = get_riemann_dist(plot_index-1, frame) / (get_times(plot_index-1, frame) - get_times(plot_index-1, frame - 1))
+        riemann_distances.append(dist_value)
+        time_data.append(get_times(plot_index-1, frame))
+
+    plt.figure(figsize=(8,6))
+    plt.plot(time_data, riemann_distances, marker='o', linestyle='-')
+    plt.xlabel("Time")
+    plt.ylabel("Riemann Velocities")
+    plt.title(f"Cell {plot_index}")
+    plt.grid(True)
+    plt.show()
+```
+![Riemann Velocities graph for cell №87](img/r.png){ width=65% style="display: block; margin-left: auto; margin-right: auto;" }
+
+### Plotting Riemann Distances with segmentation {#sec-riemann_segmentation}
+
+```{python}
+#| eval: false
+#| output: false
+def riemann_single_cell_classification(cell_number):
+    cell_index = cell_number - 1  
+
+
+    riemann_distances = []
+    time_data = []
+    type_data = defaultdict(list)  
+
+    with h5py.File('time_events_90.h5', 'r') as f:
+        track_i_data = f[f'/track_{cell_index+1}'][:]
+        first_three_rows = track_i_data[:3]
+        event_indices = first_three_rows[0, :].astype(int) - 1  
+        interval_types = first_three_rows[2, :]  # 
+
+ 
+    time_data = [times[cell_index][idx] for idx in range(1, len(times[cell_index]))]  
+    riemann_distances = [
+        get_riemann_dist(cell_index, idx) / (get_times(cell_index, idx) - get_times(cell_index, idx - 1))
+        for idx in range(1, len(times[cell_index]))
+    ]
+
+    interval_colors = {
+        0: "brown",      
+        1: "blue",       
+        2: "cyan",       
+        3: "magenta",    
+        "unclassified": "black"  
+    }
+
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    for start_idx, interval_type in enumerate(interval_types):
+        start = event_indices[start_idx]
+        end = event_indices[start_idx + 1] if start_idx + 1 < len(event_indices) else len(time_data) - 1
+
+        if start < len(time_data) and end < len(time_data):
+            time_segment = time_data[start:end + 1]  
+            segment = riemann_distances[start:end + 1]
+
+            interval_type = int(interval_type) if not np.isnan(interval_type) else "unclassified"
+            color = interval_colors.get(interval_type, "black")
+
+            type_data[interval_type].extend(segment)
+
+            ax.plot(time_segment, segment, color=color)
+
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], color="brown", lw=2, label="Immobile"),
+        Line2D([0], [0], color="blue", lw=2, label="Confined Diffusion"),
+        Line2D([0], [0], color="cyan", lw=2, label="Free Diffusion"),
+        Line2D([0], [0], color="magenta", lw=2, label="Directed Diffusion"),
+        Line2D([0], [0], color="black", lw=2, label="Unclassified")
+    ]
+    ax.legend(handles=legend_elements, loc="upper right", fontsize=8)
+
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Riemann velocity")
+    ax.set_title(f"Cell {cell_number}", fontsize=10)
+    ax.tick_params(axis='both', which='major', labelsize=8)
+
+    plt.tight_layout()
+    plt.savefig(f"riemann_single_cell_{cell_number}_classification_90.png")
+    plt.show()
+
+```
+
+### Additional examples: cell №87 topographical representations over migration modes transitions {#sec-someconf}
+
+
+This section doesn't include any sufficient results to report in the blog, but there we tried to collect some evidence of a single cell shape artifacts which emerge during migration modes transitions.
+
+::: {.columns}
+::: {.column width="100%"}
+![t = 51](img/combined_cell_87_1.png){#fig-app1 fig-align="center" width="100%"}
+:::
+:::
+
+From the @fig-app1, we observe that when the cell transitions from directed migration to a free or confined diffusion mode, a new noticeable protrusion is formed, and the overall structure of the cell membrane undergoes significant multilateral changes.
+
+
+::: {.columns}
+::: {.column width="100%"}
+![t = 85](img/combined_cell_87_2.png){#fig-app2 fig-align="center" width="100%"}
+:::
+:::
+
+@fig-app2 shows how the cell increases its volume almost uniformly across the entire membrane curve.
+
+::: {.columns}
+::: {.column width="100%"}
+![t = 230](img/combined_cell_87_3.png){#fig-app3 fig-align="center" width="100%"}
+:::
+:::
+
+Topological analysis @fig-app3 reveals how the cell transforms two protrusions into a single one while decreasing its volume.
+
+
+Since these conclusions are superficial and far-fetched, the farther exploration of single-cell topological representations might lead to a significant advance of this research. 
+
+
+# References
 
 ::: {#refs}
 :::

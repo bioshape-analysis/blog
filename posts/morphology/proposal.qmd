@@ -26,7 +26,6 @@ Cell morphology is an emerging field of biological research that examines the sh
 
 In this work, we will explore aspects of cell motility by analyzing the changing shapes of migrating cells. As a cell moves through space, it reorganizes its membrane, cytosol, and cytoskeletal structures [@Mogilner_Oster_1996]. For example, past experimental studies show that actin polymerization causes protrusions at the leading edge of a cell, forming specific structures known as lamellipodia and filopodia [@Lauffenburger_Horwitz_1996], while cells elongate along the direction they move[@SenGupta_Parent_Bear_2021]. 
 
-
 ## Goals
 Our goal is to perform a differential geometry analysis of cellular shape curves to explore the correlation between shape differences and spatial displacement. Using the Riemann Elastic Metric[@10.1007/978-3-031-38299-4_60]:
 

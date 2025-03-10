@@ -1,5 +1,5 @@
 ---
-title: "Biological shape analysis (under construction)"
+title: "Biological shape analysis"
 subtitle: "Material and Methods for MATH 612D 2025 W1 (UBC)" 
 listing:
   contents: posts
